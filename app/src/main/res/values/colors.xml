@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="accent_primary">#FF00E676</color> <color name="accent_secondary">#FF00C853</color>
-    <color name="bg_primary">#FF121212</color> <color name="bg_surface">#FF1E1E1E</color>
-    <color name="text_primary">#FFFFFFFF</color> <color name="text_secondary">#FFB0B0B0</color>
+    <color name="accent_primary">#FF00E676</color>
+    <color name="accent_secondary">#FF00C853</color>
+    <color name="accent_warning">#FFFFAB00</color>
+    <color name="bg_primary">#FF121212</color>
+    <color name="bg_surface">#FF1E1E1E</color>
+    <color name="bg_elevated">#FF2C2C2C</color>
+    <color name="bg_divider">#FF333333</color>
+    <color name="bg_thumbnail">#FF000000</color>
+    <color name="text_primary">#FFFFFFFF</color>
+    <color name="text_secondary">#FFB0B0B0</color>
     <color name="text_hint">#FF757575</color>
 </resources>
