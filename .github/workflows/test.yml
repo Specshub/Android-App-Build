@@ -1,8 +1,0 @@
-name: Test-Actions-Check
-on: [push]
-jobs:
-  check-system:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Hello from GitHub Actions
-        run: echo "The system is working perfectly!"
