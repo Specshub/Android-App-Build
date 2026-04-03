@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/layout/custom_player_controls.xml -->
+<!-- Custom ExoPlayer controller: minimal dark controls at the bottom -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:orientation="vertical"
+    android:background="@drawable/gradient_bottom_overlay"
+    android:paddingBottom="16dp">
+
+    <!-- Seek Bar -->
+    <androidx.media3.ui.DefaultTimeBar
+        android:id="@id/exo_progress"
+        android:layout_width="match_parent"
+        android:layout_height="26dp"
+        android:paddingHorizontal="16dp"
+        android:layout_marginBottom="4dp"/>
+
+    <!-- Controls Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp">
+
+        <!-- Rewind 10s -->
+        <ImageButton
+            android:id="@id/exo_rew"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_replay_10"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:tint="@android:color/white"
+            android:contentDescription="Rewind 10 seconds"/>
+
+        <!-- Play / Pause -->
+        <ImageButton
+            android:id="@id/exo_play_pause"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:tint="@android:color/white"
+            android:contentDescription="Play / Pause"/>
+
+        <!-- Forward 10s -->
+        <ImageButton
+            android:id="@id/exo_ffwd"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_forward_10"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:tint="@android:color/white"
+            android:contentDescription="Forward 10 seconds"/>
+
+        <!-- Time display -->
+        <TextView
+            android:id="@id/exo_position"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:fontFamily="monospace"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" / "
+            android:textColor="#99ffffff"
+            android:textSize="12sp"/>
+
+        <TextView
+            android:id="@id/exo_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#99ffffff"
+            android:textSize="12sp"
+            android:fontFamily="monospace"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"/>
+
+        <!-- Fullscreen toggle (handled by system via orientation) -->
+        <ImageButton
+            android:id="@id/exo_fullscreen"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_fullscreen"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:tint="@android:color/white"
+            android:contentDescription="Toggle fullscreen"/>
+
+    </LinearLayout>
+
+</LinearLayout>
