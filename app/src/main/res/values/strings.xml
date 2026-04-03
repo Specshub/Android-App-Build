@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/values/strings.xml -->
+<resources>
+    <string name="app_name">IPTV Player</string>
+
+    <string name="disclaimer_text">
+        IMPORTANT LEGAL DISCLAIMER\n\n
+        This application (\"IPTV Player\") is a generic media player designed to play
+        streaming content via the Xtream Codes API protocol.\n\n
+        THIS APP DOES NOT:\n
+        • Host, store, or distribute any media content\n
+        • Provide, sell, or pre-configure any IPTV subscriptions\n
+        • Endorse or encourage the use of unauthorized streaming services\n
+        • Contain any links to copyrighted or illegal content\n\n
+        USER RESPONSIBILITY:\n
+        You are solely responsible for ensuring that any content you access through
+        this application is legally licensed and that you have the right to access
+        such content in your jurisdiction.\n\n
+        The developers of this application are not liable for any misuse of the
+        application or violation of any applicable laws by end users. Use of this
+        application to access copyrighted content without authorization is strictly
+        prohibited and may be illegal.\n\n
+        By using this application, you agree that you will only use it with content
+        you are legally permitted to access.
+    </string>
+</resources>
