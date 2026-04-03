@@ -13,10 +13,12 @@
         <item name="android:statusBarColor">@color/bg_surface</item>
         <item name="android:navigationBarColor">@color/bg_primary</item>
         <item name="android:windowBackground">@color/bg_primary</item>
-        <item name="textColorPrimary">@color/text_primary</item>
-        <item name="textColorSecondary">@color/text_secondary</item>
-        <item name="editTextColor">@color/text_primary</item>
+        
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:editTextColor">@color/text_primary</item>
         <item name="android:textColorHint">@color/text_hint</item>
+        
         <item name="materialAlertDialogTheme">@style/DarkAlertDialog</item>
     </style>
 
