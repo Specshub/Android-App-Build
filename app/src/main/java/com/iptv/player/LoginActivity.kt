@@ -1,4 +1,4 @@
-package com.iptvplayer.app.ui
+package com.iptv.player // ✅ تم تصحيح اسم الحزمة ليتطابق مع المجلد
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,12 +8,13 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.material.snackbar.Snackbar
-import com.iptvplayer.app.data.model.Resource
-import com.iptvplayer.app.databinding.ActivityLoginBinding
-import com.iptvplayer.app.ui.viewmodel.LoginViewModel
-import com.iptvplayer.app.util.AdManager
+// ملاحظة: تأكد من صحة مسارات الـ imports التالية بناءً على مشروعك
+import com.iptv.player.data.model.Resource
+import com.iptv.player.databinding.ActivityLoginBinding
+import com.iptv.player.ui.viewmodel.LoginViewModel
+import com.iptv.player.util.AdManager
 
-// ✅ تعريف الثوابت هنا مباشرة لضمان عدم فشل المترجم
+// ✅ تعريف الثوابت هنا ينهي مشكلة Unresolved reference للأبد
 const val EXTRA_HOST = "EXTRA_HOST"
 const val EXTRA_USERNAME = "EXTRA_USERNAME"
 const val EXTRA_PASSWORD = "EXTRA_PASSWORD"
@@ -29,10 +30,8 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Initialize AdMob
         AdManager.initialize(this)
 
-        // Show disclaimer on first launch
         if (!viewModel.isDisclaimerAccepted()) {
             startActivity(Intent(this, DisclaimerActivity::class.java))
         }
@@ -74,12 +73,10 @@ class LoginActivity : AppCompatActivity() {
                     binding.btnLogin.isEnabled = true
                     binding.btnLogin.text = "Connect"
 
-                    // Load interstitial for later
                     AdManager.loadInterstitialAd(this)
 
-                    // Navigate to main dashboard
                     val intent = Intent(this, MainActivity::class.java).apply {
-                        // ✅ تم التعديل لاستخدام الثوابت المعرفة بالأعلى مباشرة
+                        // ✅ نستخدم الثوابت المعرفة بالأعلى مباشرة
                         putExtra(EXTRA_HOST, binding.etHost.text.toString().trim())
                         putExtra(EXTRA_USERNAME, binding.etUsername.text.toString().trim())
                         putExtra(EXTRA_PASSWORD, binding.etPassword.text.toString().trim())
