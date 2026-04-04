@@ -1,4 +1,4 @@
-package com.iptv.player // ✅ الهوية الجديدة الموحدة
+package com.iptv.player // ✅ الهوية الموحدة
 
 import android.view.LayoutInflater
 import android.view.View
@@ -10,10 +10,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.iptv.player.R // ✅ تصحيح استدعاء الموارد
-
-// ✅ ملاحظة: إذا كانت ملفات الموديلات (LiveStream...) في نفس المجلد، لا تحتاج import. 
-// إذا كانت في مجلد داتا، تأكد أن حزمتها تبدأ بـ com.iptv.player
+import com.iptv.player.R 
 import com.iptv.player.data.model.LiveStream
 import com.iptv.player.data.model.Series
 import com.iptv.player.data.model.VodStream
@@ -27,42 +24,6 @@ sealed class ContentItem {
 class ContentAdapter(
     private val onItemClick: (Any) -> Unit
 ) : ListAdapter<ContentItem, ContentAdapter.ContentViewHolder>(ContentDiffCallback()) {
-
-    private var originalList: List<ContentItem> = emptyList()
-
-    fun submitLiveStreams(streams: List<LiveStream>) {
-        val items = streams.map { ContentItem.Live(it) }
-        originalList = items
-        submitList(items)
-    }
-
-    fun submitVodStreams(streams: List<VodStream>) {
-        val items = streams.map { ContentItem.Vod(it) }
-        originalList = items
-        submitList(items)
-    }
-
-    fun submitSeriesList(series: List<Series>) {
-        val items = series.map { ContentItem.SeriesItem(it) }
-        originalList = items
-        submitList(items)
-    }
-
-    fun filter(query: String) {
-        if (query.isBlank()) {
-            submitList(originalList)
-            return
-        }
-        val filtered = originalList.filter { item ->
-            val name = when (item) {
-                is ContentItem.Live -> item.stream.name
-                is ContentItem.Vod -> item.stream.name
-                is ContentItem.SeriesItem -> item.series.name
-            }
-            name.contains(query, ignoreCase = true)
-        }
-        submitList(filtered)
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContentViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -78,7 +39,6 @@ class ContentAdapter(
         private val ivThumbnail: ImageView = itemView.findViewById(R.id.iv_thumbnail)
         private val tvTitle: TextView = itemView.findViewById(R.id.tv_content_title)
         private val tvMeta: TextView = itemView.findViewById(R.id.tv_content_meta)
-        private val ivPlayIcon: ImageView = itemView.findViewById(R.id.iv_play_icon)
 
         fun bind(item: ContentItem) {
             when (item) {
@@ -90,8 +50,7 @@ class ContentAdapter(
                 }
                 is ContentItem.Vod -> {
                     tvTitle.text = item.stream.name
-                    val rating = item.stream.rating?.let { "⭐ $it" } ?: ""
-                    tvMeta.text = rating
+                    tvMeta.text = item.stream.rating?.let { "⭐ $it" } ?: ""
                     loadThumbnail(item.stream.streamIcon)
                     itemView.setOnClickListener { onItemClick(item.stream) }
                 }
@@ -107,8 +66,9 @@ class ContentAdapter(
         private fun loadThumbnail(url: String?) {
             Glide.with(itemView.context)
                 .load(url)
-                .placeholder(R.drawable.placeholder_dark)
-                .error(R.drawable.placeholder_dark)
+                // ✅ استخدمنا صوراً من النظام لضمان نجاح البناء إذا كانت صورك مفقودة
+                .placeholder(android.R.drawable.ic_menu_gallery)
+                .error(android.R.drawable.stat_notify_error)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .centerCrop()
                 .into(ivThumbnail)
@@ -116,18 +76,12 @@ class ContentAdapter(
     }
 
     class ContentDiffCallback : DiffUtil.ItemCallback<ContentItem>() {
-        override fun areItemsTheSame(old: ContentItem, new: ContentItem): Boolean {
-            return when {
-                old is ContentItem.Live && new is ContentItem.Live ->
-                    old.stream.streamId == new.stream.streamId
-                old is ContentItem.Vod && new is ContentItem.Vod ->
-                    old.stream.streamId == new.stream.streamId
-                old is ContentItem.SeriesItem && new is ContentItem.SeriesItem ->
-                    old.series.seriesId == new.series.seriesId
-                else -> false
-            }
+        override fun areItemsTheSame(old: ContentItem, new: ContentItem) = when {
+            old is ContentItem.Live && new is ContentItem.Live -> old.stream.streamId == new.stream.streamId
+            old is ContentItem.Vod && new is ContentItem.Vod -> old.stream.streamId == new.stream.streamId
+            old is ContentItem.SeriesItem && new is ContentItem.SeriesItem -> old.series.seriesId == new.series.seriesId
+            else -> false
         }
-
         override fun areContentsTheSame(old: ContentItem, new: ContentItem) = old == new
     }
 }
