@@ -28,13 +28,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:src="@drawable/bg_category_gradient" />
+                android:src="@android:drawable/ic_menu_gallery" />
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="80dp"
                 android:layout_gravity="bottom"
-                android:background="@layout/gradient_overlay" />
+                android:background="@drawable/gradient_overlay" />
         </FrameLayout>
 
         <TextView
@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:textColor="#FFFFFF"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:textStyle="bold"
             android:maxLines="2"
             android:ellipsize="end"
