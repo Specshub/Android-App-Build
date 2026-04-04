@@ -25,21 +25,17 @@ class ContentAdapter(
     private val onItemClick: (ContentItem) -> Unit 
 ) : ListAdapter<ContentItem, ContentAdapter.ContentViewHolder>(ContentDiffCallback()) {
 
-    // 🔍 القائمة الكاملة التي سنستخدمها كمرجع عند البحث لكي لا نفقد البيانات الأصلية
     private var fullList: List<ContentItem> = listOf()
-
     var onItemLongClick: ((ContentItem) -> Boolean)? = null
 
-    // ✅ دالة جديدة لتحديث البيانات وحفظ نسخة منها للبحث
     fun setAllItems(list: List<ContentItem>) {
         fullList = list
         submitList(list)
     }
 
-    // ✅ دالة البحث السحرية: تقوم بتصفية القائمة بناءً على النص المكتوب
     fun filter(query: String) {
         val filteredList = if (query.isEmpty()) {
-            fullList // إذا كان البحث فارغاً، نعرض كل شيء
+            fullList
         } else {
             fullList.filter { item ->
                 when (item) {
@@ -54,8 +50,9 @@ class ContentAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContentViewHolder {
+        // ✅ التصحيح النهائي هنا
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.id.item_content_card, parent, false) // تأكد من وجود تخطيط الكارد
+            .inflate(R.layout.item_content_card, parent, false)
         return ContentViewHolder(view)
     }
 
