@@ -1,7 +1,6 @@
-// com/iptvplayer/app/data/api/XtreamApiService.kt
-package com.iptvplayer.app.data.api
+package com.iptv.player.data.api // ✅ الهوية الجديدة الموحدة
 
-import com.iptvplayer.app.data.model.*
+import com.iptv.player.data.model.* // ✅ استيراد الموديلات من المسار الجديد
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
