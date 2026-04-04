@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView // ✅ استيراد ضروري
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
@@ -20,7 +21,6 @@ class LiveTvFragment : Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var contentAdapter: ContentAdapter
 
-    // 🚩 متغير لمتابعة الحالة: هل نحن نعرض قنوات أم باقات؟
     var isShowingStreams = false
 
     override fun onCreateView(
@@ -36,25 +36,23 @@ class LiveTvFragment : Fragment() {
         
         binding.recyclerView.layoutManager = GridLayoutManager(context, 3)
 
-        // ─── 1. الضغطة العادية (الدخول للباقة أو تشغيل القناة) ───
+        // ─── إعداد المحول (Adapter) ───
         contentAdapter = ContentAdapter { clickedItem ->
             when (clickedItem) {
                 is ContentItem.Category -> {
-                    isShowingStreams = true // ⬅️ تحديث الحالة: دخلنا إلى باقة
+                    isShowingStreams = true
                     Toast.makeText(context, "جاري جلب القنوات...", Toast.LENGTH_SHORT).show()
                     viewModel.loadLiveStreams(clickedItem.id)
                 }
                 is ContentItem.Live -> {
-                    // ─── ✅ هنا نصنع سحر التشغيل ───
                     val host = activity?.intent?.getStringExtra(EXTRA_HOST) ?: ""
                     val username = activity?.intent?.getStringExtra(EXTRA_USERNAME) ?: ""
                     val password = activity?.intent?.getStringExtra(EXTRA_PASSWORD) ?: ""
 
-                    // تركيب الرابط الخاص بسيرفرات Xtream
                     val baseUrl = if (host.startsWith("http")) host else "http://$host"
-                    val streamUrl = "$baseUrl/$username/$password/${clickedItem.stream.streamId}"
+                    // أضفنا .ts لضمان تشغيل القناة كما في الخطوة السابقة
+                    val streamUrl = "$baseUrl/$username/$password/${clickedItem.stream.streamId}.ts"
 
-                    // إرسال الرابط لشاشة المشغل
                     val intent = Intent(requireContext(), PlayerActivity::class.java).apply {
                         putExtra(PlayerActivity.EXTRA_STREAM_TITLE, clickedItem.stream.name)
                         putExtra(PlayerActivity.EXTRA_STREAM_URL, streamUrl)
@@ -65,7 +63,6 @@ class LiveTvFragment : Fragment() {
             }
         }
 
-        // ─── 2. ✅ الضغطة المطولة (إضافة أو إزالة من المفضلة بذكاء) ───
         contentAdapter.onItemLongClick = { item ->
             if (item is ContentItem.Live) {
                 val currentFavs = FavoritesManager.getFavorites(requireContext())
@@ -73,44 +70,53 @@ class LiveTvFragment : Fragment() {
 
                 if (isAlreadyFav) {
                     FavoritesManager.removeFavorite(requireContext(), item.stream)
-                    Toast.makeText(context, "🗑️ تم إزالة ${item.stream.name} من المفضلة", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "🗑️ تم إزالة ${item.stream.name}", Toast.LENGTH_SHORT).show()
                 } else {
                     FavoritesManager.addFavorite(requireContext(), item.stream)
-                    Toast.makeText(context, "🌟 تم إضافة ${item.stream.name} للمفضلة", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "🌟 تم إضافة ${item.stream.name}", Toast.LENGTH_SHORT).show()
                 }
                 true
-            } else {
-                false
-            }
+            } else false
         }
 
         binding.recyclerView.adapter = contentAdapter
 
+        // ─── 🔍 برمجة منطق البحث ───
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                // استدعاء دالة الفلترة في الـ Adapter (تأكد من إضافتها في ContentAdapter كما شرحنا سابقاً)
+                contentAdapter.filter(newText ?: "")
+                return true
+            }
+        })
+
         viewModel.liveCategories.observe(viewLifecycleOwner) { resource ->
             if (resource is Resource.Success) {
-                isShowingStreams = false // ⬅️ تحديث الحالة: عدنا إلى الباقات
-                val categories = resource.data
-                val items = categories.map { ContentItem.Category(it.categoryId, it.categoryName) }
-                contentAdapter.submitList(items)
+                isShowingStreams = false
+                val items = resource.data.map { ContentItem.Category(it.categoryId, it.categoryName) }
+                // نستخدم setAllItems لدعم البحث (يجب أن تكون موجودة في الـ Adapter)
+                contentAdapter.setAllItems(items) 
             }
         }
 
         viewModel.liveStreams.observe(viewLifecycleOwner) { resource ->
             when (resource) {
-                is Resource.Loading -> { }
                 is Resource.Success -> {
-                    val streams = resource.data
-                    val items = streams.map { ContentItem.Live(it) }
-                    contentAdapter.submitList(items)
+                    val items = resource.data.map { ContentItem.Live(it) }
+                    contentAdapter.setAllItems(items)
                 }
                 is Resource.Error -> {
                     Toast.makeText(context, "خطأ: ${resource.message}", Toast.LENGTH_LONG).show()
                 }
+                else -> {}
             }
         }
     }
 
-    // 🔙 دالة العودة للباقات (تستدعى من MainActivity عند ضغط زر الرجوع)
     fun goBackToCategories() {
         viewModel.loadLiveCategories()
     }
