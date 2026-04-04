@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // يجب استدعاء تطبيق الإعدادات قبل super.onCreate لضمان رسم الواجهة بالثيم واللغة الصحيحة
         applySavedSettings()
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -60,7 +61,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (savedInstanceState == null) {
             binding.dashboardView.visibility = View.VISIBLE
             binding.fragmentContainer.visibility = View.GONE
-            supportActionBar?.title = "الرئيسية / Dashboard"
+            supportActionBar?.title = getString(R.string.app_name)
         }
 
         setupDashboardButtons()
@@ -79,14 +80,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val runnable = object : Runnable {
             override fun run() {
-                Glide.with(this@MainActivity)
-                    .load(banners[currentIndex])
-                    .transition(DrawableTransitionOptions.withCrossFade(1000))
-                    .centerCrop()
-                    .into(bannerImage)
+                if (!isFinishing) {
+                    Glide.with(this@MainActivity)
+                        .load(banners[currentIndex])
+                        .transition(DrawableTransitionOptions.withCrossFade(1000))
+                        .centerCrop()
+                        .into(bannerImage)
 
-                currentIndex = (currentIndex + 1) % banners.size
-                handler.postDelayed(this, 4000)
+                    currentIndex = (currentIndex + 1) % banners.size
+                    handler.postDelayed(this, 4000)
+                }
             }
         }
         handler.post(runnable)
@@ -205,7 +208,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         finish()
     }
 
-    // ─── تحديث حل مشكلة تغيير اللغة (آمن وبدون كراش) ───
     private fun showLanguageDialog() {
         val languages = arrayOf("العربية", "English", "Français")
         val langCodes = arrayOf("ar", "en", "fr")
@@ -214,21 +216,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val checkedItem = langCodes.indexOf(currentLang).takeIf { it >= 0 } ?: 0
 
         AlertDialog.Builder(this)
-            .setTitle("اختر لغة التطبيق")
+            .setTitle("اختر لغة التطبيق / Choose Language")
             .setSingleChoiceItems(languages, checkedItem) { dialog, which ->
-                sharedPref.edit().putString("APP_LANG", langCodes[which]).apply()
+                val newLang = langCodes[which]
+                sharedPref.edit().putString("APP_LANG", newLang).apply()
                 dialog.dismiss()
                 
-                // إعادة تشغيل النشاط بشكل نظيف لتطبيق اللغة الجديدة
-                val intent = Intent(this, MainActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
+                // الحل النهائي: إعادة تشغيل النشاط بـ Intent جديد وتنظيف الـ Task
+                val restartIntent = Intent(this, MainActivity::class.java)
+                restartIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                startActivity(restartIntent)
                 finish()
+                // إضافة خروج اختياري لضمان قتل العملية القديمة
+                Runtime.getRuntime().exit(0)
             }
             .show()
     }
 
-    // ─── تحديث حل مشكلة تغيير المظهر (آمن وبدون كراش) ───
     private fun toggleTheme() {
         val sharedPref = getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE)
         val isDark = sharedPref.getBoolean("IS_DARK_MODE", true)
@@ -236,28 +240,38 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         
         sharedPref.edit().putBoolean("IS_DARK_MODE", newMode).apply()
         
-        if (newMode) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        }
+        // تطبيق المظهر فوراً قبل الـ recreate
+        AppCompatDelegate.setDefaultNightMode(
+            if (newMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+        )
         
-        // إعادة رسم الواجهة لتطبيق الثيم الجديد
-        recreate()
+        // استخدام recreate بشكل آمن
+        val intent = intent
+        finish()
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        startActivity(intent)
     }
 
     @Suppress("DEPRECATION")
     private fun applySavedSettings() {
         val sharedPref = getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE)
+        
+        // ضبط المظهر
+        val isDark = sharedPref.getBoolean("IS_DARK_MODE", true)
+        AppCompatDelegate.setDefaultNightMode(
+            if (isDark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+        )
+
+        // ضبط اللغة وتحديث الـ Configuration بشكل كامل
         val localeCode = sharedPref.getString("APP_LANG", "ar") ?: "ar"
         val locale = Locale(localeCode)
         Locale.setDefault(locale)
-        val config = Configuration()
+        val config = resources.configuration
         config.setLocale(locale)
+        config.setLayoutDirection(locale) // مهم جداً للأجهزة الحديثة لضبط اتجاه الواجهة
+        
+        // تحديث المصادر
         resources.updateConfiguration(config, resources.displayMetrics)
-
-        val isDark = sharedPref.getBoolean("IS_DARK_MODE", true)
-        AppCompatDelegate.setDefaultNightMode(if (isDark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO)
     }
 
     override fun onBackPressed() {
@@ -272,7 +286,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 else -> {
                     binding.fragmentContainer.visibility = View.GONE
                     binding.dashboardView.visibility = View.VISIBLE
-                    supportActionBar?.title = "الرئيسية / Dashboard"
+                    supportActionBar?.title = getString(R.string.app_name)
                 }
             }
         } else {
