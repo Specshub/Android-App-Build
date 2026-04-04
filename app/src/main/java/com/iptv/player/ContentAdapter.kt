@@ -15,6 +15,7 @@ import com.iptv.player.data.model.LiveStream
 import com.iptv.player.data.model.Series
 import com.iptv.player.data.model.VodStream
 
+// 📦 حاوية ذكية لأنواع البيانات المختلفة (قنوات، أفلام، مسلسلات)
 sealed class ContentItem {
     data class Category(val id: String, val name: String) : ContentItem()
     data class Live(val stream: LiveStream) : ContentItem()
@@ -26,14 +27,15 @@ class ContentAdapter(
     private val onItemClick: (ContentItem) -> Unit 
 ) : ListAdapter<ContentItem, ContentAdapter.ContentViewHolder>(ContentDiffCallback()) {
 
+    // 🔍 القائمة الأصلية التي سنستخدمها كمرجع عند البحث
     private var fullList: List<ContentItem> = listOf()
-    var onItemLongClick: ((ContentItem) -> Boolean)? = null
 
     fun setAllItems(list: List<ContentItem>) {
         fullList = list
-        submitList(list)
+        submitList(list) // 🚀 السحر هنا: DiffUtil سيقوم بالتحديث بهدوء
     }
 
+    // ✅ دالة البحث السحرية التي لن تخرب الواجهة
     fun filter(query: String) {
         val filteredList = if (query.isEmpty()) fullList
         else fullList.filter { item ->
@@ -62,50 +64,37 @@ class ContentAdapter(
         private val tvMeta: TextView = itemView.findViewById(R.id.tv_content_meta)
 
         fun bind(item: ContentItem) {
+            // إعادة ضبط الـ Padding لضمان أن المجلدات لا تضغط الصورة
             ivThumbnail.setPadding(0, 0, 0, 0)
             
             when (item) {
                 is ContentItem.Category -> {
                     tvTitle.text = item.name
                     tvMeta.text = "FOLDER"
-                    try { tvMeta.setBackgroundResource(R.drawable.bg_tag_blue) } catch (e: Exception) {}
                     
-                    // استخدام الذكاء الصناعي للأيقونات
-                    val img = getSmartIcon(item.name)
-                    loadThumbnail(img, isCategory = true)
+                    // 🧠 ذكاء الأيقونات: جلب صورة بناءً على اسم الباقة
+                    val categoryImg = getSmartCategoryIcon(item.name)
+                    loadThumbnail(categoryImg, isCategory = true)
+                    
                     itemView.setOnClickListener { onItemClick(item) }
                 }
-                
                 is ContentItem.Live -> {
                     tvTitle.text = item.stream.name
                     tvMeta.text = "LIVE"
-                    try { tvMeta.setBackgroundResource(R.drawable.bg_tag_red) } catch (e: Exception) {}
-                    
-                    // 🚀 التحديث هنا: إذا كانت صورة القناة فارغة، ابحث عن شعار ذكي
-                    val img = if (item.stream.streamIcon.isNullOrEmpty()) getSmartIcon(item.stream.name ?: "") 
-                             else item.stream.streamIcon
-                    
-                    loadThumbnail(img)
+                    loadThumbnail(item.stream.streamIcon)
                     itemView.setOnClickListener { onItemClick(item) }
-                    itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
                 }
-                
                 is ContentItem.Vod -> {
                     tvTitle.text = item.stream.name
                     tvMeta.text = "MOVIE"
-                    try { tvMeta.setBackgroundResource(R.drawable.bg_tag_purple) } catch (e: Exception) {}
                     loadThumbnail(item.stream.streamIcon)
                     itemView.setOnClickListener { onItemClick(item) }
-                    itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
                 }
-                
                 is ContentItem.SeriesItem -> {
                     tvTitle.text = item.series.name
                     tvMeta.text = "SERIES"
-                    try { tvMeta.setBackgroundResource(R.drawable.bg_tag_orange) } catch (e: Exception) {}
                     loadThumbnail(item.series.cover)
                     itemView.setOnClickListener { onItemClick(item) }
-                    itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
                 }
             }
         }
@@ -113,31 +102,28 @@ class ContentAdapter(
         private fun loadThumbnail(url: String?, isCategory: Boolean = false) {
             Glide.with(itemView.context)
                 .load(url)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .diskCacheStrategy(DiskCacheStrategy.ALL) // ⚡ سرعة صاروخية
                 .placeholder(R.drawable.bg_category_gradient)
-                // في حال فشل التحميل، نضع أيقونة المجلد للباقات أو خلفية ملونة للقنوات
                 .error(if (isCategory) R.drawable.ic_folder_modern else R.drawable.bg_category_gradient)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .centerCrop()
                 .into(ivThumbnail)
         }
 
-        // 🧠 محرك ذكاء الأيقونات الشامل
-        private fun getSmartIcon(name: String): String {
+        private fun getSmartCategoryIcon(name: String): String {
             val n = name.lowercase()
             return when {
                 n.contains("bein") -> "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/BeIN_Sports_logo.svg/512px-BeIN_Sports_logo.svg.png"
                 n.contains("osn") -> "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/OSN_logo.svg/512px-OSN_logo.svg.png"
                 n.contains("netflix") -> "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg"
                 n.contains("shahid") -> "https://upload.wikimedia.org/wikipedia/ar/0/0e/Shahid_Logo.png"
-                n.contains("ssc") -> "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/SSC_Logo.svg/512px-SSC_Logo.svg.png"
                 n.contains("kids") || n.contains("اطفال") -> "https://cdn-icons-png.flaticon.com/512/3050/3050031.png"
-                n.contains("sport") || n.contains("رياضة") -> "https://cdn-icons-png.flaticon.com/512/857/857418.png"
-                else -> ""
+                else -> "" // سيظهر التدرج اللوني الجميل إذا لم يجد تطابقاً
             }
         }
     }
 
+    // 🧠 العقل المدبر: يقوم بمقارنة العناصر الذكية لمنع التداخل
     class ContentDiffCallback : DiffUtil.ItemCallback<ContentItem>() {
         override fun areItemsTheSame(old: ContentItem, new: ContentItem) = when {
             old is ContentItem.Category && new is ContentItem.Category -> old.id == new.id
