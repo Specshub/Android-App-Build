@@ -6,18 +6,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels // ✅ ضروري جداً للمشاركة مع الشاشة الرئيسية
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.iptv.player.R
 import com.iptv.player.databinding.FragmentLiveTvBinding
-import com.iptv.player.data.model.Resource // ✅ استيراد الحالات
+import com.iptv.player.data.model.Resource
 
 class LiveTvFragment : Fragment() {
     private var _binding: FragmentLiveTvBinding? = null
     private val binding get() = _binding!!
 
-    // ✅ استدعاء "المدير" المشترك مع الشاشة الرئيسية (يحتوي على البيانات)
     private val viewModel: MainViewModel by activityViewModels()
+    
+    // ✅ تعريف النادل (Adapter)
+    private lateinit var contentAdapter: ContentAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,27 +32,32 @@ class LiveTvFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
-        // إعداد شبكة العرض (3 أعمدة)
         binding.recyclerView.layoutManager = GridLayoutManager(context, 3)
 
-        // ─── ✅ مراقبة البيانات القادمة من السيرفر ───
+        // ✅ تهيئة النادل وتحديد ماذا يحدث عند الضغط على أي باقة
+        contentAdapter = ContentAdapter { clickedItem ->
+            if (clickedItem is ContentItem.Category) {
+                Toast.makeText(context, "جاري فتح: ${clickedItem.name}", Toast.LENGTH_SHORT).show()
+                // في الخطوة القادمة سنجعله يفتح قنوات هذه الباقة
+            }
+        }
+        binding.recyclerView.adapter = contentAdapter
+
         viewModel.liveCategories.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Loading -> {
-                    // السيرفر يبحث عن القنوات... يمكنك إظهار دائرة تحميل هنا
+                    // يمكنك إظهار دائرة تحميل هنا
                 }
                 is Resource.Success -> {
                     val categories = resource.data
                     
-                    // ✅ مبروك! البيانات وصلت.. سنظهر رسالة للتأكيد!
-                    Toast.makeText(context, "تم جلب ${categories.size} باقة بنجاح! 📺", Toast.LENGTH_LONG).show()
+                    // ✅ تحويل البيانات إلى الشكل الذي يفهمه النادل (ContentItem)
+                    val items = categories.map { ContentItem.Category(it.categoryId, it.categoryName) }
                     
-                    // 🚨 هنا يجب أن نربط الـ Adapter الخاص بك!
-                    // إذا كان لديك CategoryAdapter أو ContentAdapter قم بإلغاء التهميش عن السطر التالي وعدله:
-                    // binding.recyclerView.adapter = ContentAdapter(categories) 
+                    // ✅ تقديم الأطباق (الباقات) للشاشة!
+                    contentAdapter.submitList(items)
                 }
                 is Resource.Error -> {
-                    // فشل جلب القنوات
                     Toast.makeText(context, "خطأ: ${resource.message}", Toast.LENGTH_LONG).show()
                 }
             }
