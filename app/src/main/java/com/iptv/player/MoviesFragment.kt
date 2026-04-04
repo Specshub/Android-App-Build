@@ -1,5 +1,6 @@
 package com.iptv.player
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -31,23 +32,33 @@ class MoviesFragment : Fragment() {
         
         binding.recyclerView.layoutManager = GridLayoutManager(context, 3)
 
-        // ─── 1. ماذا يحدث عند الضغط؟ ───
         contentAdapter = ContentAdapter { clickedItem ->
             when (clickedItem) {
                 is ContentItem.Category -> {
                     Toast.makeText(context, "جاري جلب الأفلام...", Toast.LENGTH_SHORT).show()
-                    viewModel.loadVodStreams(clickedItem.id) // نطلب الأفلام
+                    viewModel.loadVodStreams(clickedItem.id)
                 }
                 is ContentItem.Vod -> {
-                    Toast.makeText(context, "جاري تشغيل فيلم: ${clickedItem.stream.name}", Toast.LENGTH_LONG).show()
-                    // TODO: فتح شاشة المشغل لاحقاً
+                    // ─── ✅ تشغيل الفيلم ───
+                    val host = activity?.intent?.getStringExtra(EXTRA_HOST) ?: ""
+                    val username = activity?.intent?.getStringExtra(EXTRA_USERNAME) ?: ""
+                    val password = activity?.intent?.getStringExtra(EXTRA_PASSWORD) ?: ""
+
+                    val baseUrl = if (host.startsWith("http")) host else "http://$host"
+                    // سيرفرات الأي بي تي في للأفلام تكون بصيغة: host/movie/user/pass/id.mp4
+                    val streamUrl = "$baseUrl/movie/$username/$password/${clickedItem.stream.streamId}.mp4"
+
+                    val intent = Intent(requireContext(), PlayerActivity::class.java).apply {
+                        putExtra(PlayerActivity.EXTRA_STREAM_TITLE, clickedItem.stream.name)
+                        putExtra(PlayerActivity.EXTRA_STREAM_URL, streamUrl)
+                    }
+                    startActivity(intent)
                 }
                 else -> {}
             }
         }
         binding.recyclerView.adapter = contentAdapter
 
-        // ─── 2. مراقبة باقات الأفلام ───
         viewModel.vodCategories.observe(viewLifecycleOwner) { resource ->
             if (resource is Resource.Success) {
                 val categories = resource.data
@@ -56,14 +67,13 @@ class MoviesFragment : Fragment() {
             }
         }
 
-        // ─── 3. مراقبة الأفلام الفعلية ───
         viewModel.vodStreams.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Loading -> { }
                 is Resource.Success -> {
                     val streams = resource.data
                     val items = streams.map { ContentItem.Vod(it) }
-                    contentAdapter.submitList(items) // استبدال الباقات بالأفلام
+                    contentAdapter.submitList(items)
                 }
                 is Resource.Error -> {
                     Toast.makeText(context, "خطأ: ${resource.message}", Toast.LENGTH_LONG).show()
