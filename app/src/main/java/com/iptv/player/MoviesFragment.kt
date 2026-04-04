@@ -40,10 +40,13 @@ class MoviesFragment : Fragment() {
                     val host = activity?.intent?.getStringExtra(EXTRA_HOST) ?: ""
                     val username = activity?.intent?.getStringExtra(EXTRA_USERNAME) ?: ""
                     val password = activity?.intent?.getStringExtra(EXTRA_PASSWORD) ?: ""
-                    val baseUrl = if (host.startsWith("http")) host else "http://$host"
+                    
+                    // ─── 🚀 تم التحديث هنا: تنظيف الرابط لمنع خطأ التحميل ───
+                    val cleanHost = if (host.endsWith("/")) host.dropLast(1) else host
+                    val baseUrl = if (cleanHost.startsWith("http")) cleanHost else "http://$cleanHost"
                     val streamUrl = "$baseUrl/movie/$username/$password/${clickedItem.stream.streamId}.mp4"
 
-                    // ─── 🚀 نافذة الخيارات الجديدة ───
+                    // ─── نافذة الخيارات ───
                     val options = arrayOf("▶️ تشغيل الفيلم (Play)", "⬇️ تحميل الفيلم (Download)")
                     AlertDialog.Builder(requireContext())
                         .setTitle(clickedItem.stream.name)
