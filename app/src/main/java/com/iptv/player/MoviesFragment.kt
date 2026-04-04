@@ -6,12 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.iptv.player.databinding.FragmentMoviesBinding
 import com.iptv.player.data.model.Resource
-import com.iptv.player.FavoritesManager // ✅ إضافة المفضلة
+import com.iptv.player.FavoritesManager
 
 class MoviesFragment : Fragment() {
     private var _binding: FragmentMoviesBinding? = null
@@ -28,7 +29,7 @@ class MoviesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.recyclerView.layoutManager = GridLayoutManager(context, 3)
 
-        // 1. الضغطة العادية (تشغيل الفيلم)
+        // 1. الضغطة العادية (نافذة الخيارات: تشغيل أم تحميل؟)
         contentAdapter = ContentAdapter { clickedItem ->
             when (clickedItem) {
                 is ContentItem.Category -> {
@@ -42,17 +43,36 @@ class MoviesFragment : Fragment() {
                     val baseUrl = if (host.startsWith("http")) host else "http://$host"
                     val streamUrl = "$baseUrl/movie/$username/$password/${clickedItem.stream.streamId}.mp4"
 
-                    val intent = Intent(requireContext(), PlayerActivity::class.java).apply {
-                        putExtra(PlayerActivity.EXTRA_STREAM_TITLE, clickedItem.stream.name)
-                        putExtra(PlayerActivity.EXTRA_STREAM_URL, streamUrl)
-                    }
-                    startActivity(intent)
+                    // ─── 🚀 نافذة الخيارات الجديدة ───
+                    val options = arrayOf("▶️ تشغيل الفيلم (Play)", "⬇️ تحميل الفيلم (Download)")
+                    AlertDialog.Builder(requireContext())
+                        .setTitle(clickedItem.stream.name)
+                        .setItems(options) { _, which ->
+                            if (which == 0) {
+                                // الخيار الأول: تشغيل
+                                val intent = Intent(requireContext(), PlayerActivity::class.java).apply {
+                                    putExtra(PlayerActivity.EXTRA_STREAM_TITLE, clickedItem.stream.name)
+                                    putExtra(PlayerActivity.EXTRA_STREAM_URL, streamUrl)
+                                }
+                                startActivity(intent)
+                            } else {
+                                // الخيار الثاني: إرسال الفيلم لمدير التحميلات
+                                OfflineManager.startDownload(
+                                    requireContext(),
+                                    streamUrl,
+                                    clickedItem.stream.name ?: "Movie",
+                                    clickedItem.stream.streamId.toString(),
+                                    clickedItem.stream.streamIcon
+                                )
+                            }
+                        }
+                        .show()
                 }
                 else -> {}
             }
         }
 
-        // 2. ✅ الضغطة المطولة (حفظ أو إزالة الفيلم)
+        // 2. الضغطة المطولة (حفظ أو إزالة الفيلم من المفضلة - كما كانت)
         contentAdapter.onItemLongClick = { item ->
             if (item is ContentItem.Vod) {
                 val isAlreadyFav = FavoritesManager.getVodFavorites(requireContext()).any { it.streamId == item.stream.streamId }
