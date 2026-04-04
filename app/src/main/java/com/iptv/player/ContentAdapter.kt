@@ -22,10 +22,12 @@ sealed class ContentItem {
 }
 
 class ContentAdapter(
-    private val onItemClick: (ContentItem) -> Unit,
-    // ✅ تمت إضافة الضغطة المطولة هنا
-    private val onItemLongClick: (ContentItem) -> Boolean = { false } 
+    // أبقينا الضغطة العادية كما هي لكي لا تتعطل باقي الشاشات
+    private val onItemClick: (ContentItem) -> Unit 
 ) : ListAdapter<ContentItem, ContentAdapter.ContentViewHolder>(ContentDiffCallback()) {
+
+    // ✅ جعلنا الضغطة المطولة متغيراً اختيارياً يمكن للشاشات استخدامه براحة
+    var onItemLongClick: ((ContentItem) -> Boolean)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContentViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -50,7 +52,7 @@ class ContentAdapter(
                     ivThumbnail.setImageResource(android.R.drawable.ic_menu_agenda)
                     
                     itemView.setOnClickListener { onItemClick(item) }
-                    itemView.setOnLongClickListener { onItemLongClick(item) } // ✅ تفعيل الضغطة المطولة
+                    itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
                 }
                 is ContentItem.Live -> {
                     tvTitle.text = item.stream.name
@@ -58,7 +60,7 @@ class ContentAdapter(
                     loadThumbnail(item.stream.streamIcon)
                     
                     itemView.setOnClickListener { onItemClick(item) }
-                    itemView.setOnLongClickListener { onItemLongClick(item) } // ✅ تفعيل الضغطة المطولة
+                    itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
                 }
                 is ContentItem.Vod -> {
                     tvTitle.text = item.stream.name
@@ -66,7 +68,7 @@ class ContentAdapter(
                     loadThumbnail(item.stream.streamIcon)
                     
                     itemView.setOnClickListener { onItemClick(item) }
-                    itemView.setOnLongClickListener { onItemLongClick(item) }
+                    itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
                 }
                 is ContentItem.SeriesItem -> {
                     tvTitle.text = item.series.name
@@ -74,7 +76,7 @@ class ContentAdapter(
                     loadThumbnail(item.series.cover)
                     
                     itemView.setOnClickListener { onItemClick(item) }
-                    itemView.setOnLongClickListener { onItemLongClick(item) }
+                    itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
                 }
             }
         }
