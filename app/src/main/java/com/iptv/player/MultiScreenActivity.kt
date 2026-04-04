@@ -10,7 +10,6 @@ import androidx.media3.exoplayer.ExoPlayer
 
 class MultiScreenActivity : AppCompatActivity() {
 
-    // تجهيز 4 مشغلات مستقلة
     private var player1: ExoPlayer? = null
     private var player2: ExoPlayer? = null
     private var player3: ExoPlayer? = null
@@ -20,7 +19,6 @@ class MultiScreenActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_multi_screen)
 
-        // جعل الشاشة كاملة (Immersive Mode) لتجربة سينمائية
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         window.decorView.systemUiVisibility = (
             View.SYSTEM_UI_FLAG_FULLSCREEN
@@ -28,7 +26,6 @@ class MultiScreenActivity : AppCompatActivity() {
             or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
         )
 
-        // برمجة أزرار (+) الأربعة
         findViewById<ImageView>(R.id.btnAdd1).setOnClickListener {
             Toast.makeText(this, "جاري برمجة نافذة القنوات للشاشة 1...", Toast.LENGTH_SHORT).show()
         }
@@ -43,7 +40,6 @@ class MultiScreenActivity : AppCompatActivity() {
         }
     }
 
-    // يجب تحرير الذاكرة عند الخروج لمنع تشنج الهاتف
     override fun onDestroy() {
         super.onDestroy()
         player1?.release()
