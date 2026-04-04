@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/nav_live_tv" android:icon="@android:drawable/ic_menu_slideshow" android:title="البث المباشر / Live TV" />
+        <item android:id="@+id/nav_movies" android:icon="@android:drawable/ic_menu_gallery" android:title="الأفلام / Movies" />
+        <item android:id="@+id/nav_series" android:icon="@android:drawable/ic_menu_recent_history" android:title="المسلسلات / Series" />
+        <item android:id="@+id/nav_schedule" android:icon="@android:drawable/ic_menu_today" android:title="جدول المباريات / Schedule" />
+        <item android:id="@+id/nav_favorites" android:icon="@android:drawable/btn_star" android:title="المفضلة / Favorites" />
+        <item android:id="@+id/nav_multi_screen" android:icon="@android:drawable/ic_dialog_map" android:title="شاشات متعددة / Multi-Screen" />
+    </group>
+
+    <item android:title="أدوات وإعدادات">
+        <menu>
+            <item android:id="@+id/nav_speed_test" android:icon="@android:drawable/ic_menu_sort_by_size" android:title="فحص السرعة / Speed Test" />
+            <item android:id="@+id/nav_clear_cache" android:icon="@android:drawable/ic_menu_delete" android:title="تنظيف الذاكرة / Clear Cache" />
+            <item android:id="@+id/nav_language" android:icon="@android:drawable/ic_menu_set_as" android:title="اللغة / Language" />
+            <item android:id="@+id/nav_theme" android:icon="@android:drawable/ic_menu_view" android:title="المظهر / Theme" />
+            <item android:id="@+id/nav_settings" android:icon="@android:drawable/ic_menu_preferences" android:title="الإعدادات / Settings" />
+        </menu>
+    </item>
+
+    <item android:title="أخرى">
+        <menu>
+            <item android:id="@+id/nav_support" android:icon="@android:drawable/ic_menu_call" android:title="الدعم الفني / Support" />
+            <item android:id="@+id/nav_logout" android:icon="@android:drawable/ic_menu_close_clear_cancel" android:title="تسجيل الخروج / Logout" />
+        </menu>
+    </item>
+
+</menu>
