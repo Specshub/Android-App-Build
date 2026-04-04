@@ -68,21 +68,28 @@ class ContentAdapter(
                 is ContentItem.Category -> {
                     tvTitle.text = item.name
                     tvMeta.text = "FOLDER"
-                    // استخدام محاولة آمنة لتعيين الخلفية
                     try { tvMeta.setBackgroundResource(R.drawable.bg_tag_blue) } catch (e: Exception) {}
                     
-                    val categoryImg = getSmartCategoryIcon(item.name)
-                    loadThumbnail(categoryImg, isCategory = true)
+                    // استخدام الذكاء الصناعي للأيقونات
+                    val img = getSmartIcon(item.name)
+                    loadThumbnail(img, isCategory = true)
                     itemView.setOnClickListener { onItemClick(item) }
                 }
+                
                 is ContentItem.Live -> {
                     tvTitle.text = item.stream.name
                     tvMeta.text = "LIVE"
                     try { tvMeta.setBackgroundResource(R.drawable.bg_tag_red) } catch (e: Exception) {}
-                    loadThumbnail(item.stream.streamIcon)
+                    
+                    // 🚀 التحديث هنا: إذا كانت صورة القناة فارغة، ابحث عن شعار ذكي
+                    val img = if (item.stream.streamIcon.isNullOrEmpty()) getSmartIcon(item.stream.name ?: "") 
+                             else item.stream.streamIcon
+                    
+                    loadThumbnail(img)
                     itemView.setOnClickListener { onItemClick(item) }
                     itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
                 }
+                
                 is ContentItem.Vod -> {
                     tvTitle.text = item.stream.name
                     tvMeta.text = "MOVIE"
@@ -91,6 +98,7 @@ class ContentAdapter(
                     itemView.setOnClickListener { onItemClick(item) }
                     itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
                 }
+                
                 is ContentItem.SeriesItem -> {
                     tvTitle.text = item.series.name
                     tvMeta.text = "SERIES"
@@ -107,22 +115,24 @@ class ContentAdapter(
                 .load(url)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .placeholder(R.drawable.bg_category_gradient)
+                // في حال فشل التحميل، نضع أيقونة المجلد للباقات أو خلفية ملونة للقنوات
                 .error(if (isCategory) R.drawable.ic_folder_modern else R.drawable.bg_category_gradient)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .centerCrop()
                 .into(ivThumbnail)
         }
 
-        private fun getSmartCategoryIcon(name: String): String {
+        // 🧠 محرك ذكاء الأيقونات الشامل
+        private fun getSmartIcon(name: String): String {
             val n = name.lowercase()
             return when {
                 n.contains("bein") -> "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/BeIN_Sports_logo.svg/512px-BeIN_Sports_logo.svg.png"
                 n.contains("osn") -> "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/OSN_logo.svg/512px-OSN_logo.svg.png"
                 n.contains("netflix") -> "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg"
                 n.contains("shahid") -> "https://upload.wikimedia.org/wikipedia/ar/0/0e/Shahid_Logo.png"
+                n.contains("ssc") -> "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/SSC_Logo.svg/512px-SSC_Logo.svg.png"
                 n.contains("kids") || n.contains("اطفال") -> "https://cdn-icons-png.flaticon.com/512/3050/3050031.png"
                 n.contains("sport") || n.contains("رياضة") -> "https://cdn-icons-png.flaticon.com/512/857/857418.png"
-                n.contains("movie") || n.contains("افلام") -> "https://cdn-icons-png.flaticon.com/512/4221/4221419.png"
                 else -> ""
             }
         }
