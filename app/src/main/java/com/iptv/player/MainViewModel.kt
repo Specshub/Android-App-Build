@@ -1,22 +1,22 @@
-// com/iptvplayer/app/ui/viewmodel/MainViewModel.kt
-package com.iptvplayer.app.ui.viewmodel
+package com.iptv.player // ✅ الهوية الموحدة الجديدة
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.iptvplayer.app.data.local.PrefsManager
-import com.iptvplayer.app.data.model.*
-import com.iptvplayer.app.data.repository.XtreamRepository
+import com.iptv.player.data.api.RetrofitClient // ✅ استيراد المحرك الصحيح
+import com.iptv.player.data.api.XtreamApiService
+import com.iptv.player.data.model.* // ✅ استيراد الموديلات من Models.kt الشامل
+import com.iptv.player.data.repository.Resource // ✅ استيراد كلاس النتائج
+import com.iptv.player.data.repository.XtreamRepository
 import kotlinx.coroutines.launch
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    val prefsManager = PrefsManager(application)
-    private val repository = XtreamRepository()
-
-    private var credentials: LoginCredentials? = null
+    // ✅ تهيئة المستودع باستخدام الـ API المحدث
+    private val apiService = RetrofitClient.instance.create(XtreamApiService::class.java)
+    private val repository = XtreamRepository(apiService)
 
     // ── Live TV ─────────────────────────────────────────────────────────────
     private val _liveCategories = MutableLiveData<Resource<List<LiveCategory>>>()
@@ -39,88 +39,48 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _seriesList = MutableLiveData<Resource<List<Series>>>()
     val seriesList: LiveData<Resource<List<Series>>> = _seriesList
 
-    // ── Series Detail ────────────────────────────────────────────────────────
-    private val _seriesInfo = MutableLiveData<Resource<SeriesInfo>>()
-    val seriesInfo: LiveData<Resource<SeriesInfo>> = _seriesInfo
-
-    fun setCredentials(c: LoginCredentials) {
-        credentials = c
-    }
-
-    fun getCredentials() = credentials ?: prefsManager.getCredentials()
-
-    // ── Loaders ─────────────────────────────────────────────────────────────
+    // ── Loaders (تحديث الطلبات لتتوافق مع المستودع الجديد) ─────────────────────
 
     fun loadLiveCategories() {
-        val creds = getCredentials() ?: return
         _liveCategories.value = Resource.Loading()
         viewModelScope.launch {
-            _liveCategories.value = repository.getLiveCategories(creds)
+            // ملاحظة: يمكنك تمرير Credentials إذا قمت بتحديث المستودع لاستقبالها
+            _liveCategories.value = repository.getLiveCategories()
         }
     }
 
     fun loadLiveStreams(categoryId: String? = null) {
-        val creds = getCredentials() ?: return
         _liveStreams.value = Resource.Loading()
         viewModelScope.launch {
-            _liveStreams.value = if (categoryId != null) {
-                repository.getLiveStreamsByCategory(creds, categoryId)
-            } else {
-                repository.getLiveStreams(creds)
-            }
+            _liveStreams.value = repository.getLiveStreams(categoryId)
         }
     }
 
     fun loadVodCategories() {
-        val creds = getCredentials() ?: return
         _vodCategories.value = Resource.Loading()
         viewModelScope.launch {
-            _vodCategories.value = repository.getVodCategories(creds)
+            _vodCategories.value = repository.getVodCategories()
         }
     }
 
     fun loadVodStreams(categoryId: String? = null) {
-        val creds = getCredentials() ?: return
         _vodStreams.value = Resource.Loading()
         viewModelScope.launch {
-            _vodStreams.value = if (categoryId != null) {
-                repository.getVodStreamsByCategory(creds, categoryId)
-            } else {
-                repository.getVodStreams(creds)
-            }
+            _vodStreams.value = repository.getVodStreams(categoryId)
         }
     }
 
     fun loadSeriesCategories() {
-        val creds = getCredentials() ?: return
         _seriesCategories.value = Resource.Loading()
         viewModelScope.launch {
-            _seriesCategories.value = repository.getSeriesCategories(creds)
+            _seriesCategories.value = repository.getSeriesCategories()
         }
     }
 
     fun loadSeries(categoryId: String? = null) {
-        val creds = getCredentials() ?: return
         _seriesList.value = Resource.Loading()
         viewModelScope.launch {
-            _seriesList.value = if (categoryId != null) {
-                repository.getSeriesByCategory(creds, categoryId)
-            } else {
-                repository.getSeries(creds)
-            }
+            _seriesList.value = repository.getSeries(categoryId)
         }
-    }
-
-    fun loadSeriesInfo(seriesId: Int) {
-        val creds = getCredentials() ?: return
-        _seriesInfo.value = Resource.Loading()
-        viewModelScope.launch {
-            _seriesInfo.value = repository.getSeriesInfo(creds, seriesId)
-        }
-    }
-
-    fun logout() {
-        prefsManager.clearCredentials()
-        credentials = null
     }
 }
