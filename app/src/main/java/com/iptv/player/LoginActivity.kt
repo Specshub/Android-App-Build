@@ -1,5 +1,6 @@
 package com.iptv.player
 
+import android.content.Context // ✅ استيراد ضروري للذاكرة
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -11,52 +12,62 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.iptv.player.data.model.Resource
 
-// ثوابت نقل البيانات للشاشة الرئيسية
 const val EXTRA_HOST = "EXTRA_HOST"
 const val EXTRA_USERNAME = "EXTRA_USERNAME"
 const val EXTRA_PASSWORD = "EXTRA_PASSWORD"
 
 class LoginActivity : AppCompatActivity() {
 
-    // ✅ استدعاء العقل المدبر لتسجيل الدخول
     private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // ─── 1. التحقق السريع: هل المستخدم مسجل دخوله مسبقاً؟ ───
+        val sharedPref = getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE)
+        val savedHost = sharedPref.getString("HOST", null)
+        val savedUser = sharedPref.getString("USER", null)
+        val savedPass = sharedPref.getString("PASS", null)
+
+        // إذا وجدنا البيانات محفوظة، نفتح الشاشة الرئيسية فوراً ونغلق شاشة الدخول
+        if (!savedHost.isNullOrEmpty() && !savedUser.isNullOrEmpty() && !savedPass.isNullOrEmpty()) {
+            openMainActivity(savedHost, savedUser, savedPass)
+            return // إيقاف تنفيذ باقي الكود هنا
+        }
+
+        // ─── 2. إذا لم يكن مسجلاً، نظهر له الشاشة العادية ───
         setContentView(R.layout.activity_login)
 
-        // 1. ربط الحقول بالواجهة (تأكد أن هذه الـ IDs مطابقة لملف activity_login.xml)
-        val etHost = findViewById<EditText>(R.id.et_host) 
+        val etHost = findViewById<EditText>(R.id.et_host)
         val etUsername = findViewById<EditText>(R.id.et_username)
         val etPassword = findViewById<EditText>(R.id.et_password)
         val btnLogin = findViewById<Button>(R.id.btn_login)
-        
-        // إذا كان لديك شريط تحميل (أضفه في الـ XML إن لم يكن موجوداً أو تجاهل هذا السطر)
-        val progressBar = findViewById<ProgressBar>(R.id.progress_bar) 
+        val progressBar = findViewById<ProgressBar>(R.id.progress_bar)
 
-        // 2. مراقبة "رد السيرفر" من الـ ViewModel
         viewModel.authState.observe(this) { resource ->
             when (resource) {
                 is Resource.Loading -> {
-                    // السيرفر يفكر.. نعطل الزر ونظهر التحميل
                     btnLogin.isEnabled = false
                     progressBar?.visibility = View.VISIBLE
                 }
                 is Resource.Success -> {
-                    // ✅ نجاح! بيانات صحيحة، نفتح الباب
                     btnLogin.isEnabled = true
                     progressBar?.visibility = View.GONE
 
-                    val intent = Intent(this, MainActivity::class.java).apply {
-                        putExtra(EXTRA_HOST, etHost?.text.toString().trim())
-                        putExtra(EXTRA_USERNAME, etUsername?.text.toString().trim())
-                        putExtra(EXTRA_PASSWORD, etPassword?.text.toString().trim())
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    }
-                    startActivity(intent)
+                    val host = etHost?.text.toString().trim()
+                    val username = etUsername?.text.toString().trim()
+                    val password = etPassword?.text.toString().trim()
+
+                    // ─── 3. الدخول ناجح؟ إذن احفظ البيانات للمرات القادمة ───
+                    sharedPref.edit()
+                        .putString("HOST", host)
+                        .putString("USER", username)
+                        .putString("PASS", password)
+                        .apply() // حفظ!
+
+                    openMainActivity(host, username, password)
                 }
                 is Resource.Error -> {
-                    // ❌ فشل! نعيد تفعيل الزر ونظهر رسالة الخطأ
                     btnLogin.isEnabled = true
                     progressBar?.visibility = View.GONE
                     Toast.makeText(this, resource.message, Toast.LENGTH_LONG).show()
@@ -64,14 +75,22 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        // 3. ماذا يحدث عند الضغط على زر Connect؟
         btnLogin?.setOnClickListener {
             val host = etHost?.text?.toString()?.trim() ?: ""
             val username = etUsername?.text?.toString()?.trim() ?: ""
             val password = etPassword?.text?.toString()?.trim() ?: ""
-
-            // نأمر الـ ViewModel ببدء التحقق الفعلي من السيرفر
             viewModel.login(host, username, password)
         }
+    }
+
+    // دالة مساعدة لفتح الشاشة الرئيسية وإغلاق شاشة الدخول تماماً
+    private fun openMainActivity(host: String, user: String, pass: String) {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            putExtra(EXTRA_HOST, host)
+            putExtra(EXTRA_USERNAME, user)
+            putExtra(EXTRA_PASSWORD, pass)
+        }
+        startActivity(intent)
+        finish() // ✅ هذه الكلمة تمنع المستخدم من العودة لشاشة الدخول عند ضغط زر "الرجوع"
     }
 }
