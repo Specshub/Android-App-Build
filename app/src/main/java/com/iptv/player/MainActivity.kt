@@ -32,12 +32,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // يجب استدعاء تطبيق الإعدادات قبل super.onCreate لضمان رسم الواجهة بالثيم واللغة الصحيحة
         applySavedSettings()
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // إعداد بيانات الدخول
         val host = intent.getStringExtra("EXTRA_HOST") ?: ""
         val username = intent.getStringExtra("EXTRA_USERNAME") ?: ""
         val password = intent.getStringExtra("EXTRA_PASSWORD") ?: ""
@@ -49,6 +49,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         setSupportActionBar(binding.toolbar)
 
+        // إعداد القائمة الجانبية
         val toggle = ActionBarDrawerToggle(
             this, binding.drawerLayout, binding.toolbar,
             R.string.navigation_drawer_open, R.string.navigation_drawer_close
@@ -88,7 +89,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         .into(bannerImage)
 
                     currentIndex = (currentIndex + 1) % banners.size
-                    handler.postDelayed(this, 4000)
+                    handler.postDelayed(this, 5000)
                 }
             }
         }
@@ -96,28 +97,43 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun setupDashboardButtons() {
-        findViewById<View>(R.id.mainBtnLive).apply {
-            findViewById<TextView>(R.id.btnText).text = "البث المباشر"
-            findViewById<ImageView>(R.id.btnIcon).setImageResource(android.R.drawable.ic_menu_slideshow)
-            setOnClickListener { navigateToSection(R.id.nav_live_tv) }
-        }
+        val buttonsInfo = listOf(
+            Triple(R.id.mainBtnLive, "البث المباشر", android.R.drawable.ic_menu_slideshow),
+            Triple(R.id.mainBtnMovies, "الأفلام (VOD)", android.R.drawable.ic_menu_gallery),
+            Triple(R.id.mainBtnSeries, "المسلسلات", android.R.drawable.ic_menu_recent_history),
+            Triple(R.id.mainBtnSchedule, "جدول المباريات", android.R.drawable.ic_menu_today)
+        )
 
-        findViewById<View>(R.id.mainBtnMovies).apply {
-            findViewById<TextView>(R.id.btnText).text = "الأفلام (VOD)"
-            findViewById<ImageView>(R.id.btnIcon).setImageResource(android.R.drawable.ic_menu_gallery)
-            setOnClickListener { navigateToSection(R.id.nav_movies) }
-        }
+        buttonsInfo.forEach { (id, text, icon) ->
+            findViewById<View>(id)?.apply {
+                findViewById<TextView>(R.id.btnText).text = text
+                findViewById<ImageView>(R.id.btnIcon).setImageResource(icon)
+                
+                // تفعيل دعم التلفاز (Focus)
+                isFocusable = true
+                isFocusableInTouchMode = true
+                
+                setOnFocusChangeListener { v, hasFocus ->
+                    if (hasFocus) {
+                        // تأثير "أسطوري" عند الوقوف بالريموت
+                        v.animate().scaleX(1.1f).scaleY(1.1f).alpha(1.0f).setDuration(200).start()
+                        v.elevation = 20f
+                    } else {
+                        v.animate().scaleX(1.0f).scaleY(1.0f).alpha(0.8f).setDuration(200).start()
+                        v.elevation = 4f
+                    }
+                }
 
-        findViewById<View>(R.id.mainBtnSeries).apply {
-            findViewById<TextView>(R.id.btnText).text = "المسلسلات"
-            findViewById<ImageView>(R.id.btnIcon).setImageResource(android.R.drawable.ic_menu_recent_history)
-            setOnClickListener { navigateToSection(R.id.nav_series) }
-        }
-
-        findViewById<View>(R.id.mainBtnSchedule).apply {
-            findViewById<TextView>(R.id.btnText).text = "جدول المباريات"
-            findViewById<ImageView>(R.id.btnIcon).setImageResource(android.R.drawable.ic_menu_today)
-            setOnClickListener { navigateToSection(R.id.nav_schedule) }
+                setOnClickListener { 
+                    val navId = when(id) {
+                        R.id.mainBtnLive -> R.id.nav_live_tv
+                        R.id.mainBtnMovies -> R.id.nav_movies
+                        R.id.mainBtnSeries -> R.id.nav_series
+                        else -> R.id.nav_schedule
+                    }
+                    navigateToSection(navId) 
+                }
+            }
         }
     }
 
@@ -126,18 +142,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding.fragmentContainer.visibility = View.VISIBLE
         binding.navView.setCheckedItem(itemId)
 
-        var fragment: Fragment? = null
-        var title = ""
+        val fragment: Fragment?
+        val title: String
 
         when (itemId) {
             R.id.nav_live_tv -> { fragment = LiveTvFragment(); title = "Live TV"; viewModel.loadLiveCategories() }
             R.id.nav_movies -> { fragment = MoviesFragment(); title = "Movies"; viewModel.loadVodCategories() }
             R.id.nav_series -> { fragment = SeriesFragment(); title = "Series"; viewModel.loadSeriesCategories() }
             R.id.nav_schedule -> { fragment = MatchScheduleFragment(); title = "جدول المباريات" }
+            else -> { fragment = null; title = "" }
         }
 
-        if (fragment != null) {
-            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit()
+        fragment?.let {
+            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, it).commit()
             supportActionBar?.title = title
         }
     }
@@ -149,57 +166,29 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             return true
         }
 
-        var fragment: Fragment? = null
-        var title = ""
-
         when (item.itemId) {
             R.id.nav_favorites -> {
                 binding.dashboardView.visibility = View.GONE
                 binding.fragmentContainer.visibility = View.VISIBLE
-                fragment = FavoritesFragment()
-                title = "المفضلة / Favorites"
+                loadFragment(FavoritesFragment(), "المفضلة")
             }
-            R.id.nav_speed_test -> { openSpeedTest(); return true }
-            R.id.nav_clear_cache -> { clearAppCache(); return true }
-            R.id.nav_support -> { openLiveSupport(); return true }
-            R.id.nav_multi_screen -> {
-                startActivity(Intent(this, MultiScreenActivity::class.java))
-                return true
-            }
-            R.id.nav_language -> { showLanguageDialog(); return true }
-            R.id.nav_theme -> { toggleTheme(); return true }
-            R.id.nav_settings -> {
-                Toast.makeText(this, "الإعدادات قيد التطوير ⚙️", Toast.LENGTH_SHORT).show()
-                return true
-            }
-            R.id.nav_logout -> { performLogout(); return true }
+            R.id.nav_speed_test -> openUrl("https://fast.com/ar/")
+            R.id.nav_support -> openUrl("https://api.whatsapp.com/send?phone=212772863204")
+            R.id.nav_language -> showLanguageDialog()
+            R.id.nav_theme -> toggleTheme()
+            R.id.nav_logout -> performLogout()
         }
-
-        if (fragment != null) {
-            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit()
-            supportActionBar?.title = title
-        }
-
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }
 
-    private fun clearAppCache() {
-        try {
-            cacheDir.deleteRecursively()
-            Toast.makeText(this, "تم تنظيف الذاكرة المؤقتة بنجاح! 🚀", Toast.LENGTH_LONG).show()
-        } catch (e: Exception) {}
-        binding.drawerLayout.closeDrawer(GravityCompat.START)
+    private fun loadFragment(fragment: Fragment, title: String) {
+        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit()
+        supportActionBar?.title = title
     }
 
-    private fun openSpeedTest() {
-        try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://fast.com/ar/"))) } catch (e: Exception) {}
-        binding.drawerLayout.closeDrawer(GravityCompat.START)
-    }
-
-    private fun openLiveSupport() {
-        try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://api.whatsapp.com/send?phone=212772863204&text=مرحباً"))) } catch (e: Exception) {}
-        binding.drawerLayout.closeDrawer(GravityCompat.START)
+    private fun openUrl(url: String) {
+        try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) } catch (e: Exception) {}
     }
 
     private fun performLogout() {
@@ -212,40 +201,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val languages = arrayOf("العربية", "English", "Français")
         val langCodes = arrayOf("ar", "en", "fr")
         val sharedPref = getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE)
-        val currentLang = sharedPref.getString("APP_LANG", "ar")
-        val checkedItem = langCodes.indexOf(currentLang).takeIf { it >= 0 } ?: 0
+        val checkedItem = langCodes.indexOf(sharedPref.getString("APP_LANG", "ar")).coerceAtLeast(0)
 
         AlertDialog.Builder(this)
-            .setTitle("اختر لغة التطبيق / Choose Language")
+            .setTitle("اختر لغة التطبيق")
             .setSingleChoiceItems(languages, checkedItem) { dialog, which ->
-                val newLang = langCodes[which]
-                sharedPref.edit().putString("APP_LANG", newLang).apply()
+                sharedPref.edit().putString("APP_LANG", langCodes[which]).apply()
                 dialog.dismiss()
-                
-                // الحل النهائي: إعادة تشغيل النشاط بـ Intent جديد وتنظيف الـ Task
-                val restartIntent = Intent(this, MainActivity::class.java)
-                restartIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                startActivity(restartIntent)
-                finish()
-                // إضافة خروج اختياري لضمان قتل العملية القديمة
+                val intent = Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                startActivity(intent)
                 Runtime.getRuntime().exit(0)
-            }
-            .show()
+            }.show()
     }
 
     private fun toggleTheme() {
         val sharedPref = getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE)
         val isDark = sharedPref.getBoolean("IS_DARK_MODE", true)
-        val newMode = !isDark
+        sharedPref.edit().putBoolean("IS_DARK_MODE", !isDark).apply()
+        AppCompatDelegate.setDefaultNightMode(if (!isDark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO)
         
-        sharedPref.edit().putBoolean("IS_DARK_MODE", newMode).apply()
-        
-        // تطبيق المظهر فوراً قبل الـ recreate
-        AppCompatDelegate.setDefaultNightMode(
-            if (newMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-        )
-        
-        // استخدام recreate بشكل آمن
         val intent = intent
         finish()
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
@@ -255,22 +229,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     @Suppress("DEPRECATION")
     private fun applySavedSettings() {
         val sharedPref = getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE)
-        
-        // ضبط المظهر
         val isDark = sharedPref.getBoolean("IS_DARK_MODE", true)
-        AppCompatDelegate.setDefaultNightMode(
-            if (isDark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-        )
+        AppCompatDelegate.setDefaultNightMode(if (isDark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO)
 
-        // ضبط اللغة وتحديث الـ Configuration بشكل كامل
-        val localeCode = sharedPref.getString("APP_LANG", "ar") ?: "ar"
-        val locale = Locale(localeCode)
+        val locale = Locale(sharedPref.getString("APP_LANG", "ar") ?: "ar")
         Locale.setDefault(locale)
         val config = resources.configuration
         config.setLocale(locale)
-        config.setLayoutDirection(locale) // مهم جداً للأجهزة الحديثة لضبط اتجاه الواجهة
-        
-        // تحديث المصادر
+        config.setLayoutDirection(locale)
         resources.updateConfiguration(config, resources.displayMetrics)
     }
 
@@ -279,18 +245,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             binding.drawerLayout.closeDrawer(GravityCompat.START)
         } else if (binding.fragmentContainer.visibility == View.VISIBLE) {
             val fragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
-            when {
-                fragment is LiveTvFragment && fragment.isShowingStreams -> fragment.goBackToCategories()
-                fragment is MoviesFragment && fragment.isShowingStreams -> fragment.goBackToCategories()
-                fragment is SeriesFragment && fragment.isShowingStreams -> fragment.goBackToCategories()
-                else -> {
-                    binding.fragmentContainer.visibility = View.GONE
-                    binding.dashboardView.visibility = View.VISIBLE
-                    supportActionBar?.title = getString(R.string.app_name)
-                }
+            if (fragment is LiveTvFragment && fragment.isShowingStreams) fragment.goBackToCategories()
+            else {
+                binding.fragmentContainer.visibility = View.GONE
+                binding.dashboardView.visibility = View.VISIBLE
+                supportActionBar?.title = getString(R.string.app_name)
             }
-        } else {
-            super.onBackPressed()
-        }
+        } else super.onBackPressed()
     }
 }
