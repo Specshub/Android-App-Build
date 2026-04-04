@@ -79,6 +79,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 viewModel.loadSeriesCategories()
             }
             
+            // ─── 🌟 ميزة المفضلة ───
+            R.id.nav_favorites -> {
+                fragment = FavoritesFragment()
+                title = "المفضلة / Favorites"
+            }
+            
             // ─── ميزة فحص السرعة الحقيقية ───
             R.id.nav_speed_test -> {
                 openSpeedTest()
@@ -109,7 +115,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
 
             // ─── الميزات المعقدة (تحتاج شاشات جديدة سنصنعها معاً لاحقاً) ───
-            R.id.nav_favorites, 
             R.id.nav_downloads, 
             R.id.nav_schedule, 
             R.id.nav_kids_mode -> {
