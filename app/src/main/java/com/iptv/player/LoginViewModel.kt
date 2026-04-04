@@ -1,48 +1,36 @@
-package com.iptv.player // ✅ الحزمة الموحدة الجديدة
+package com.iptv.player
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.iptv.player.data.api.RetrofitClient 
+import com.iptv.player.data.api.RetrofitClient // ✅ تأكد من وجوده في data/api
 import com.iptv.player.data.api.XtreamApiService
-import com.iptv.player.data.model.* // ✅ استيراد الموديلات وكلاس Resource
-import com.iptv.player.data.repository.XtreamRepository
+import com.iptv.player.data.model.* import com.iptv.player.data.repository.XtreamRepository
 import kotlinx.coroutines.launch
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
-    // ✅ إنشاء واجهة الـ API عبر الـ RetrofitClient
     private val apiService = RetrofitClient.instance.create(XtreamApiService::class.java)
-    
-    // ✅ تمرير الـ apiService للمستودع (Repository)
     private val repository = XtreamRepository(apiService)
 
     private val _authState = MutableLiveData<Resource<AuthResponse>>()
     val authState: LiveData<Resource<AuthResponse>> = _authState
 
-    /**
-     * تنفيذ عملية تسجيل الدخول
-     */
     fun login(host: String, username: String, password: String) {
-        // التحقق الأولي من الحقول
         if (host.isBlank() || username.isBlank() || password.isBlank()) {
-            _authState.value = Resource.Error("الرجاء إدخال جميع البيانات")
+            _authState.value = Resource.Error("الرجاء ملء جميع الحقول")
             return
         }
 
-        // إرسال حالة التحميل للـ UI
-        _authState.value = Resource.Loading() 
+        // ✅ إنشاء كائن البيانات المطلوب
+        val creds = LoginCredentials(host, username, password)
 
+        _authState.value = Resource.Loading()
         viewModelScope.launch {
-            try {
-                // طلب المصادقة من المستودع
-                val result = repository.authenticate(username, password)
-                _authState.value = result
-            } catch (e: Exception) {
-                _authState.value = Resource.Error(e.localizedMessage ?: "حدث خطأ أثناء الاتصال")
-            }
+            // ✅ تمرير الكائن بدلاً من النصوص المنفردة
+            _authState.value = repository.authenticate(creds)
         }
     }
 }
