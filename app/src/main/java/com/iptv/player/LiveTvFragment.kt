@@ -1,5 +1,6 @@
 package com.iptv.player
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -31,51 +32,52 @@ class LiveTvFragment : Fragment() {
         
         binding.recyclerView.layoutManager = GridLayoutManager(context, 3)
 
-        // ─── 1. ماذا يحدث عند الضغط؟ ───
         contentAdapter = ContentAdapter { clickedItem ->
             when (clickedItem) {
                 is ContentItem.Category -> {
-                    // إذا ضغط على "باقة"، نطلب من المدير جلب قنوات هذه الباقة!
                     Toast.makeText(context, "جاري جلب القنوات...", Toast.LENGTH_SHORT).show()
-                    viewModel.loadLiveStreams(clickedItem.id) 
+                    viewModel.loadLiveStreams(clickedItem.id)
                 }
                 is ContentItem.Live -> {
-                    // إذا ضغط على "قناة فعلية"، هنا سنقوم بتشغيل الفيديو لاحقاً!
-                    Toast.makeText(context, "جاري تشغيل قناة: ${clickedItem.stream.name}", Toast.LENGTH_LONG).show()
-                    // TODO: فتح شاشة مشغل الفيديو (PlayerActivity)
+                    // ─── ✅ هنا نصنع سحر التشغيل ───
+                    val host = activity?.intent?.getStringExtra(EXTRA_HOST) ?: ""
+                    val username = activity?.intent?.getStringExtra(EXTRA_USERNAME) ?: ""
+                    val password = activity?.intent?.getStringExtra(EXTRA_PASSWORD) ?: ""
+
+                    // تركيب الرابط الخاص بسيرفرات Xtream
+                    val baseUrl = if (host.startsWith("http")) host else "http://$host"
+                    val streamUrl = "$baseUrl/$username/$password/${clickedItem.stream.streamId}"
+
+                    // إرسال الرابط لشاشة المشغل
+                    val intent = Intent(requireContext(), PlayerActivity::class.java).apply {
+                        putExtra(PlayerActivity.EXTRA_STREAM_TITLE, clickedItem.stream.name)
+                        putExtra(PlayerActivity.EXTRA_STREAM_URL, streamUrl)
+                    }
+                    startActivity(intent)
                 }
                 else -> {}
             }
         }
         binding.recyclerView.adapter = contentAdapter
 
-        // ─── 2. مراقبة الباقات (Categories) ───
         viewModel.liveCategories.observe(viewLifecycleOwner) { resource ->
             if (resource is Resource.Success) {
                 val categories = resource.data
                 val items = categories.map { ContentItem.Category(it.categoryId, it.categoryName) }
-                // عرض الباقات عند فتح الشاشة
                 contentAdapter.submitList(items)
             }
         }
 
-        // ─── 3. مراقبة القنوات الفعلية (Live Streams) ───
-        // ✅ هذا هو الجزء الجديد الذي سيرسم القنوات عند جلبها!
         viewModel.liveStreams.observe(viewLifecycleOwner) { resource ->
             when (resource) {
-                is Resource.Loading -> {
-                    // يمكنك إظهار شريط تحميل هنا
-                }
+                is Resource.Loading -> { }
                 is Resource.Success -> {
                     val streams = resource.data
-                    // تحويل البيانات إلى قنوات ليفهمها النادل
                     val items = streams.map { ContentItem.Live(it) }
-                    
-                    // استبدال الباقات بالقنوات في نفس الشاشة!
                     contentAdapter.submitList(items)
                 }
                 is Resource.Error -> {
-                    Toast.makeText(context, "خطأ في جلب القنوات: ${resource.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "خطأ: ${resource.message}", Toast.LENGTH_LONG).show()
                 }
             }
         }
