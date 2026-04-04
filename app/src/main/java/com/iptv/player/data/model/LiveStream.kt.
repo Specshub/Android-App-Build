@@ -1,0 +1,11 @@
+package com.iptv.player.data.model // ✅ الحزمة الجديدة
+
+import com.google.gson.annotations.SerializedName
+
+data class LiveStream(
+    @SerializedName("num") val num: Int?,
+    @SerializedName("name") val name: String,
+    @SerializedName("stream_id") val streamId: String,
+    @SerializedName("stream_icon") val streamIcon: String?,
+    @SerializedName("category_id") val categoryId: String?
+)
