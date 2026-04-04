@@ -3,19 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="2dp">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_margin="6dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"> <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp">
+        android:background="#1E1E1E"
+        android:paddingBottom="8dp">
 
         <ImageView
             android:id="@+id/iv_thumbnail"
             android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:layout_height="140dp"
             android:scaleType="centerCrop"
             app:layout_constraintTop_toTopOf="parent"
             android:src="@android:drawable/ic_menu_report_image" />
@@ -24,7 +26,14 @@
             android:id="@+id/tv_content_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="4dp"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
             android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end"
             app:layout_constraintTop_toBottomOf="@id/iv_thumbnail"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/iv_play_icon" />
@@ -33,16 +42,22 @@
             android:id="@+id/tv_content_meta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
+            android:layout_marginStart="8dp"
+            android:textColor="#BBBBBB"
+            android:textSize="11sp"
+            android:maxLines="1"
             app:layout_constraintTop_toBottomOf="@id/tv_content_title"
             app:layout_constraintStart_toStartOf="parent" />
 
         <ImageView
             android:id="@+id/iv_play_icon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginEnd="8dp"
             android:src="@android:drawable/ic_media_play"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:tint="#00FF00"
+            app:layout_constraintBottom_toBottomOf="@id/tv_content_meta"
+            app:layout_constraintTop_toTopOf="@id/tv_content_title"
             app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
