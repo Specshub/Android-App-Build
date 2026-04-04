@@ -1,143 +1,59 @@
-// com/iptvplayer/app/data/repository/XtreamRepository.kt
-package com.iptvplayer.app.data.repository
+package com.iptv.player.data.repository // ✅ الهوية الجديدة الموحدة
 
-import com.iptvplayer.app.data.api.RetrofitClient
-import com.iptvplayer.app.data.api.XtreamUrlBuilder
-import com.iptvplayer.app.data.model.*
+import com.iptv.player.RetrofitClient // ✅ استيراد المحرك الصحيح
+import com.iptv.player.data.model.* // ✅ استيراد الموديلات الجديدة
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import retrofit2.Response
 
-class XtreamRepository {
+// ✅ تعريف فئة Resource (ضرورية جداً لكي يعمل الكود بدون أخطاء)
+sealed class Resource<T>(
+    val data: T? = null,
+    val message: String? = null
+) {
+    class Success<T>(data: T) : Resource<T>(data)
+    class Error<T>(message: String, data: T? = null) : Resource<T>(data, message)
+}
 
-    private val api = RetrofitClient.apiService
+class XtreamRepository(private val api: XtreamApiService) { // ✅ تمرير الـ API عبر المنشئ أفضل
 
     // ── Authentication ──────────────────────────────────────────────────────
-
-    suspend fun authenticate(credentials: LoginCredentials): Resource<AuthResponse> =
+    suspend fun authenticate(username: String, password: String): Resource<AuthResponse> =
         withContext(Dispatchers.IO) {
-            safeApiCall {
-                api.authenticate(XtreamUrlBuilder.authUrl(credentials))
-            }
+            safeApiCall { api.authenticate("get_live_streams", username, password) }
         }
 
     // ── Live TV ─────────────────────────────────────────────────────────────
-
-    suspend fun getLiveCategories(credentials: LoginCredentials): Resource<List<LiveCategory>> =
+    suspend fun getLiveStreams(): Resource<List<LiveStream>> =
         withContext(Dispatchers.IO) {
-            safeApiCall {
-                api.getLiveCategories(XtreamUrlBuilder.liveCategories(credentials))
-            }
-        }
-
-    suspend fun getLiveStreams(credentials: LoginCredentials): Resource<List<LiveStream>> =
-        withContext(Dispatchers.IO) {
-            safeApiCall {
-                api.getLiveStreams(XtreamUrlBuilder.liveStreams(credentials))
-            }
-        }
-
-    suspend fun getLiveStreamsByCategory(
-        credentials: LoginCredentials,
-        categoryId: String
-    ): Resource<List<LiveStream>> =
-        withContext(Dispatchers.IO) {
-            safeApiCall {
-                api.getLiveStreams(XtreamUrlBuilder.liveStreamsByCategory(credentials, categoryId))
-            }
+            safeApiCall { api.getLiveStreams("get_live_streams") }
         }
 
     // ── VOD ─────────────────────────────────────────────────────────────────
-
-    suspend fun getVodCategories(credentials: LoginCredentials): Resource<List<VodCategory>> =
+    suspend fun getVodStreams(): Resource<List<VodStream>> =
         withContext(Dispatchers.IO) {
-            safeApiCall {
-                api.getVodCategories(XtreamUrlBuilder.vodCategories(credentials))
-            }
-        }
-
-    suspend fun getVodStreams(credentials: LoginCredentials): Resource<List<VodStream>> =
-        withContext(Dispatchers.IO) {
-            safeApiCall {
-                api.getVodStreams(XtreamUrlBuilder.vodStreams(credentials))
-            }
-        }
-
-    suspend fun getVodStreamsByCategory(
-        credentials: LoginCredentials,
-        categoryId: String
-    ): Resource<List<VodStream>> =
-        withContext(Dispatchers.IO) {
-            safeApiCall {
-                api.getVodStreams(XtreamUrlBuilder.vodStreamsByCategory(credentials, categoryId))
-            }
+            safeApiCall { api.getVodStreams("get_vod_streams") }
         }
 
     // ── Series ──────────────────────────────────────────────────────────────
-
-    suspend fun getSeriesCategories(credentials: LoginCredentials): Resource<List<SeriesCategory>> =
+    suspend fun getSeries(): Resource<List<Series>> =
         withContext(Dispatchers.IO) {
-            safeApiCall {
-                api.getSeriesCategories(XtreamUrlBuilder.seriesCategories(credentials))
-            }
+            safeApiCall { api.getSeries("get_series") }
         }
 
-    suspend fun getSeries(credentials: LoginCredentials): Resource<List<Series>> =
-        withContext(Dispatchers.IO) {
-            safeApiCall {
-                api.getSeries(XtreamUrlBuilder.series(credentials))
-            }
-        }
-
-    suspend fun getSeriesByCategory(
-        credentials: LoginCredentials,
-        categoryId: String
-    ): Resource<List<Series>> =
-        withContext(Dispatchers.IO) {
-            safeApiCall {
-                api.getSeries(XtreamUrlBuilder.seriesByCategory(credentials, categoryId))
-            }
-        }
-
-    suspend fun getSeriesInfo(
-        credentials: LoginCredentials,
-        seriesId: Int
-    ): Resource<SeriesInfo> =
-        withContext(Dispatchers.IO) {
-            safeApiCall {
-                api.getSeriesInfo(XtreamUrlBuilder.seriesInfo(credentials, seriesId))
-            }
-        }
-
-    // ── Helper ──────────────────────────────────────────────────────────────
-
-    private suspend fun <T> safeApiCall(
-        call: suspend () -> retrofit2.Response<T>
-    ): Resource<T> {
+    // ── Helper (المنقذ من الانهيار) ──────────────────────────────────────────
+    private suspend fun <T> safeApiCall(call: suspend () -> Response<T>): Resource<T> {
         return try {
             val response = call()
             if (response.isSuccessful) {
                 val body = response.body()
-                if (body != null) {
-                    Resource.Success(body)
-                } else {
-                    Resource.Error("Empty response body")
-                }
+                if (body != null) Resource.Success(body)
+                else Resource.Error("Empty response body")
             } else {
-                val errorMsg = when (response.code()) {
-                    401 -> "Invalid credentials. Please check your username and password."
-                    403 -> "Access forbidden. Your account may be expired."
-                    404 -> "Server not found. Please check the host URL."
-                    500 -> "Server error. Please try again later."
-                    else -> "Request failed with code: ${response.code()}"
-                }
-                Resource.Error(errorMsg)
+                Resource.Error("Error code: ${response.code()}")
             }
-        } catch (e: java.net.UnknownHostException) {
-            Resource.Error("Cannot reach server. Check the host URL and your internet connection.")
-        } catch (e: java.net.SocketTimeoutException) {
-            Resource.Error("Connection timed out. Server may be slow or unreachable.")
         } catch (e: Exception) {
-            Resource.Error(e.localizedMessage ?: "An unexpected error occurred.")
+            Resource.Error(e.localizedMessage ?: "An unexpected error occurred")
         }
     }
 }
