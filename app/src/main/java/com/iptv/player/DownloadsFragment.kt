@@ -62,8 +62,8 @@ class DownloadsFragment : Fragment() {
                 ContentItem.Vod(VodStream(
                     streamId = it.id.toInt(),
                     name = it.title,
-                    streamIcon = it.posterUrl,
-                    containerExtension = "mp4"
+                    streamIcon = it.posterUrl
+                    // ❌ قمنا بحذف السطر الذي كان يسبب الخطأ من هنا
                 ))
             }
             adapter.submitList(items)
