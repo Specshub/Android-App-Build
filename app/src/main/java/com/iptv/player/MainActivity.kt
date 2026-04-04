@@ -5,7 +5,12 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.MenuItem
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -14,6 +19,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.iptv.player.databinding.ActivityMainBinding
 import com.google.android.material.navigation.NavigationView
 import com.iptv.player.data.model.LoginCredentials
@@ -30,9 +37,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val host = intent.getStringExtra("EXTRA_HOST") ?: intent.getStringExtra(EXTRA_HOST) ?: ""
-        val username = intent.getStringExtra("EXTRA_USERNAME") ?: intent.getStringExtra(EXTRA_USERNAME) ?: ""
-        val password = intent.getStringExtra("EXTRA_PASSWORD") ?: intent.getStringExtra(EXTRA_PASSWORD) ?: ""
+        val host = intent.getStringExtra("EXTRA_HOST") ?: ""
+        val username = intent.getStringExtra("EXTRA_USERNAME") ?: ""
+        val password = intent.getStringExtra("EXTRA_PASSWORD") ?: ""
 
         if (host.isNotEmpty() && username.isNotEmpty()) {
             val creds = LoginCredentials(host, username, password)
@@ -50,17 +57,103 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         binding.navView.setNavigationItemSelectedListener(this)
 
+        // 1. عند فتح التطبيق، تظهر الرئيسية (Dashboard) ويكون قسم القنوات مخفياً
         if (savedInstanceState == null) {
-            loadFragment(LiveTvFragment())
-            binding.navView.setCheckedItem(R.id.nav_live_tv)
-            supportActionBar?.title = "Live TV"
-            viewModel.loadLiveCategories()
+            binding.dashboardView.visibility = View.VISIBLE
+            binding.fragmentContainer.visibility = View.GONE
+            supportActionBar?.title = "الرئيسية / Dashboard"
         }
+
+        // 2. تشغيل الميزات الاحترافية
+        setupDashboardButtons()
+        setupAnimatedBanner()
+    }
+
+    // ─── إعداد الشريط المتحرك (Slider) ───
+    private fun setupAnimatedBanner() {
+        val bannerImage = findViewById<ImageView>(R.id.bannerImage) ?: return
+
+        // روابط صور لبعض العروض أو الأفلام (يمكنك تغييرها لاحقاً لتأتي من API)
+        val banners = listOf(
+            "https://image.tmdb.org/t/p/original/8Y43POKjjKDGI9MH89NW0NAzzp8.jpg", 
+            "https://image.tmdb.org/t/p/original/t5zCBSB5xMDKcDqe91qahCOUYVV.jpg",
+            "https://image.tmdb.org/t/p/original/1X7vow16X7CnCoexXh4H4F2yDJv.jpg"
+        )
+
+        val handler = Handler(Looper.getMainLooper())
+        var currentIndex = 0
+
+        val runnable = object : Runnable {
+            override fun run() {
+                Glide.with(this@MainActivity)
+                    .load(banners[currentIndex])
+                    .transition(DrawableTransitionOptions.withCrossFade(1000)) // انتقال ناعم
+                    .centerCrop()
+                    .into(bannerImage)
+
+                currentIndex = (currentIndex + 1) % banners.size
+                handler.postDelayed(this, 4000) // تغيير الصورة كل 4 ثوانٍ
+            }
+        }
+        handler.post(runnable)
+    }
+
+    // ─── إعداد أزرار الشاشة الرئيسية ───
+    private fun setupDashboardButtons() {
+        // زر البث المباشر
+        findViewById<View>(R.id.mainBtnLive).apply {
+            findViewById<TextView>(R.id.btnText).text = "البث المباشر"
+            setOnClickListener { 
+                binding.navView.setCheckedItem(R.id.nav_live_tv)
+                openSection(R.id.nav_live_tv) 
+            }
+        }
+
+        // زر الأفلام
+        findViewById<View>(R.id.mainBtnMovies).apply {
+            findViewById<TextView>(R.id.btnText).text = "الأفلام (VOD)"
+            setOnClickListener { 
+                binding.navView.setCheckedItem(R.id.nav_movies)
+                openSection(R.id.nav_movies) 
+            }
+        }
+
+        // زر المسلسلات
+        findViewById<View>(R.id.mainBtnSeries).apply {
+            findViewById<TextView>(R.id.btnText).text = "المسلسلات"
+            setOnClickListener { 
+                binding.navView.setCheckedItem(R.id.nav_series)
+                openSection(R.id.nav_series) 
+            }
+        }
+
+        // زر جدول المباريات
+        findViewById<View>(R.id.mainBtnSchedule).apply {
+            findViewById<TextView>(R.id.btnText).text = "جدول المباريات"
+            setOnClickListener { 
+                binding.navView.setCheckedItem(R.id.nav_schedule)
+                openSection(R.id.nav_schedule) 
+            }
+        }
+    }
+
+    // دالة لفتح الأقسام وإخفاء الرئيسية
+    private fun openSection(itemId: Int) {
+        binding.dashboardView.visibility = View.GONE
+        binding.fragmentContainer.visibility = View.VISIBLE
+        onNavigationItemSelected(binding.navView.menu.findItem(itemId) ?: return)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         var fragment: Fragment? = null
         var title = ""
+
+        // إذا تم اختيار قسم من القائمة الجانبية، تأكد من إخفاء الرئيسية
+        val isContentSection = item.itemId in listOf(R.id.nav_live_tv, R.id.nav_movies, R.id.nav_series, R.id.nav_schedule, R.id.nav_favorites)
+        if (isContentSection) {
+            binding.dashboardView.visibility = View.GONE
+            binding.fragmentContainer.visibility = View.VISIBLE
+        }
 
         when (item.itemId) {
             R.id.nav_live_tv -> {
@@ -82,61 +175,35 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 fragment = FavoritesFragment()
                 title = "المفضلة / Favorites"
             }
-            R.id.nav_speed_test -> {
-                openSpeedTest()
-                binding.drawerLayout.closeDrawer(GravityCompat.START)
-                return true
-            }
-            R.id.nav_clear_cache -> {
-                clearAppCache()
-                binding.drawerLayout.closeDrawer(GravityCompat.START)
-                return true
-            }
-            R.id.nav_support -> {
-                openLiveSupport()
-                binding.drawerLayout.closeDrawer(GravityCompat.START)
-                return true
-            }
-            R.id.nav_multi_screen -> {
-                val intent = Intent(this, MultiScreenActivity::class.java)
-                startActivity(intent)
-                binding.drawerLayout.closeDrawer(GravityCompat.START)
-                return true
-            }
             R.id.nav_schedule -> {
                 fragment = MatchScheduleFragment()
-                title = "جدول المباريات / Match Schedule"
+                title = "جدول المباريات"
             }
-            R.id.nav_language -> {
-                showLanguageDialog()
+            R.id.nav_speed_test -> { openSpeedTest(); binding.drawerLayout.closeDrawer(GravityCompat.START); return true }
+            R.id.nav_clear_cache -> { clearAppCache(); binding.drawerLayout.closeDrawer(GravityCompat.START); return true }
+            R.id.nav_support -> { openLiveSupport(); binding.drawerLayout.closeDrawer(GravityCompat.START); return true }
+            R.id.nav_multi_screen -> {
+                startActivity(Intent(this, MultiScreenActivity::class.java))
+                binding.drawerLayout.closeDrawer(GravityCompat.START)
                 return true
             }
-            R.id.nav_theme -> {
-                toggleTheme()
-                return true
-            }
+            R.id.nav_language -> { showLanguageDialog(); return true }
+            R.id.nav_theme -> { toggleTheme(); return true }
             R.id.nav_settings -> {
                 Toast.makeText(this, "الإعدادات قيد التطوير ⚙️", Toast.LENGTH_SHORT).show()
                 binding.drawerLayout.closeDrawer(GravityCompat.START)
                 return true
             }
-            R.id.nav_logout -> {
-                performLogout()
-                return true
-            }
+            R.id.nav_logout -> { performLogout(); return true }
         }
 
         if (fragment != null) {
-            loadFragment(fragment)
+            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit()
             supportActionBar?.title = title
         }
 
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
-    }
-
-    private fun loadFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit()
     }
 
     private fun clearAppCache() {
@@ -147,15 +214,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun openSpeedTest() {
-        try {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://fast.com/ar/")))
-        } catch (e: Exception) {}
+        try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://fast.com/ar/"))) } catch (e: Exception) {}
     }
 
     private fun openLiveSupport() {
-        try {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://api.whatsapp.com/send?phone=212772863204&text=مرحباً")))
-        } catch (e: Exception) {}
+        try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://api.whatsapp.com/send?phone=212772863204&text=مرحباً"))) } catch (e: Exception) {}
     }
 
     private fun performLogout() {
@@ -209,37 +272,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         )
     }
 
-    // ─── 🚀 الذكاء الاصطناعي لزر الرجوع (التحديث الشامل) ───
+    // ─── 🚀 الذكاء الاصطناعي لزر الرجوع (التحديث الاحترافي) ───
     override fun onBackPressed() {
         if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            // 1. إذا كانت القائمة الجانبية مفتوحة، أغلقها
             binding.drawerLayout.closeDrawer(GravityCompat.START)
-        } else {
+        } else if (binding.fragmentContainer.visibility == View.VISIBLE) {
             val fragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
 
             when {
-                // 2. الرجوع من داخل الباقات إلى الأقسام
-                fragment is LiveTvFragment && fragment.isShowingStreams -> {
-                    fragment.goBackToCategories()
+                fragment is LiveTvFragment && fragment.isShowingStreams -> fragment.goBackToCategories()
+                fragment is MoviesFragment && fragment.isShowingStreams -> fragment.goBackToCategories()
+                fragment is SeriesFragment && fragment.isShowingStreams -> fragment.goBackToCategories()
+                else -> {
+                    // السحر هنا: العودة إلى لوحة التحكم الرئيسية بدلاً من الخروج
+                    binding.fragmentContainer.visibility = View.GONE
+                    binding.dashboardView.visibility = View.VISIBLE
+                    supportActionBar?.title = "الرئيسية / Dashboard"
                 }
-                fragment is MoviesFragment && fragment.isShowingStreams -> {
-                    fragment.goBackToCategories()
-                }
-                fragment is SeriesFragment && fragment.isShowingStreams -> {
-                    fragment.goBackToCategories()
-                }
-                
-                // 3. السحر هنا: إذا كان في أي مكان آخر (مفضلة، جدول، أفلام، مسلسلات) ورغب بالرجوع
-                // لا تخرج من التطبيق، بل أعده للشاشة الرئيسية (البث المباشر)
-                fragment !is LiveTvFragment -> {
-                    loadFragment(LiveTvFragment())
-                    binding.navView.setCheckedItem(R.id.nav_live_tv)
-                    supportActionBar?.title = "Live TV"
-                }
-                
-                // 4. الخروج من التطبيق فقط إذا كان في القائمة الرئيسية للبث المباشر
-                else -> super.onBackPressed()
             }
+        } else {
+            // الخروج من التطبيق فقط إذا كان المستخدم في الصفحة الرئيسية
+            super.onBackPressed()
         }
     }
 }
