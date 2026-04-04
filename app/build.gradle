@@ -18,7 +18,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    // ✅ إضافة صمام أمان لمصحيح الأخطاء في KAPT
     kapt {
         correctErrorTypes = true
     }
@@ -83,10 +82,12 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    // ✅ هذا هو السطر الذي كان ينقصك وتسبب في خطأ RetrofitClient
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0' 
 
     // Glide
     implementation 'com.github.bumptech.glide:glide:4.16.0'
-    // ❌ تعطيل هذا السطر مؤقتاً هو "مفتاح الحل" لتجاوز خطأ الـ KAPT الحالي
+    // معطل مؤقتاً لحل مشكلة KAPT
     // kapt 'com.github.bumptech.glide:compiler:4.16.0'
 
     // Google AdMob
