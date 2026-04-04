@@ -11,7 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.iptv.player.databinding.FragmentLiveTvBinding
 import com.iptv.player.data.model.Resource
-import com.iptv.player.FavoritesManager // ✅ استيراد مدير المفضلة
+import com.iptv.player.FavoritesManager
 
 class LiveTvFragment : Fragment() {
     private var _binding: FragmentLiveTvBinding? = null
@@ -19,6 +19,9 @@ class LiveTvFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var contentAdapter: ContentAdapter
+
+    // 🚩 متغير لمتابعة الحالة: هل نحن نعرض قنوات أم باقات؟
+    var isShowingStreams = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,6 +40,7 @@ class LiveTvFragment : Fragment() {
         contentAdapter = ContentAdapter { clickedItem ->
             when (clickedItem) {
                 is ContentItem.Category -> {
+                    isShowingStreams = true // ⬅️ تحديث الحالة: دخلنا إلى باقة
                     Toast.makeText(context, "جاري جلب القنوات...", Toast.LENGTH_SHORT).show()
                     viewModel.loadLiveStreams(clickedItem.id)
                 }
@@ -64,20 +68,17 @@ class LiveTvFragment : Fragment() {
         // ─── 2. ✅ الضغطة المطولة (إضافة أو إزالة من المفضلة بذكاء) ───
         contentAdapter.onItemLongClick = { item ->
             if (item is ContentItem.Live) {
-                // نتحقق أولاً: هل القناة موجودة في المفضلة؟
                 val currentFavs = FavoritesManager.getFavorites(requireContext())
                 val isAlreadyFav = currentFavs.any { it.streamId == item.stream.streamId }
 
                 if (isAlreadyFav) {
-                    // إذا كانت موجودة، نقوم بحذفها
                     FavoritesManager.removeFavorite(requireContext(), item.stream)
                     Toast.makeText(context, "🗑️ تم إزالة ${item.stream.name} من المفضلة", Toast.LENGTH_SHORT).show()
                 } else {
-                    // إذا لم تكن موجودة، نقوم بإضافتها
                     FavoritesManager.addFavorite(requireContext(), item.stream)
                     Toast.makeText(context, "🌟 تم إضافة ${item.stream.name} للمفضلة", Toast.LENGTH_SHORT).show()
                 }
-                true // نجاح التعامل مع الضغطة
+                true
             } else {
                 false
             }
@@ -87,6 +88,7 @@ class LiveTvFragment : Fragment() {
 
         viewModel.liveCategories.observe(viewLifecycleOwner) { resource ->
             if (resource is Resource.Success) {
+                isShowingStreams = false // ⬅️ تحديث الحالة: عدنا إلى الباقات
                 val categories = resource.data
                 val items = categories.map { ContentItem.Category(it.categoryId, it.categoryName) }
                 contentAdapter.submitList(items)
@@ -106,6 +108,11 @@ class LiveTvFragment : Fragment() {
                 }
             }
         }
+    }
+
+    // 🔙 دالة العودة للباقات (تستدعى من MainActivity عند ضغط زر الرجوع)
+    fun goBackToCategories() {
+        viewModel.loadLiveCategories()
     }
 
     override fun onDestroyView() {
