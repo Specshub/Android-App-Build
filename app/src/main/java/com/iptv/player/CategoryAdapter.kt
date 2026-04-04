@@ -1,4 +1,3 @@
-// com/iptvplayer/app/ui/adapter/CategoryAdapter.kt
 package com.iptvplayer.app.ui.adapter
 
 import android.view.LayoutInflater
@@ -10,7 +9,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.iptvplayer.app.R
-import com.iptvplayer.app.ui.GenericCategory
+
+// ✅ تعريف الفئة مباشرة داخل الملف لحل مشكلة Unresolved reference
+data class GenericCategory(
+    val categoryId: String,
+    val categoryName: String
+)
 
 class CategoryAdapter(
     private val onCategoryClick: (GenericCategory) -> Unit
