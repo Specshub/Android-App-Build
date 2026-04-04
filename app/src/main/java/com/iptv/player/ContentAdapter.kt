@@ -9,13 +9,14 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.iptv.player.data.model.LiveStream
 import com.iptv.player.data.model.Series
 import com.iptv.player.data.model.VodStream
 
 sealed class ContentItem {
-    data class Category(val id: String, val name: String) : ContentItem()
+    data class Category(val id: String, val name: String, val imageUrl: String? = null) : ContentItem()
     data class Live(val stream: LiveStream) : ContentItem()
     data class Vod(val stream: VodStream) : ContentItem()
     data class SeriesItem(val series: Series) : ContentItem()
@@ -34,24 +35,20 @@ class ContentAdapter(
     }
 
     fun filter(query: String) {
-        val filteredList = if (query.isEmpty()) {
-            fullList
-        } else {
-            fullList.filter { item ->
-                when (item) {
-                    is ContentItem.Category -> item.name.contains(query, ignoreCase = true)
-                    is ContentItem.Live -> item.stream.name?.contains(query, ignoreCase = true) == true
-                    is ContentItem.Vod -> item.stream.name?.contains(query, ignoreCase = true) == true
-                    is ContentItem.SeriesItem -> item.series.name?.contains(query, ignoreCase = true) == true
-                }
+        val filteredList = if (query.isEmpty()) fullList
+        else fullList.filter { item ->
+            when (item) {
+                is ContentItem.Category -> item.name.contains(query, ignoreCase = true)
+                is ContentItem.Live -> item.stream.name?.contains(query, ignoreCase = true) == true
+                is ContentItem.Vod -> item.stream.name?.contains(query, ignoreCase = true) == true
+                is ContentItem.SeriesItem -> item.series.name?.contains(query, ignoreCase = true) == true
             }
         }
         submitList(filteredList)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContentViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_content_card, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_content_card, parent, false)
         return ContentViewHolder(view)
     }
 
@@ -65,62 +62,73 @@ class ContentAdapter(
         private val tvMeta: TextView = itemView.findViewById(R.id.tv_content_meta)
 
         fun bind(item: ContentItem) {
-            // إعادة ضبط الإعدادات الافتراضية للكارد (مهم عند تدوير العناصر)
+            // إعادة ضبط الإعدادات لمنع تداخل التصاميم عند التمرير السريع
             ivThumbnail.setPadding(0, 0, 0, 0)
-            ivThumbnail.setBackgroundResource(0)
-            tvMeta.visibility = View.VISIBLE
-
+            
             when (item) {
                 is ContentItem.Category -> {
                     tvTitle.text = item.name
-                    tvMeta.text = "📁 FOLDER"
+                    tvMeta.text = "FOLDER"
+                    tvMeta.setBackgroundResource(R.drawable.bg_tag_blue) // تأكد من وجود هذا الملف
                     
-                    // 🎨 سحر الباقات: نستخدم التدرج اللوني الذي صنعناه وأيقونة أنيقة
-                    ivThumbnail.setImageResource(android.R.drawable.ic_menu_agenda) // يفضل استبدالها بأيقونة مجلد حديثة لاحقاً
-                    ivThumbnail.setBackgroundResource(R.drawable.bg_category_gradient)
-                    ivThumbnail.setPadding(60, 60, 60, 60) // جعل الأيقونة في المنتصف بشكل جميل
+                    // 🧠 ذكاء الأيقونات: اختيار صورة بناءً على اسم الباقة
+                    val categoryImg = getSmartCategoryIcon(item.name)
+                    loadThumbnail(categoryImg, isCategory = true)
                     
                     itemView.setOnClickListener { onItemClick(item) }
-                    itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
                 }
-                
                 is ContentItem.Live -> {
                     tvTitle.text = item.stream.name
-                    tvMeta.text = "🔴 LIVE"
+                    tvMeta.text = "LIVE"
+                    tvMeta.setBackgroundResource(R.drawable.bg_tag_red) 
                     loadThumbnail(item.stream.streamIcon)
-                    
                     itemView.setOnClickListener { onItemClick(item) }
                     itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
                 }
-                
                 is ContentItem.Vod -> {
                     tvTitle.text = item.stream.name
-                    tvMeta.text = item.stream.rating?.let { "⭐ $it" } ?: "VOD"
+                    tvMeta.text = "MOVIE"
+                    tvMeta.setBackgroundResource(R.drawable.bg_tag_purple)
                     loadThumbnail(item.stream.streamIcon)
-                    
                     itemView.setOnClickListener { onItemClick(item) }
                     itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
                 }
-                
                 is ContentItem.SeriesItem -> {
                     tvTitle.text = item.series.name
-                    tvMeta.text = "📺 SERIES"
+                    tvMeta.text = "SERIES"
+                    tvMeta.setBackgroundResource(R.drawable.bg_tag_orange)
                     loadThumbnail(item.series.cover)
-                    
                     itemView.setOnClickListener { onItemClick(item) }
                     itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
                 }
             }
         }
 
-        private fun loadThumbnail(url: String?) {
+        // 🚀 دالة التحميل السريع جداً مع التخزين المؤقت
+        private fun loadThumbnail(url: String?, isCategory: Boolean = false) {
             Glide.with(itemView.context)
                 .load(url)
-                .placeholder(R.drawable.bg_category_gradient) // استخدام التدرج كخلفية انتظار
-                .error(R.drawable.bg_category_gradient)
+                .diskCacheStrategy(DiskCacheStrategy.ALL) // ⚡ سرعة صاروخية في التحميل المرة القادمة
+                .placeholder(R.drawable.bg_category_gradient)
+                .error(if (isCategory) R.drawable.ic_folder_modern else R.drawable.bg_category_gradient)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .centerCrop()
                 .into(ivThumbnail)
+        }
+
+        // 🔍 محرك بحث الأيقونات الذكي
+        private fun getSmartCategoryIcon(name: String): String {
+            val n = name.lowercase()
+            return when {
+                n.contains("bein") -> "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/BeIN_Sports_logo.svg/512px-BeIN_Sports_logo.svg.png"
+                n.contains("osn") -> "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/OSN_logo.svg/512px-OSN_logo.svg.png"
+                n.contains("netflix") -> "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg"
+                n.contains("shahid") -> "https://upload.wikimedia.org/wikipedia/ar/0/0e/Shahid_Logo.png"
+                n.contains("kids") || n.contains("اطفال") -> "https://cdn-icons-png.flaticon.com/512/3050/3050031.png"
+                n.contains("sport") || n.contains("رياضة") -> "https://cdn-icons-png.flaticon.com/512/857/857418.png"
+                n.contains("movie") || n.contains("افلام") -> "https://cdn-icons-png.flaticon.com/512/4221/4221419.png"
+                else -> "" // سيظهر التدرج اللوني الجميل إذا لم يجد تطابقاً
+            }
         }
     }
 
