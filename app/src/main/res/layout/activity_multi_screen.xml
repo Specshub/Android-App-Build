@@ -6,12 +6,14 @@
     android:background="#000000">
 
     <LinearLayout
+        android:id="@+id/row1"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="horizontal">
 
         <FrameLayout
+            android:id="@+id/frame1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -31,6 +33,7 @@
         </FrameLayout>
 
         <FrameLayout
+            android:id="@+id/frame2"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -51,12 +54,14 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/row2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="horizontal">
 
         <FrameLayout
+            android:id="@+id/frame3"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -76,6 +81,7 @@
         </FrameLayout>
 
         <FrameLayout
+            android:id="@+id/frame4"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
