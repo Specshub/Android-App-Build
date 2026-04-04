@@ -57,29 +57,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         binding.navView.setNavigationItemSelectedListener(this)
 
-        // 1. عند فتح التطبيق، تظهر الرئيسية (Dashboard) ويكون قسم القنوات مخفياً
         if (savedInstanceState == null) {
             binding.dashboardView.visibility = View.VISIBLE
             binding.fragmentContainer.visibility = View.GONE
             supportActionBar?.title = "الرئيسية / Dashboard"
         }
 
-        // 2. تشغيل الميزات الاحترافية
         setupDashboardButtons()
         setupAnimatedBanner()
     }
 
-    // ─── إعداد الشريط المتحرك (Slider) ───
     private fun setupAnimatedBanner() {
         val bannerImage = findViewById<ImageView>(R.id.bannerImage) ?: return
-
-        // روابط صور لبعض العروض أو الأفلام (يمكنك تغييرها لاحقاً لتأتي من API)
         val banners = listOf(
             "https://image.tmdb.org/t/p/original/8Y43POKjjKDGI9MH89NW0NAzzp8.jpg", 
             "https://image.tmdb.org/t/p/original/t5zCBSB5xMDKcDqe91qahCOUYVV.jpg",
             "https://image.tmdb.org/t/p/original/1X7vow16X7CnCoexXh4H4F2yDJv.jpg"
         )
-
         val handler = Handler(Looper.getMainLooper())
         var currentIndex = 0
 
@@ -87,75 +81,54 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             override fun run() {
                 Glide.with(this@MainActivity)
                     .load(banners[currentIndex])
-                    .transition(DrawableTransitionOptions.withCrossFade(1000)) // انتقال ناعم
+                    .transition(DrawableTransitionOptions.withCrossFade(1000))
                     .centerCrop()
                     .into(bannerImage)
 
                 currentIndex = (currentIndex + 1) % banners.size
-                handler.postDelayed(this, 4000) // تغيير الصورة كل 4 ثوانٍ
+                handler.postDelayed(this, 4000)
             }
         }
         handler.post(runnable)
     }
 
-    // ─── إعداد أزرار الشاشة الرئيسية ───
+    // ─── إعداد الأزرار والأيقونات الجديدة ───
     private fun setupDashboardButtons() {
-        // زر البث المباشر
         findViewById<View>(R.id.mainBtnLive).apply {
             findViewById<TextView>(R.id.btnText).text = "البث المباشر"
-            setOnClickListener { 
-                binding.navView.setCheckedItem(R.id.nav_live_tv)
-                openSection(R.id.nav_live_tv) 
-            }
+            findViewById<ImageView>(R.id.btnIcon).setImageResource(android.R.drawable.ic_menu_slideshow) // أيقونة عرض
+            setOnClickListener { navigateToSection(R.id.nav_live_tv) }
         }
 
-        // زر الأفلام
         findViewById<View>(R.id.mainBtnMovies).apply {
             findViewById<TextView>(R.id.btnText).text = "الأفلام (VOD)"
-            setOnClickListener { 
-                binding.navView.setCheckedItem(R.id.nav_movies)
-                openSection(R.id.nav_movies) 
-            }
+            findViewById<ImageView>(R.id.btnIcon).setImageResource(android.R.drawable.ic_menu_gallery) // أيقونة صور/أفلام
+            setOnClickListener { navigateToSection(R.id.nav_movies) }
         }
 
-        // زر المسلسلات
         findViewById<View>(R.id.mainBtnSeries).apply {
             findViewById<TextView>(R.id.btnText).text = "المسلسلات"
-            setOnClickListener { 
-                binding.navView.setCheckedItem(R.id.nav_series)
-                openSection(R.id.nav_series) 
-            }
+            findViewById<ImageView>(R.id.btnIcon).setImageResource(android.R.drawable.ic_menu_recent_history) // أيقونة متسلسلة
+            setOnClickListener { navigateToSection(R.id.nav_series) }
         }
 
-        // زر جدول المباريات
         findViewById<View>(R.id.mainBtnSchedule).apply {
             findViewById<TextView>(R.id.btnText).text = "جدول المباريات"
-            setOnClickListener { 
-                binding.navView.setCheckedItem(R.id.nav_schedule)
-                openSection(R.id.nav_schedule) 
-            }
+            findViewById<ImageView>(R.id.btnIcon).setImageResource(android.R.drawable.ic_menu_today) // أيقونة جدول/تقويم
+            setOnClickListener { navigateToSection(R.id.nav_schedule) }
         }
     }
 
-    // دالة لفتح الأقسام وإخفاء الرئيسية
-    private fun openSection(itemId: Int) {
+    // ─── الدالة القوية للانتقال ───
+    private fun navigateToSection(itemId: Int) {
         binding.dashboardView.visibility = View.GONE
         binding.fragmentContainer.visibility = View.VISIBLE
-        onNavigationItemSelected(binding.navView.menu.findItem(itemId) ?: return)
-    }
+        binding.navView.setCheckedItem(itemId)
 
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
         var fragment: Fragment? = null
         var title = ""
 
-        // إذا تم اختيار قسم من القائمة الجانبية، تأكد من إخفاء الرئيسية
-        val isContentSection = item.itemId in listOf(R.id.nav_live_tv, R.id.nav_movies, R.id.nav_series, R.id.nav_schedule, R.id.nav_favorites)
-        if (isContentSection) {
-            binding.dashboardView.visibility = View.GONE
-            binding.fragmentContainer.visibility = View.VISIBLE
-        }
-
-        when (item.itemId) {
+        when (itemId) {
             R.id.nav_live_tv -> {
                 fragment = LiveTvFragment()
                 title = "Live TV"
@@ -171,13 +144,36 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 title = "Series"
                 viewModel.loadSeriesCategories()
             }
-            R.id.nav_favorites -> {
-                fragment = FavoritesFragment()
-                title = "المفضلة / Favorites"
-            }
             R.id.nav_schedule -> {
                 fragment = MatchScheduleFragment()
                 title = "جدول المباريات"
+            }
+        }
+
+        if (fragment != null) {
+            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit()
+            supportActionBar?.title = title
+        }
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        // إذا كان الاختيار من الأقسام الأساسية، نستخدم دالة الانتقال القوية
+        if (item.itemId in listOf(R.id.nav_live_tv, R.id.nav_movies, R.id.nav_series, R.id.nav_schedule)) {
+            navigateToSection(item.itemId)
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
+            return true
+        }
+
+        // للأزرار الأخرى في القائمة الجانبية
+        var fragment: Fragment? = null
+        var title = ""
+
+        when (item.itemId) {
+            R.id.nav_favorites -> {
+                binding.dashboardView.visibility = View.GONE
+                binding.fragmentContainer.visibility = View.VISIBLE
+                fragment = FavoritesFragment()
+                title = "المفضلة / Favorites"
             }
             R.id.nav_speed_test -> { openSpeedTest(); binding.drawerLayout.closeDrawer(GravityCompat.START); return true }
             R.id.nav_clear_cache -> { clearAppCache(); binding.drawerLayout.closeDrawer(GravityCompat.START); return true }
@@ -272,7 +268,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         )
     }
 
-    // ─── 🚀 الذكاء الاصطناعي لزر الرجوع (التحديث الاحترافي) ───
     override fun onBackPressed() {
         if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
             binding.drawerLayout.closeDrawer(GravityCompat.START)
@@ -284,14 +279,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 fragment is MoviesFragment && fragment.isShowingStreams -> fragment.goBackToCategories()
                 fragment is SeriesFragment && fragment.isShowingStreams -> fragment.goBackToCategories()
                 else -> {
-                    // السحر هنا: العودة إلى لوحة التحكم الرئيسية بدلاً من الخروج
                     binding.fragmentContainer.visibility = View.GONE
                     binding.dashboardView.visibility = View.VISIBLE
                     supportActionBar?.title = "الرئيسية / Dashboard"
                 }
             }
         } else {
-            // الخروج من التطبيق فقط إذا كان المستخدم في الصفحة الرئيسية
             super.onBackPressed()
         }
     }
