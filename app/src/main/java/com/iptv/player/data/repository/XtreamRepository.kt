@@ -1,51 +1,82 @@
-package com.iptv.player.data.repository
+package com.iptv.player.data.repository // ✅ الهوية الموحدة
 
 import com.iptv.player.data.api.XtreamApiService
-import com.iptv.player.data.model.*
+import com.iptv.player.data.api.XtreamUrlBuilder
+import com.iptv.player.data.model.* // ✅ استيراد الموديلات وكلاس Resource من Models.kt
 import retrofit2.Response
 
 class XtreamRepository(private val api: XtreamApiService) {
 
-    suspend fun authenticate(username: String, password: String): Resource<AuthResponse> =
-        safeApiCall { api.authenticate("get_live_streams", username, password) }
+    /**
+     * ── 1. المصادقة (Login)
+     */
+    suspend fun authenticate(creds: LoginCredentials): Resource<AuthResponse> =
+        safeApiCall { api.authenticate(XtreamUrlBuilder.authUrl(creds)) }
 
-    // قنوات البث المباشر
-    suspend fun getLiveCategories(): Resource<List<LiveCategory>> =
-        safeApiCall { api.getLiveCategories("get_live_categories") }
+    /**
+     * ── 2. القنوات الحية (Live TV)
+     */
+    suspend fun getLiveCategories(creds: LoginCredentials): Resource<List<LiveCategory>> =
+        safeApiCall { api.getLiveCategories(XtreamUrlBuilder.liveCategories(creds)) }
 
-    suspend fun getLiveStreams(categoryId: String? = null): Resource<List<LiveStream>> =
+    suspend fun getLiveStreams(creds: LoginCredentials, categoryId: String? = null): Resource<List<LiveStream>> =
         safeApiCall { 
-            if (categoryId != null) api.getLiveStreamsByCategory("get_live_streams", categoryId)
-            else api.getLiveStreams("get_live_streams")
+            if (categoryId != null) {
+                api.getLiveStreamsByCategory(XtreamUrlBuilder.liveStreamsByCategory(creds, categoryId), categoryId)
+            } else {
+                api.getLiveStreams(XtreamUrlBuilder.liveStreams(creds))
+            }
         }
 
-    // الأفلام VOD
-    suspend fun getVodCategories(): Resource<List<VodCategory>> =
-        safeApiCall { api.getVodCategories("get_vod_categories") }
+    /**
+     * ── 3. الأفلام (VOD)
+     */
+    suspend fun getVodCategories(creds: LoginCredentials): Resource<List<VodCategory>> =
+        safeApiCall { api.getVodCategories(XtreamUrlBuilder.vodCategories(creds)) }
 
-    suspend fun getVodStreams(categoryId: String? = null): Resource<List<VodStream>> =
+    suspend fun getVodStreams(creds: LoginCredentials, categoryId: String? = null): Resource<List<VodStream>> =
         safeApiCall {
-            if (categoryId != null) api.getVodStreamsByCategory("get_vod_streams", categoryId)
-            else api.getVodStreams("get_vod_streams")
+            if (categoryId != null) {
+                api.getVodStreamsByCategory(XtreamUrlBuilder.vodStreamsByCategory(creds, categoryId), categoryId)
+            } else {
+                api.getVodStreams(XtreamUrlBuilder.vodStreams(creds))
+            }
         }
 
-    // المسلسلات
-    suspend fun getSeriesCategories(): Resource<List<SeriesCategory>> =
-        safeApiCall { api.getSeriesCategories("get_series_categories") }
+    /**
+     * ── 4. المسلسلات (Series)
+     */
+    suspend fun getSeriesCategories(creds: LoginCredentials): Resource<List<SeriesCategory>> =
+        safeApiCall { api.getSeriesCategories(XtreamUrlBuilder.seriesCategories(creds)) }
 
-    suspend fun getSeries(categoryId: String? = null): Resource<List<Series>> =
+    suspend fun getSeries(creds: LoginCredentials, categoryId: String? = null): Resource<List<Series>> =
         safeApiCall {
-            if (categoryId != null) api.getSeriesByCategory("get_series", categoryId)
-            else api.getSeries("get_series")
+            if (categoryId != null) {
+                api.getSeriesByCategory(XtreamUrlBuilder.seriesByCategory(creds, categoryId), categoryId)
+            } else {
+                api.getSeries(XtreamUrlBuilder.series(creds))
+            }
         }
 
+    suspend fun getSeriesInfo(creds: LoginCredentials, seriesId: Int): Resource<SeriesInfo> =
+        safeApiCall { api.getSeriesInfo(XtreamUrlBuilder.seriesInfo(creds, seriesId)) }
+
+    /**
+     * 🛡️ دالة المعالجة الآمنة (The Safe Call)
+     * تقوم بالتعامل مع الأخطاء لضمان عدم انهيار التطبيق
+     */
     private suspend fun <T> safeApiCall(call: suspend () -> Response<T>): Resource<T> {
         return try {
             val response = call()
-            if (response.isSuccessful && response.body() != null) Resource.Success(response.body()!!)
-            else Resource.Error("خطأ في السيرفر: ${response.code()}")
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) Resource.Success(body)
+                else Resource.Error("لا توجد بيانات (Empty Body)")
+            } else {
+                Resource.Error("خطأ من السيرفر: ${response.code()}")
+            }
         } catch (e: Exception) {
-            Resource.Error(e.localizedMessage ?: "حدث خطأ غير متوقع")
+            Resource.Error(e.localizedMessage ?: "حدث خطأ غير متوقع في الاتصال")
         }
     }
 }
