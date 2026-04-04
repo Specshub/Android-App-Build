@@ -84,6 +84,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 fragment = FavoritesFragment()
                 title = "المفضلة / Favorites"
             }
+
+            // ─── 📥 ميزة التحميلات الحقيقية ───
+            R.id.nav_downloads -> {
+                fragment = DownloadsFragment()
+                title = "التحميلات / Offline Downloads"
+            }
             
             // ─── ميزة فحص السرعة الحقيقية ───
             R.id.nav_speed_test -> {
@@ -114,8 +120,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 return true
             }
 
-            // ─── الميزات المعقدة (تحتاج شاشات جديدة سنصنعها معاً لاحقاً) ───
-            R.id.nav_downloads, 
+            // ─── الميزات المتبقية (جدول المباريات ووضع الأطفال) ───
             R.id.nav_schedule, 
             R.id.nav_kids_mode -> {
                 Toast.makeText(this, "جاري برمجة هذه الميزة وإضافتها للتطبيق...", Toast.LENGTH_LONG).show()
