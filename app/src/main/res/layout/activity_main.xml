@@ -54,19 +54,56 @@
                         android:src="@drawable/bg_category_gradient" />
                 </com.google.android.material.card.MaterialCardView>
 
-                <GridLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:columnCount="2"
-                    android:alignmentMode="alignMargins">
+                    android:orientation="vertical">
 
-                    <include android:id="@+id/mainBtnLive" layout="@layout/item_dashboard_button" />
-                    <include android:id="@+id/mainBtnMovies" layout="@layout/item_dashboard_button" />
-                    <include android:id="@+id/mainBtnSeries" layout="@layout/item_dashboard_button" />
-                    <include android:id="@+id/mainBtnSchedule" layout="@layout/item_dashboard_button" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
 
-                </GridLayout>
+                        <include
+                            android:id="@+id/mainBtnLive"
+                            layout="@layout/item_dashboard_button"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1" />
+
+                        <include
+                            android:id="@+id/mainBtnMovies"
+                            layout="@layout/item_dashboard_button"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp"
+                        android:baselineAligned="false">
+
+                        <include
+                            android:id="@+id/mainBtnSeries"
+                            layout="@layout/item_dashboard_button"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1" />
+
+                        <include
+                            android:id="@+id/mainBtnSchedule"
+                            layout="@layout/item_dashboard_button"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1" />
+                    </LinearLayout>
+                </LinearLayout>
+
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
