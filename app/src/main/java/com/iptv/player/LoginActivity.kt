@@ -1,4 +1,3 @@
-// com/iptvplayer/app/ui/LoginActivity.kt
 package com.iptvplayer.app.ui
 
 import android.content.Intent
@@ -13,6 +12,11 @@ import com.iptvplayer.app.data.model.Resource
 import com.iptvplayer.app.databinding.ActivityLoginBinding
 import com.iptvplayer.app.ui.viewmodel.LoginViewModel
 import com.iptvplayer.app.util.AdManager
+
+// ✅ تعريف الثوابت هنا مباشرة لضمان عدم فشل المترجم
+const val EXTRA_HOST = "EXTRA_HOST"
+const val EXTRA_USERNAME = "EXTRA_USERNAME"
+const val EXTRA_PASSWORD = "EXTRA_PASSWORD"
 
 class LoginActivity : AppCompatActivity() {
 
@@ -75,9 +79,10 @@ class LoginActivity : AppCompatActivity() {
 
                     // Navigate to main dashboard
                     val intent = Intent(this, MainActivity::class.java).apply {
-                        putExtra(MainActivity.EXTRA_HOST, binding.etHost.text.toString().trim())
-                        putExtra(MainActivity.EXTRA_USERNAME, binding.etUsername.text.toString().trim())
-                        putExtra(MainActivity.EXTRA_PASSWORD, binding.etPassword.text.toString().trim())
+                        // ✅ تم التعديل لاستخدام الثوابت المعرفة بالأعلى مباشرة
+                        putExtra(EXTRA_HOST, binding.etHost.text.toString().trim())
+                        putExtra(EXTRA_USERNAME, binding.etUsername.text.toString().trim())
+                        putExtra(EXTRA_PASSWORD, binding.etPassword.text.toString().trim())
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     }
                     startActivity(intent)
