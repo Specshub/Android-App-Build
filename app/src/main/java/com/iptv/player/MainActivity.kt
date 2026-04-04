@@ -209,14 +209,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         )
     }
 
-    // ─── 🚀 الذكاء الاصطناعي لزر الرجوع تمت إضافته هنا ───
+    // ─── 🚀 الذكاء الاصطناعي لزر الرجوع (التحديث الشامل) ───
     override fun onBackPressed() {
         if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            // 1. إذا كانت القائمة الجانبية مفتوحة، أغلقها
             binding.drawerLayout.closeDrawer(GravityCompat.START)
         } else {
             val fragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
 
             when {
+                // 2. الرجوع من داخل الباقات إلى الأقسام
                 fragment is LiveTvFragment && fragment.isShowingStreams -> {
                     fragment.goBackToCategories()
                 }
@@ -226,6 +228,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 fragment is SeriesFragment && fragment.isShowingStreams -> {
                     fragment.goBackToCategories()
                 }
+                
+                // 3. السحر هنا: إذا كان في أي مكان آخر (مفضلة، جدول، أفلام، مسلسلات) ورغب بالرجوع
+                // لا تخرج من التطبيق، بل أعده للشاشة الرئيسية (البث المباشر)
+                fragment !is LiveTvFragment -> {
+                    loadFragment(LiveTvFragment())
+                    binding.navView.setCheckedItem(R.id.nav_live_tv)
+                    supportActionBar?.title = "Live TV"
+                }
+                
+                // 4. الخروج من التطبيق فقط إذا كان في القائمة الرئيسية للبث المباشر
                 else -> super.onBackPressed()
             }
         }
