@@ -35,10 +35,6 @@
                 android:icon="@android:drawable/stat_sys_download"
                 android:title="فحص السرعة / Speed Test" />
             <item
-                android:id="@+id/nav_kids_mode"
-                android:icon="@android:drawable/ic_menu_myplaces"
-                android:title="وضع الأطفال / Kids Mode" />
-            <item
                 android:id="@+id/nav_clear_cache"
                 android:icon="@android:drawable/ic_menu_delete"
                 android:title="تسريع التطبيق / Clear Cache" />
