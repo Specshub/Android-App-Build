@@ -27,8 +27,6 @@ class ContentAdapter(
 ) : ListAdapter<ContentItem, ContentAdapter.ContentViewHolder>(ContentDiffCallback()) {
 
     private var fullList: List<ContentItem> = listOf()
-
-    // ✅ أعدنا هذا السطر المفقود (هو سبب المشكلة في الـ Build)
     var onItemLongClick: ((ContentItem) -> Boolean)? = null
 
     fun setAllItems(list: List<ContentItem>) {
@@ -65,8 +63,6 @@ class ContentAdapter(
 
         fun bind(item: ContentItem) {
             ivThumbnail.setPadding(0, 0, 0, 0)
-            
-            // ✅ ربط الأزرار والضغط المطول
             itemView.setOnClickListener { onItemClick(item) }
             itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
 
@@ -74,8 +70,7 @@ class ContentAdapter(
                 is ContentItem.Category -> {
                     tvTitle.text = item.name
                     tvMeta.text = "FOLDER"
-                    val categoryImg = getSmartCategoryIcon(item.name)
-                    loadThumbnail(categoryImg, isCategory = true)
+                    loadThumbnail(getSmartCategoryIcon(item.name), isCategory = true)
                 }
                 is ContentItem.Live -> {
                     tvTitle.text = item.stream.name
@@ -92,3 +87,41 @@ class ContentAdapter(
                     tvMeta.text = "SERIES"
                     loadThumbnail(item.series.cover)
                 }
+            }
+        }
+
+        private fun loadThumbnail(url: String?, isCategory: Boolean = false) {
+            Glide.with(itemView.context)
+                .load(url)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .placeholder(R.drawable.bg_category_gradient)
+                .error(if (isCategory) R.drawable.ic_folder_modern else R.drawable.bg_category_gradient)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .centerCrop()
+                .into(ivThumbnail)
+        }
+
+        private fun getSmartCategoryIcon(name: String): String {
+            val n = name.lowercase()
+            return when {
+                n.contains("bein") -> "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/BeIN_Sports_logo.svg/512px-BeIN_Sports_logo.svg.png"
+                n.contains("osn") -> "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/OSN_logo.svg/512px-OSN_logo.svg.png"
+                n.contains("netflix") -> "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg"
+                n.contains("shahid") -> "https://upload.wikimedia.org/wikipedia/ar/0/0e/Shahid_Logo.png"
+                n.contains("kids") || n.contains("اطفال") -> "https://cdn-icons-png.flaticon.com/512/3050/3050031.png"
+                else -> ""
+            }
+        }
+    }
+
+    class ContentDiffCallback : DiffUtil.ItemCallback<ContentItem>() {
+        override fun areItemsTheSame(old: ContentItem, new: ContentItem) = when {
+            old is ContentItem.Category && new is ContentItem.Category -> old.id == new.id
+            old is ContentItem.Live && new is ContentItem.Live -> old.stream.streamId == new.stream.streamId
+            old is ContentItem.Vod && new is ContentItem.Vod -> old.stream.streamId == new.stream.streamId
+            old is ContentItem.SeriesItem && new is ContentItem.SeriesItem -> old.series.seriesId == new.series.seriesId
+            else -> false
+        }
+        override fun areContentsTheSame(old: ContentItem, new: ContentItem) = old == new
+    }
+}
