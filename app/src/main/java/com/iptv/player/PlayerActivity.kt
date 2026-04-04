@@ -9,10 +9,8 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.datasource.DefaultHttpDataSource
-import androidx.media3.exoplayer.source.MediaSource
-import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory // 🚀 السحر الجديد هنا
 import androidx.media3.ui.AspectRatioFrameLayout
 import com.iptv.player.databinding.ActivityPlayerBinding
 
@@ -31,7 +29,6 @@ class PlayerActivity : AppCompatActivity() {
     private var streamUrl: String = ""
     private var streamTitle: String = ""
 
-    // للتحكم في أبعاد الشاشة
     private val aspectRatios = listOf(
         AspectRatioFrameLayout.RESIZE_MODE_FIT,
         AspectRatioFrameLayout.RESIZE_MODE_FILL,
@@ -63,35 +60,37 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun initializePlayer() {
         if (streamUrl.isEmpty()) {
-            showError("Stream URL is missing.")
+            showError("الرابط مفقود (Stream URL is missing)")
             return
         }
 
-        player = ExoPlayer.Builder(this).build().also { exo ->
+        // 1. التخفي كمتصفح جوجل كروم لتخطي حماية السيرفر
+        val dataSourceFactory = DefaultHttpDataSource.Factory()
+            .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
+            .setAllowCrossProtocolRedirects(true)
+            .setConnectTimeoutMs(15000)
+            .setReadTimeoutMs(15000)
+
+        // 2. 🚀 المصنع الذكي: يكتشف نوع البث تلقائياً (TS, M3U8, MP4) بدون الحاجة لصيغة في الرابط
+        val mediaSourceFactory = DefaultMediaSourceFactory(dataSourceFactory)
+
+        // 3. بناء المشغل
+        player = ExoPlayer.Builder(this)
+            .setMediaSourceFactory(mediaSourceFactory)
+            .build().also { exo ->
+            
             binding.playerView.player = exo
 
-            // ─── 🚀 سحر التخفي: نرتدي قناع متصفح جوجل كروم لتخطي حظر السيرفر ───
-            val dataSourceFactory = DefaultHttpDataSource.Factory()
-                .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
-                .setAllowCrossProtocolRedirects(true)
-                .setConnectTimeoutMs(15000) // إعطاء السيرفر وقتاً كافياً للرد
-                .setReadTimeoutMs(15000)
-
-            val mediaSource: MediaSource = if (streamUrl.contains(".m3u8", ignoreCase = true) || streamUrl.contains("/live/", ignoreCase = true)) {
-                HlsMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(MediaItem.fromUri(streamUrl))
-            } else {
-                ProgressiveMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(MediaItem.fromUri(streamUrl))
-            }
-
-            exo.setMediaSource(mediaSource)
+            // 4. وضع الرابط وتشغيله
+            exo.setMediaItem(MediaItem.fromUri(streamUrl))
             exo.prepare()
             exo.playWhenReady = true
 
             exo.addListener(object : Player.Listener {
                 override fun onPlayerError(error: PlaybackException) {
-                    showError("حدث خطأ في التشغيل: تأكد من جودة الإنترنت أو صلاحية الاشتراك")
+                    // 🔍 إظهار الخطأ التقني بدقة لنعرف سبب المشكلة الحقيقي لو فشل التشغيل
+                    val cause = error.cause?.message ?: error.errorCodeName
+                    showError("الخطأ: $cause\nالرابط: $streamUrl")
                 }
 
                 override fun onPlaybackStateChanged(playbackState: Int) {
@@ -112,7 +111,6 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun setupAspectRatioToggle() {
         binding.btnAspectRatio.setOnClickListener {
-            // برمجة زر تغيير أبعاد الشاشة (16:9, ملء الشاشة، تكبير)
             currentAspectRatioIndex = (currentAspectRatioIndex + 1) % aspectRatios.size
             binding.playerView.resizeMode = aspectRatios[currentAspectRatioIndex]
             
