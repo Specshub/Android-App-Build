@@ -1,4 +1,4 @@
-package com.iptvplayer.app.ui
+package com.iptv.player // ✅ توحيد الحزمة لتكون com.iptv.player
 
 import android.os.Bundle
 import android.view.MenuItem
@@ -6,8 +6,8 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
-import com.iptvplayer.app.R
-import com.iptvplayer.app.databinding.ActivityMainBinding
+import com.iptv.player.R // ✅ تصحيح استيراد الموارد
+import com.iptv.player.databinding.ActivityMainBinding // ✅ تصحيح استيراد Binding
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -19,10 +19,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 1. إعداد شريط الأدوات (Toolbar)
         setSupportActionBar(binding.toolbar)
 
-        // 2. إعداد القائمة الجانبية (DrawerLayout) وزر التبديل (Toggle)
         val toggle = ActionBarDrawerToggle(
             this, 
             binding.drawerLayout, 
@@ -33,18 +31,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
-        // 3. ربط مستمع النقرات بالقائمة الجانبية
         binding.navView.setNavigationItemSelectedListener(this)
 
-        // 4. تحميل القسم الافتراضي (Live TV) عند فتح التطبيق لأول مرة
         if (savedInstanceState == null) {
+            // ملاحظة: تأكد أن هذه الأقسام موجودة في نفس المجلد com.iptv.player
             loadFragment(LiveTvFragment())
             binding.navView.setCheckedItem(R.id.nav_live_tv)
             supportActionBar?.title = "Live TV"
         }
     }
 
-    // 5. التعامل مع اختيار الأقسام من القائمة الجانبية
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         var fragment: Fragment? = null
         var title = ""
@@ -55,15 +51,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 title = "Live TV"
             }
             R.id.nav_movies -> {
-                fragment = MoviesFragment() // تم التفعيل بنجاح ✅
+                fragment = MoviesFragment()
                 title = "Movies"
             }
             R.id.nav_series -> {
-                fragment = SeriesFragment() // تم التفعيل بنجاح ✅
+                fragment = SeriesFragment()
                 title = "Series"
             }
             R.id.nav_settings -> {
-                // هنا يمكن إضافة شاشة الإعدادات لاحقاً
                 title = "Settings"
             }
         }
@@ -73,19 +68,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             supportActionBar?.title = title
         }
 
-        // إغلاق القائمة بعد الاختيار
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }
 
-    // دالة مساعدة لتبديل الفراغ (Fragment Container) بالقسم المطلوب
     private fun loadFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment)
             .commit()
     }
 
-    // التعامل مع زر العودة لإغلاق القائمة الجانبية إذا كانت مفتوحة
     override fun onBackPressed() {
         if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
             binding.drawerLayout.closeDrawer(GravityCompat.START)
