@@ -3,61 +3,47 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardBackgroundColor="@color/bg_surface"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="4dp"
-    app:strokeColor="@color/bg_divider"
-    app:strokeWidth="1dp">
+    android:layout_margin="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="8dp">
 
         <ImageView
-            android:id="@+id/thumbnail"
+            android:id="@+id/iv_thumbnail"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="120dp"
             android:scaleType="centerCrop"
-            app:layout_constraintDimensionRatio="H,16:9"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/title_container"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:src="@android:drawable/sym_def_app_icon"/>
+            android:src="@android:drawable/ic_menu_report_image" />
 
-        <LinearLayout
-            android:id="@+id/title_container"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tv_content_title"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp"
-            android:gravity="center_vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/iv_thumbnail"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintEnd_toStartOf="@id/iv_play_icon" />
 
-            <TextView
-                android:id="@+id/title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Channel Name"
-                android:textColor="@color/text_primary"
-                android:textSize="14sp"
-                android:maxLines="1"
-                android:ellipsize="end"/>
+        <TextView
+            android:id="@+id/tv_content_meta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            app:layout_constraintTop_toBottomOf="@id/tv_content_title"
+            app:layout_constraintStart_toStartOf="parent" />
 
-            <ImageView
-                android:id="@+id/play_icon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginStart="8dp"
-                android:src="@android:drawable/ic_media_play"
-                app:tint="@color/accent_primary"/>
-
-        </LinearLayout>
+        <ImageView
+            android:id="@+id/iv_play_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_media_play"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </com.google.android.material.card.MaterialCardView>
