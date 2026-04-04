@@ -6,12 +6,10 @@ plugins {
 }
 
 android {
-    // ✅ تم التصحيح: النطاق الرسمي الآن يطابق الكود والمجلدات
     namespace 'com.iptv.player' 
     compileSdk 34
 
     defaultConfig {
-        // ✅ تم التصحيح: معرف التطبيق الرسمي
         applicationId "com.iptv.player"
         minSdk 21
         targetSdk 34
@@ -34,7 +32,8 @@ android {
 
     buildFeatures {
         viewBinding true
-        dataBinding true
+        // ✅ تم التعطيل لإنهاء خطأ KAPT (نحن نستخدم ViewBinding فقط)
+        dataBinding false 
     }
 
     compileOptions {
