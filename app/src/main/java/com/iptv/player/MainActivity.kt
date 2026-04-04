@@ -1,24 +1,44 @@
-package com.iptv.player // ✅ توحيد الحزمة لتكون com.iptv.player
+package com.iptv.player
 
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.activity.viewModels // ✅ استيراد ضروري لتشغيل الـ ViewModel
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
-import com.iptv.player.R // ✅ تصحيح استيراد الموارد
-import com.iptv.player.databinding.ActivityMainBinding // ✅ تصحيح استيراد Binding
+import com.iptv.player.R
+import com.iptv.player.databinding.ActivityMainBinding
 import com.google.android.material.navigation.NavigationView
+import com.iptv.player.data.model.LoginCredentials // ✅ استيراد موديل البيانات
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var binding: ActivityMainBinding
+    
+    // ✅ استدعاء "القائد" الذي سيوزع البيانات على الشاشات
+    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // ─── 1. استلام بيانات الدخول من شاشة Login ───
+        val host = intent.getStringExtra(EXTRA_HOST) ?: ""
+        val username = intent.getStringExtra(EXTRA_USERNAME) ?: ""
+        val password = intent.getStringExtra(EXTRA_PASSWORD) ?: ""
+
+        // ─── 2. تسليم البيانات للقائد (ViewModel) ───
+        if (host.isNotEmpty() && username.isNotEmpty()) {
+            val creds = LoginCredentials(host, username, password)
+            viewModel.setCredentials(creds)
+            
+            // 💡 اختياري: نأمره بتحميل أقسام البث المباشر فوراً كبداية
+            viewModel.loadLiveCategories() 
+        }
+
+        // ─── 3. إعدادات الواجهة (الدرج الجانبي) ───
         setSupportActionBar(binding.toolbar)
 
         val toggle = ActionBarDrawerToggle(
@@ -34,7 +54,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding.navView.setNavigationItemSelectedListener(this)
 
         if (savedInstanceState == null) {
-            // ملاحظة: تأكد أن هذه الأقسام موجودة في نفس المجلد com.iptv.player
             loadFragment(LiveTvFragment())
             binding.navView.setCheckedItem(R.id.nav_live_tv)
             supportActionBar?.title = "Live TV"
@@ -49,14 +68,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_live_tv -> {
                 fragment = LiveTvFragment()
                 title = "Live TV"
+                viewModel.loadLiveCategories() // ✅ تحديث البيانات عند فتح القسم
             }
             R.id.nav_movies -> {
                 fragment = MoviesFragment()
                 title = "Movies"
+                viewModel.loadVodCategories() // ✅ تحميل الأفلام عند فتح القسم
             }
             R.id.nav_series -> {
                 fragment = SeriesFragment()
                 title = "Series"
+                viewModel.loadSeriesCategories() // ✅ تحميل المسلسلات عند فتح القسم
             }
             R.id.nav_settings -> {
                 title = "Settings"
