@@ -103,7 +103,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 binding.drawerLayout.closeDrawer(GravityCompat.START)
                 return true
             }
-            // ─── ⚽ تفعيل ميزة جدول المباريات الحقيقية ───
             R.id.nav_schedule -> {
                 fragment = MatchScheduleFragment()
                 title = "جدول المباريات / Match Schedule"
@@ -210,8 +209,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         )
     }
 
+    // ─── 🚀 الذكاء الاصطناعي لزر الرجوع تمت إضافته هنا ───
     override fun onBackPressed() {
-        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) binding.drawerLayout.closeDrawer(GravityCompat.START)
-        else super.onBackPressed()
+        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
+        } else {
+            val fragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
+
+            when {
+                fragment is LiveTvFragment && fragment.isShowingStreams -> {
+                    fragment.goBackToCategories()
+                }
+                fragment is MoviesFragment && fragment.isShowingStreams -> {
+                    fragment.goBackToCategories()
+                }
+                fragment is SeriesFragment && fragment.isShowingStreams -> {
+                    fragment.goBackToCategories()
+                }
+                else -> super.onBackPressed()
+            }
+        }
     }
 }
