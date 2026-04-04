@@ -19,20 +19,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Setup Toolbar
+        // 1. إعداد شريط الأدوات (Toolbar)
         setSupportActionBar(binding.toolbar)
 
-        // Setup DrawerLayout and NavigationView
+        // 2. إعداد القائمة الجانبية (DrawerLayout) وزر التبديل (Toggle)
         val toggle = ActionBarDrawerToggle(
-            this, binding.drawerLayout, binding.toolbar,
-            R.string.navigation_drawer_open, R.string.navigation_drawer_close
+            this, 
+            binding.drawerLayout, 
+            binding.toolbar,
+            R.string.navigation_drawer_open, 
+            R.string.navigation_drawer_close
         )
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
+        // 3. ربط مستمع النقرات بالقائمة الجانبية
         binding.navView.setNavigationItemSelectedListener(this)
 
-        // Load default fragment (Live TV)
+        // 4. تحميل القسم الافتراضي (Live TV) عند فتح التطبيق لأول مرة
         if (savedInstanceState == null) {
             loadFragment(LiveTvFragment())
             binding.navView.setCheckedItem(R.id.nav_live_tv)
@@ -40,6 +44,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    // 5. التعامل مع اختيار الأقسام من القائمة الجانبية
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         var fragment: Fragment? = null
         var title = ""
@@ -50,15 +55,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 title = "Live TV"
             }
             R.id.nav_movies -> {
-                // fragment = MoviesFragment()
-                // title = "Movies"
+                fragment = MoviesFragment() // تم التفعيل بنجاح ✅
+                title = "Movies"
             }
             R.id.nav_series -> {
-                // fragment = SeriesFragment()
-                // title = "Series"
+                fragment = SeriesFragment() // تم التفعيل بنجاح ✅
+                title = "Series"
             }
             R.id.nav_settings -> {
-                // Start SettingsActivity or load fragment
+                // هنا يمكن إضافة شاشة الإعدادات لاحقاً
+                title = "Settings"
             }
         }
 
@@ -67,16 +73,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             supportActionBar?.title = title
         }
 
+        // إغلاق القائمة بعد الاختيار
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }
 
+    // دالة مساعدة لتبديل الفراغ (Fragment Container) بالقسم المطلوب
     private fun loadFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment)
             .commit()
     }
 
+    // التعامل مع زر العودة لإغلاق القائمة الجانبية إذا كانت مفتوحة
     override fun onBackPressed() {
         if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
             binding.drawerLayout.closeDrawer(GravityCompat.START)
