@@ -16,7 +16,7 @@ import com.iptv.player.data.model.Series
 import com.iptv.player.data.model.VodStream
 
 sealed class ContentItem {
-    data class Category(val id: String, val name: String, val imageUrl: String? = null) : ContentItem()
+    data class Category(val id: String, val name: String) : ContentItem()
     data class Live(val stream: LiveStream) : ContentItem()
     data class Vod(val stream: VodStream) : ContentItem()
     data class SeriesItem(val series: Series) : ContentItem()
@@ -62,25 +62,23 @@ class ContentAdapter(
         private val tvMeta: TextView = itemView.findViewById(R.id.tv_content_meta)
 
         fun bind(item: ContentItem) {
-            // إعادة ضبط الإعدادات لمنع تداخل التصاميم عند التمرير السريع
             ivThumbnail.setPadding(0, 0, 0, 0)
             
             when (item) {
                 is ContentItem.Category -> {
                     tvTitle.text = item.name
                     tvMeta.text = "FOLDER"
-                    tvMeta.setBackgroundResource(R.drawable.bg_tag_blue) // تأكد من وجود هذا الملف
+                    // استخدام محاولة آمنة لتعيين الخلفية
+                    try { tvMeta.setBackgroundResource(R.drawable.bg_tag_blue) } catch (e: Exception) {}
                     
-                    // 🧠 ذكاء الأيقونات: اختيار صورة بناءً على اسم الباقة
                     val categoryImg = getSmartCategoryIcon(item.name)
                     loadThumbnail(categoryImg, isCategory = true)
-                    
                     itemView.setOnClickListener { onItemClick(item) }
                 }
                 is ContentItem.Live -> {
                     tvTitle.text = item.stream.name
                     tvMeta.text = "LIVE"
-                    tvMeta.setBackgroundResource(R.drawable.bg_tag_red) 
+                    try { tvMeta.setBackgroundResource(R.drawable.bg_tag_red) } catch (e: Exception) {}
                     loadThumbnail(item.stream.streamIcon)
                     itemView.setOnClickListener { onItemClick(item) }
                     itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
@@ -88,7 +86,7 @@ class ContentAdapter(
                 is ContentItem.Vod -> {
                     tvTitle.text = item.stream.name
                     tvMeta.text = "MOVIE"
-                    tvMeta.setBackgroundResource(R.drawable.bg_tag_purple)
+                    try { tvMeta.setBackgroundResource(R.drawable.bg_tag_purple) } catch (e: Exception) {}
                     loadThumbnail(item.stream.streamIcon)
                     itemView.setOnClickListener { onItemClick(item) }
                     itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
@@ -96,7 +94,7 @@ class ContentAdapter(
                 is ContentItem.SeriesItem -> {
                     tvTitle.text = item.series.name
                     tvMeta.text = "SERIES"
-                    tvMeta.setBackgroundResource(R.drawable.bg_tag_orange)
+                    try { tvMeta.setBackgroundResource(R.drawable.bg_tag_orange) } catch (e: Exception) {}
                     loadThumbnail(item.series.cover)
                     itemView.setOnClickListener { onItemClick(item) }
                     itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
@@ -104,11 +102,10 @@ class ContentAdapter(
             }
         }
 
-        // 🚀 دالة التحميل السريع جداً مع التخزين المؤقت
         private fun loadThumbnail(url: String?, isCategory: Boolean = false) {
             Glide.with(itemView.context)
                 .load(url)
-                .diskCacheStrategy(DiskCacheStrategy.ALL) // ⚡ سرعة صاروخية في التحميل المرة القادمة
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .placeholder(R.drawable.bg_category_gradient)
                 .error(if (isCategory) R.drawable.ic_folder_modern else R.drawable.bg_category_gradient)
                 .transition(DrawableTransitionOptions.withCrossFade())
@@ -116,7 +113,6 @@ class ContentAdapter(
                 .into(ivThumbnail)
         }
 
-        // 🔍 محرك بحث الأيقونات الذكي
         private fun getSmartCategoryIcon(name: String): String {
             val n = name.lowercase()
             return when {
@@ -127,7 +123,7 @@ class ContentAdapter(
                 n.contains("kids") || n.contains("اطفال") -> "https://cdn-icons-png.flaticon.com/512/3050/3050031.png"
                 n.contains("sport") || n.contains("رياضة") -> "https://cdn-icons-png.flaticon.com/512/857/857418.png"
                 n.contains("movie") || n.contains("افلام") -> "https://cdn-icons-png.flaticon.com/512/4221/4221419.png"
-                else -> "" // سيظهر التدرج اللوني الجميل إذا لم يجد تطابقاً
+                else -> ""
             }
         }
     }
