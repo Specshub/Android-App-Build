@@ -16,11 +16,12 @@ object OfflineManager {
     private const val KEY_DOWNLOADS = "saved_downloads"
 
     fun startDownload(context: Context, url: String, title: String, id: String, posterUrl: String?) {
-        // تنظيف اسم الملف من أي رموز قد تسبب مشكلة في التخزين
         val cleanTitle = title.replace("[^a-zA-Z0-9.-]".toRegex(), "_")
         val fileName = "${cleanTitle}_$id.mp4"
         
-        val file = File(context.getExternalFilesDir(Environment.DIRECTORY_MOVIES), fileName)
+        // ─── 🚀 التغيير 1: الحفظ في مجلد التنزيلات العام المسموح به في كل الهواتف ───
+        val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val file = File(downloadDir, fileName)
 
         if (file.exists()) {
             Toast.makeText(context, "هذا الفيلم محمل مسبقاً! ⬇️", Toast.LENGTH_SHORT).show()
@@ -30,21 +31,20 @@ object OfflineManager {
         try {
             val request = DownloadManager.Request(Uri.parse(url))
                 .setTitle(title)
-                .setDescription("جاري تحميل الفيلم للمشاهدة بدون إنترنت...")
-                .setMimeType("video/mp4") // 🚀 إجبار الأندرويد على قبول الملف كفيديو
+                .setDescription("جاري تحميل الفيلم للمشاهدة أوفلاين...")
+                // ─── 🚀 التغيير 2: حذفنا قيود نوع الملف ليتقبل السيرفر أي صيغة (mkv, avi, mp4) ───
                 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                .setDestinationInExternalFilesDir(context, Environment.DIRECTORY_MOVIES, fileName)
+                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
                 .setAllowedOverMetered(true)
                 .setAllowedOverRoaming(true)
-                // 🥷 سحر التخفي: نخبر السيرفر أننا مشغل VLC ولسنا برنامج تحميل لتجاوز الحماية!
-                .addRequestHeader("User-Agent", "VLC/3.0.16 LibVLC/3.0.16")
-                .addRequestHeader("Accept", "*/*")
-                .addRequestHeader("Connection", "keep-alive")
+                // ─── 🚀 التغيير 3: التخفي كمشغل ExoPlayer الحقيقي (الذي تستخدمه للتطبيق) ───
+                .addRequestHeader("User-Agent", "ExoPlayer/2.18.1 (Linux; Android 11)") 
+                .addRequestHeader("Icy-MetaData", "1") // بعض السيرفرات تطلب هذا
 
             val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
             downloadManager.enqueue(request)
 
-            Toast.makeText(context, "بدأ التحميل... يمكنك متابعة التقدم في إشعارات الهاتف ⬇️", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "بدأ التحميل... راجع شريط الإشعارات ⬇️", Toast.LENGTH_LONG).show()
 
             val newItem = DownloadedItem(id, title, file.absolutePath, posterUrl)
             saveDownloadMetadata(context, newItem)
