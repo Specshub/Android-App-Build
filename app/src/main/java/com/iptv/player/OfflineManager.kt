@@ -31,13 +31,15 @@ object OfflineManager {
             val request = DownloadManager.Request(Uri.parse(url))
                 .setTitle(title)
                 .setDescription("جاري تحميل الفيلم للمشاهدة بدون إنترنت...")
+                .setMimeType("video/mp4") // 🚀 إجبار الأندرويد على قبول الملف كفيديو
                 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
                 .setDestinationInExternalFilesDir(context, Environment.DIRECTORY_MOVIES, fileName)
                 .setAllowedOverMetered(true)
                 .setAllowedOverRoaming(true)
-                // ─── 🚀 هنا سحر التخفي لكي لا يطردنا سيرفر الـ IPTV ───
-                .addRequestHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
+                // 🥷 سحر التخفي: نخبر السيرفر أننا مشغل VLC ولسنا برنامج تحميل لتجاوز الحماية!
+                .addRequestHeader("User-Agent", "VLC/3.0.16 LibVLC/3.0.16")
                 .addRequestHeader("Accept", "*/*")
+                .addRequestHeader("Connection", "keep-alive")
 
             val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
             downloadManager.enqueue(request)
