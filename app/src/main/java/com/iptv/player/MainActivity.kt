@@ -78,13 +78,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 title = "Series"
                 viewModel.loadSeriesCategories()
             }
-            
-            // ─── 🌟 ميزة المفضلة ───
             R.id.nav_favorites -> {
                 fragment = FavoritesFragment()
                 title = "المفضلة / Favorites"
             }
-            
             R.id.nav_speed_test -> {
                 openSpeedTest()
                 binding.drawerLayout.closeDrawer(GravityCompat.START)
@@ -106,15 +103,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 binding.drawerLayout.closeDrawer(GravityCompat.START)
                 return true
             }
-
-            // الميزات المتبقية (قريباً)
-            R.id.nav_schedule, 
-            R.id.nav_kids_mode -> {
+            // ─── ميزة جدول المباريات المتبقية ───
+            R.id.nav_schedule -> {
                 Toast.makeText(this, "جاري برمجة هذه الميزة وإضافتها للتطبيق...", Toast.LENGTH_LONG).show()
                 binding.drawerLayout.closeDrawer(GravityCompat.START)
                 return true
             }
-
             R.id.nav_language -> {
                 showLanguageDialog()
                 return true
