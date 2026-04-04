@@ -30,7 +30,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // ─── جلب البيانات بالطريقة الأصلية المستقرة ───
         val host = intent.getStringExtra("EXTRA_HOST") ?: intent.getStringExtra(EXTRA_HOST) ?: ""
         val username = intent.getStringExtra("EXTRA_USERNAME") ?: intent.getStringExtra(EXTRA_USERNAME) ?: ""
         val password = intent.getStringExtra("EXTRA_PASSWORD") ?: intent.getStringExtra(EXTRA_PASSWORD) ?: ""
@@ -85,12 +84,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 fragment = FavoritesFragment()
                 title = "المفضلة / Favorites"
             }
-
-            // ─── 📥 ميزة التحميلات الحقيقية ───
-            R.id.nav_downloads -> {
-                fragment = DownloadsFragment()
-                title = "التحميلات / Offline Downloads"
-            }
             
             R.id.nav_speed_test -> {
                 openSpeedTest()
@@ -113,12 +106,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 binding.drawerLayout.closeDrawer(GravityCompat.START)
                 return true
             }
+
+            // الميزات المتبقية (قريباً)
             R.id.nav_schedule, 
             R.id.nav_kids_mode -> {
                 Toast.makeText(this, "جاري برمجة هذه الميزة وإضافتها للتطبيق...", Toast.LENGTH_LONG).show()
                 binding.drawerLayout.closeDrawer(GravityCompat.START)
                 return true
             }
+
             R.id.nav_language -> {
                 showLanguageDialog()
                 return true
