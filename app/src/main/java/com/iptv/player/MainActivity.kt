@@ -30,9 +30,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val host = intent.getStringExtra(EXTRA_HOST) ?: ""
-        val username = intent.getStringExtra(EXTRA_USERNAME) ?: ""
-        val password = intent.getStringExtra(EXTRA_PASSWORD) ?: ""
+        // ─── جلب البيانات بالطريقة الأصلية المستقرة ───
+        val host = intent.getStringExtra("EXTRA_HOST") ?: intent.getStringExtra(EXTRA_HOST) ?: ""
+        val username = intent.getStringExtra("EXTRA_USERNAME") ?: intent.getStringExtra(EXTRA_USERNAME) ?: ""
+        val password = intent.getStringExtra("EXTRA_PASSWORD") ?: intent.getStringExtra(EXTRA_PASSWORD) ?: ""
 
         if (host.isNotEmpty() && username.isNotEmpty()) {
             val creds = LoginCredentials(host, username, password)
@@ -91,43 +92,33 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 title = "التحميلات / Offline Downloads"
             }
             
-            // ─── ميزة فحص السرعة الحقيقية ───
             R.id.nav_speed_test -> {
                 openSpeedTest()
                 binding.drawerLayout.closeDrawer(GravityCompat.START)
                 return true
             }
-
-            // ─── ميزة تسريع التطبيق ───
             R.id.nav_clear_cache -> {
                 clearAppCache()
                 binding.drawerLayout.closeDrawer(GravityCompat.START)
                 return true
             }
-
-            // ─── ميزة الدعم الفني المباشر (لطلب الاشتراك) ───
             R.id.nav_support -> {
                 openLiveSupport()
                 binding.drawerLayout.closeDrawer(GravityCompat.START)
                 return true
             }
-
-            // ─── 🚀 ميزة الشاشات المتعددة الحقيقية ───
             R.id.nav_multi_screen -> {
                 val intent = Intent(this, MultiScreenActivity::class.java)
                 startActivity(intent)
                 binding.drawerLayout.closeDrawer(GravityCompat.START)
                 return true
             }
-
-            // ─── الميزات المتبقية (جدول المباريات ووضع الأطفال) ───
             R.id.nav_schedule, 
             R.id.nav_kids_mode -> {
                 Toast.makeText(this, "جاري برمجة هذه الميزة وإضافتها للتطبيق...", Toast.LENGTH_LONG).show()
                 binding.drawerLayout.closeDrawer(GravityCompat.START)
                 return true
             }
-
             R.id.nav_language -> {
                 showLanguageDialog()
                 return true
@@ -157,48 +148,31 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun loadFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .commit()
+        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit()
     }
 
     private fun clearAppCache() {
         try {
             cacheDir.deleteRecursively()
-            Toast.makeText(this, "تم تنظيف الذاكرة المؤقتة وتسريع التطبيق بنجاح! 🚀", Toast.LENGTH_LONG).show()
-        } catch (e: Exception) {
-            Toast.makeText(this, "حدث خطأ أثناء تنظيف الذاكرة.", Toast.LENGTH_SHORT).show()
-        }
+            Toast.makeText(this, "تم تنظيف الذاكرة المؤقتة بنجاح! 🚀", Toast.LENGTH_LONG).show()
+        } catch (e: Exception) {}
     }
 
     private fun openSpeedTest() {
         try {
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse("https://fast.com/ar/")
-            startActivity(intent)
-        } catch (e: Exception) {
-            Toast.makeText(this, "حدث خطأ في فتح متصفح الإنترنت.", Toast.LENGTH_SHORT).show()
-        }
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://fast.com/ar/")))
+        } catch (e: Exception) {}
     }
 
     private fun openLiveSupport() {
-        val phoneNumber = "212772863204" 
-        val message = "مرحباً، أريد الاشتراك في تطبيق IPTV الخاص بك 📺"
-        val url = "https://api.whatsapp.com/send?phone=$phoneNumber&text=${Uri.encode(message)}"
         try {
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse(url)
-            startActivity(intent)
-        } catch (e: Exception) {
-            Toast.makeText(this, "تطبيق واتساب غير مثبت على جهازك!", Toast.LENGTH_SHORT).show()
-        }
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://api.whatsapp.com/send?phone=212772863204&text=مرحباً")))
+        } catch (e: Exception) {}
     }
 
     private fun performLogout() {
-        val sharedPref = getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE)
-        sharedPref.edit().clear().apply()
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
+        getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE).edit().clear().apply()
+        startActivity(Intent(this, LoginActivity::class.java))
         finish()
     }
 
@@ -210,12 +184,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val checkedItem = langCodes.indexOf(currentLang).takeIf { it >= 0 } ?: 0
 
         AlertDialog.Builder(this)
-            .setTitle("اختر لغة التطبيق / Choose Language")
+            .setTitle("اختر لغة التطبيق")
             .setSingleChoiceItems(languages, checkedItem) { dialog, which ->
-                val selectedLangCode = langCodes[which]
-                sharedPref.edit().putString("APP_LANG", selectedLangCode).apply()
+                sharedPref.edit().putString("APP_LANG", langCodes[which]).apply()
                 dialog.dismiss()
-                val intent = intent
                 finish()
                 startActivity(intent)
             }
@@ -225,7 +197,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun toggleTheme() {
         val sharedPref = getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE)
         val isDark = sharedPref.getBoolean("IS_DARK_MODE", true)
-
         if (isDark) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             sharedPref.edit().putBoolean("IS_DARK_MODE", false).apply()
@@ -238,26 +209,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     @Suppress("DEPRECATION")
     private fun applySavedSettings() {
         val sharedPref = getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE)
-        val langCode = sharedPref.getString("APP_LANG", "ar") ?: "ar" 
-        val locale = Locale(langCode)
+        val locale = Locale(sharedPref.getString("APP_LANG", "ar") ?: "ar")
         Locale.setDefault(locale)
         val config = Configuration()
         config.setLocale(locale)
         resources.updateConfiguration(config, resources.displayMetrics)
 
-        val isDark = sharedPref.getBoolean("IS_DARK_MODE", true)
-        if (isDark) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        }
+        AppCompatDelegate.setDefaultNightMode(
+            if (sharedPref.getBoolean("IS_DARK_MODE", true)) AppCompatDelegate.MODE_NIGHT_YES 
+            else AppCompatDelegate.MODE_NIGHT_NO
+        )
     }
 
     override fun onBackPressed() {
-        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            binding.drawerLayout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
-        }
+        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) binding.drawerLayout.closeDrawer(GravityCompat.START)
+        else super.onBackPressed()
     }
 }
