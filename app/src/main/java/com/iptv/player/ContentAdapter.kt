@@ -1,5 +1,4 @@
-// com/iptvplayer/app/ui/adapter/ContentAdapter.kt
-package com.iptvplayer.app.ui.adapter
+package com.iptv.player // ✅ الهوية الجديدة الموحدة
 
 import android.view.LayoutInflater
 import android.view.View
@@ -11,10 +10,13 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.iptvplayer.app.R
-import com.iptvplayer.app.data.model.LiveStream
-import com.iptvplayer.app.data.model.Series
-import com.iptvplayer.app.data.model.VodStream
+import com.iptv.player.R // ✅ تصحيح استدعاء الموارد
+
+// ✅ ملاحظة: إذا كانت ملفات الموديلات (LiveStream...) في نفس المجلد، لا تحتاج import. 
+// إذا كانت في مجلد داتا، تأكد أن حزمتها تبدأ بـ com.iptv.player
+import com.iptv.player.data.model.LiveStream
+import com.iptv.player.data.model.Series
+import com.iptv.player.data.model.VodStream
 
 sealed class ContentItem {
     data class Live(val stream: LiveStream) : ContentItem()
