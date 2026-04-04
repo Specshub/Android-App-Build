@@ -3,25 +3,58 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/nav_favorites"
+            android:icon="@android:drawable/btn_star"
+            android:title="المفضلة / Favorites" />
+        <item
             android:id="@+id/nav_live_tv"
             android:icon="@android:drawable/ic_menu_view"
-            android:title="Live TV" />
+            android:title="البث المباشر / Live TV" />
         <item
             android:id="@+id/nav_movies"
             android:icon="@android:drawable/ic_menu_slideshow"
-            android:title="Movies" />
+            android:title="الأفلام / Movies" />
         <item
             android:id="@+id/nav_series"
             android:icon="@android:drawable/ic_menu_gallery"
-            android:title="Series" />
+            android:title="المسلسلات / Series" />
     </group>
 
-    <item android:title="Others">
+    <item android:title="أدوات ذكية / Smart Tools">
         <menu>
+            <item
+                android:id="@+id/nav_speed_test"
+                android:icon="@android:drawable/stat_sys_download"
+                android:title="فحص السرعة / Speed Test" />
+            <item
+                android:id="@+id/nav_clear_cache"
+                android:icon="@android:drawable/ic_menu_delete"
+                android:title="تسريع التطبيق / Clear Cache" />
+            <item
+                android:id="@+id/nav_kids_mode"
+                android:icon="@android:drawable/ic_menu_myplaces"
+                android:title="وضع الأطفال / Kids Mode" />
+        </menu>
+    </item>
+
+    <item android:title="الإعدادات / Settings">
+        <menu>
+            <item
+                android:id="@+id/nav_language"
+                android:icon="@android:drawable/ic_menu_sort_alphabetically"
+                android:title="تغيير اللغة / Language" />
+            <item
+                android:id="@+id/nav_theme"
+                android:icon="@android:drawable/ic_menu_day"
+                android:title="الوضع الليلي / Dark Mode" />
             <item
                 android:id="@+id/nav_settings"
                 android:icon="@android:drawable/ic_menu_preferences"
-                android:title="Settings" />
+                android:title="الإعدادات العامة / Settings" />
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@android:drawable/ic_lock_power_off"
+                android:title="تسجيل الخروج / Logout" />
         </menu>
     </item>
 
