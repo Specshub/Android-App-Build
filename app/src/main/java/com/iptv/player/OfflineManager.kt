@@ -9,20 +9,17 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.File
 
-// كلاس صغير لحفظ معلومات الفيلم المحمل
 data class DownloadedItem(val id: String, val title: String, val localPath: String, val posterUrl: String?)
 
 object OfflineManager {
     private const val PREFS_NAME = "downloads_prefs"
     private const val KEY_DOWNLOADS = "saved_downloads"
 
-    // دالة بدء التحميل
     fun startDownload(context: Context, url: String, title: String, id: String, posterUrl: String?) {
-        // تنظيف اسم الملف من الرموز الممنوعة
+        // تنظيف اسم الملف من أي رموز قد تسبب مشكلة في التخزين
         val cleanTitle = title.replace("[^a-zA-Z0-9.-]".toRegex(), "_")
         val fileName = "${cleanTitle}_$id.mp4"
         
-        // مسار الحفظ داخل الهاتف (مجلد الأفلام الخاص بالتطبيق)
         val file = File(context.getExternalFilesDir(Environment.DIRECTORY_MOVIES), fileName)
 
         if (file.exists()) {
@@ -31,7 +28,6 @@ object OfflineManager {
         }
 
         try {
-            // توجيه أمر التحميل لنظام الأندرويد
             val request = DownloadManager.Request(Uri.parse(url))
                 .setTitle(title)
                 .setDescription("جاري تحميل الفيلم للمشاهدة بدون إنترنت...")
@@ -39,13 +35,15 @@ object OfflineManager {
                 .setDestinationInExternalFilesDir(context, Environment.DIRECTORY_MOVIES, fileName)
                 .setAllowedOverMetered(true)
                 .setAllowedOverRoaming(true)
+                // ─── 🚀 هنا سحر التخفي لكي لا يطردنا سيرفر الـ IPTV ───
+                .addRequestHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
+                .addRequestHeader("Accept", "*/*")
 
             val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
             downloadManager.enqueue(request)
 
             Toast.makeText(context, "بدأ التحميل... يمكنك متابعة التقدم في إشعارات الهاتف ⬇️", Toast.LENGTH_LONG).show()
 
-            // حفظ بيانات الفيلم في الذاكرة لكي نعرضه لاحقاً في شاشة التحميلات
             val newItem = DownloadedItem(id, title, file.absolutePath, posterUrl)
             saveDownloadMetadata(context, newItem)
 
@@ -54,7 +52,6 @@ object OfflineManager {
         }
     }
 
-    // جلب قائمة الأفلام المحملة
     fun getDownloadedItems(context: Context): List<DownloadedItem> {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val json = prefs.getString(KEY_DOWNLOADS, null) ?: return emptyList()
@@ -70,7 +67,6 @@ object OfflineManager {
         prefs.edit().putString(KEY_DOWNLOADS, Gson().toJson(items)).apply()
     }
 
-    // حذف الفيلم من الهاتف لتفريغ المساحة
     fun removeDownload(context: Context, item: DownloadedItem) {
         val file = File(item.localPath)
         if (file.exists()) {
