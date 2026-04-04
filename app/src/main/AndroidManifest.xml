@@ -46,5 +46,11 @@
                   android:screenOrientation="landscape" 
                   android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout" />
 
+        <activity 
+            android:name=".MultiScreenActivity" 
+            android:exported="false" 
+            android:screenOrientation="landscape" 
+            android:configChanges="orientation|screenSize" />
+
     </application>
 </manifest>
