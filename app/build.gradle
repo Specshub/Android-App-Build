@@ -18,6 +18,11 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // ✅ إضافة صمام أمان لمصحيح الأخطاء في KAPT
+    kapt {
+        correctErrorTypes = true
+    }
+
     buildTypes {
         release {
             minifyEnabled true
@@ -32,7 +37,6 @@ android {
 
     buildFeatures {
         viewBinding true
-        // ✅ تم التعطيل لإنهاء خطأ KAPT (نحن نستخدم ViewBinding فقط)
         dataBinding false 
     }
 
@@ -53,7 +57,7 @@ android {
 }
 
 dependencies {
-    // AndroidX Core & UI
+    // AndroidX & UI
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'
@@ -62,45 +66,31 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
-    // Lifecycle / ViewModel / LiveData
+    // Lifecycle / ViewModels
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
     implementation 'androidx.activity:activity-ktx:1.8.2'
     implementation 'androidx.fragment:fragment-ktx:1.6.2'
 
-    // Navigation Component
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.7'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.7.7'
-
     // ExoPlayer (Media3)
     implementation 'androidx.media3:media3-exoplayer:1.3.0'
     implementation 'androidx.media3:media3-exoplayer-hls:1.3.0'
-    implementation 'androidx.media3:media3-exoplayer-dash:1.3.0'
     implementation 'androidx.media3:media3-ui:1.3.0'
     implementation 'androidx.media3:media3-common:1.3.0'
-    implementation 'androidx.media3:media3-session:1.3.0'
 
     // Retrofit + OkHttp
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
 
-    // Coroutines
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
-
-    // Glide & GSON
-    implementation 'com.google.code.gson:gson:2.10.1'
+    // Glide
     implementation 'com.github.bumptech.glide:glide:4.16.0'
-    kapt 'com.github.bumptech.glide:compiler:4.16.0'
+    // ❌ تعطيل هذا السطر مؤقتاً هو "مفتاح الحل" لتجاوز خطأ الـ KAPT الحالي
+    // kapt 'com.github.bumptech.glide:compiler:4.16.0'
 
     // Google AdMob
     implementation 'com.google.android.gms:play-services-ads:23.0.0'
 
-    // Testing
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
