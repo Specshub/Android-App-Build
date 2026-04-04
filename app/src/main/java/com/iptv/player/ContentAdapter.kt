@@ -22,16 +22,40 @@ sealed class ContentItem {
 }
 
 class ContentAdapter(
-    // أبقينا الضغطة العادية كما هي لكي لا تتعطل باقي الشاشات
     private val onItemClick: (ContentItem) -> Unit 
 ) : ListAdapter<ContentItem, ContentAdapter.ContentViewHolder>(ContentDiffCallback()) {
 
-    // ✅ جعلنا الضغطة المطولة متغيراً اختيارياً يمكن للشاشات استخدامه براحة
+    // 🔍 القائمة الكاملة التي سنستخدمها كمرجع عند البحث لكي لا نفقد البيانات الأصلية
+    private var fullList: List<ContentItem> = listOf()
+
     var onItemLongClick: ((ContentItem) -> Boolean)? = null
+
+    // ✅ دالة جديدة لتحديث البيانات وحفظ نسخة منها للبحث
+    fun setAllItems(list: List<ContentItem>) {
+        fullList = list
+        submitList(list)
+    }
+
+    // ✅ دالة البحث السحرية: تقوم بتصفية القائمة بناءً على النص المكتوب
+    fun filter(query: String) {
+        val filteredList = if (query.isEmpty()) {
+            fullList // إذا كان البحث فارغاً، نعرض كل شيء
+        } else {
+            fullList.filter { item ->
+                when (item) {
+                    is ContentItem.Category -> item.name.contains(query, ignoreCase = true)
+                    is ContentItem.Live -> item.stream.name?.contains(query, ignoreCase = true) == true
+                    is ContentItem.Vod -> item.stream.name?.contains(query, ignoreCase = true) == true
+                    is ContentItem.SeriesItem -> item.series.name?.contains(query, ignoreCase = true) == true
+                }
+            }
+        }
+        submitList(filteredList)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContentViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_content_card, parent, false)
+            .inflate(R.id.item_content_card, parent, false) // تأكد من وجود تخطيط الكارد
         return ContentViewHolder(view)
     }
 
@@ -50,7 +74,6 @@ class ContentAdapter(
                     tvTitle.text = item.name
                     tvMeta.text = "📁 باقة"
                     ivThumbnail.setImageResource(android.R.drawable.ic_menu_agenda)
-                    
                     itemView.setOnClickListener { onItemClick(item) }
                     itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
                 }
@@ -58,7 +81,6 @@ class ContentAdapter(
                     tvTitle.text = item.stream.name
                     tvMeta.text = "🔴 LIVE"
                     loadThumbnail(item.stream.streamIcon)
-                    
                     itemView.setOnClickListener { onItemClick(item) }
                     itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
                 }
@@ -66,7 +88,6 @@ class ContentAdapter(
                     tvTitle.text = item.stream.name
                     tvMeta.text = item.stream.rating?.let { "⭐ $it" } ?: ""
                     loadThumbnail(item.stream.streamIcon)
-                    
                     itemView.setOnClickListener { onItemClick(item) }
                     itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
                 }
@@ -74,7 +95,6 @@ class ContentAdapter(
                     tvTitle.text = item.series.name
                     tvMeta.text = item.series.genre ?: ""
                     loadThumbnail(item.series.cover)
-                    
                     itemView.setOnClickListener { onItemClick(item) }
                     itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
                 }
