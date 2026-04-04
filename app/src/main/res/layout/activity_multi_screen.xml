@@ -17,20 +17,17 @@
             android:layout_weight="1"
             android:layout_margin="2dp"
             android:background="#222222">
-            
             <androidx.media3.ui.PlayerView
                 android:id="@+id/player1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone"/>
-                
             <ImageView
                 android:id="@+id/btnAdd1"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_gravity="center"
-                android:src="@android:drawable/ic_input_add"
-                android:contentDescription="Add Channel" />
+                android:src="@android:drawable/ic_input_add" />
         </FrameLayout>
 
         <FrameLayout
@@ -39,13 +36,11 @@
             android:layout_weight="1"
             android:layout_margin="2dp"
             android:background="#222222">
-            
             <androidx.media3.ui.PlayerView
                 android:id="@+id/player2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone"/>
-                
             <ImageView
                 android:id="@+id/btnAdd2"
                 android:layout_width="64dp"
@@ -67,13 +62,11 @@
             android:layout_weight="1"
             android:layout_margin="2dp"
             android:background="#222222">
-            
             <androidx.media3.ui.PlayerView
                 android:id="@+id/player3"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone"/>
-                
             <ImageView
                 android:id="@+id/btnAdd3"
                 android:layout_width="64dp"
@@ -88,13 +81,11 @@
             android:layout_weight="1"
             android:layout_margin="2dp"
             android:background="#222222">
-            
             <androidx.media3.ui.PlayerView
                 android:id="@+id/player4"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone"/>
-                
             <ImageView
                 android:id="@+id/btnAdd4"
                 android:layout_width="64dp"
