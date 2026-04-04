@@ -31,21 +31,39 @@ class SeriesFragment : Fragment() {
         
         binding.recyclerView.layoutManager = GridLayoutManager(context, 3)
 
+        // ─── 1. ماذا يحدث عند الضغط؟ ───
         contentAdapter = ContentAdapter { clickedItem ->
-            if (clickedItem is ContentItem.Category) {
-                Toast.makeText(context, "جاري فتح باقة المسلسلات: ${clickedItem.name}", Toast.LENGTH_SHORT).show()
+            when (clickedItem) {
+                is ContentItem.Category -> {
+                    Toast.makeText(context, "جاري جلب المسلسلات...", Toast.LENGTH_SHORT).show()
+                    viewModel.loadSeries(clickedItem.id) // نطلب المسلسلات
+                }
+                is ContentItem.SeriesItem -> {
+                    Toast.makeText(context, "جاري فتح مسلسل: ${clickedItem.series.name}", Toast.LENGTH_LONG).show()
+                    // TODO: فتح تفاصيل المسلسل والحلقات لاحقاً
+                }
+                else -> {}
             }
         }
         binding.recyclerView.adapter = contentAdapter
 
-        // ✅ مراقبة باقات المسلسلات (Series)
+        // ─── 2. مراقبة باقات المسلسلات ───
         viewModel.seriesCategories.observe(viewLifecycleOwner) { resource ->
+            if (resource is Resource.Success) {
+                val categories = resource.data
+                val items = categories.map { ContentItem.Category(it.categoryId, it.categoryName) }
+                contentAdapter.submitList(items)
+            }
+        }
+
+        // ─── 3. مراقبة المسلسلات الفعلية ───
+        viewModel.seriesList.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Loading -> { }
                 is Resource.Success -> {
-                    val categories = resource.data
-                    val items = categories.map { ContentItem.Category(it.categoryId, it.categoryName) }
-                    contentAdapter.submitList(items)
+                    val seriesList = resource.data
+                    val items = seriesList.map { ContentItem.SeriesItem(it) }
+                    contentAdapter.submitList(items) // استبدال الباقات بالمسلسلات
                 }
                 is Resource.Error -> {
                     Toast.makeText(context, "خطأ: ${resource.message}", Toast.LENGTH_LONG).show()
