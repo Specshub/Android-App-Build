@@ -14,7 +14,7 @@ import com.iptv.player.databinding.FragmentSeriesBinding
 import com.iptv.player.data.model.Resource
 import com.iptv.player.data.model.Episode
 import com.iptv.player.data.model.SeriesInfo
-import com.iptv.player.FavoritesManager // ✅ إضافة المفضلة
+import com.iptv.player.FavoritesManager
 
 class SeriesFragment : Fragment() {
     private var _binding: FragmentSeriesBinding? = null
@@ -22,6 +22,9 @@ class SeriesFragment : Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var contentAdapter: ContentAdapter
     private var currentSelectedSeriesId: Int? = null
+
+    // 🚩 متغير لمتابعة الحالة: هل نحن نعرض مسلسلات أم باقات/أقسام؟
+    var isShowingStreams = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentSeriesBinding.inflate(inflater, container, false)
@@ -36,6 +39,7 @@ class SeriesFragment : Fragment() {
         contentAdapter = ContentAdapter { clickedItem ->
             when (clickedItem) {
                 is ContentItem.Category -> {
+                    isShowingStreams = true // ⬅️ تحديث الحالة: دخلنا إلى قسم المسلسلات
                     Toast.makeText(context, "جاري جلب المسلسلات...", Toast.LENGTH_SHORT).show()
                     viewModel.loadSeries(clickedItem.id)
                 }
@@ -66,11 +70,16 @@ class SeriesFragment : Fragment() {
         binding.recyclerView.adapter = contentAdapter
 
         viewModel.seriesCategories.observe(viewLifecycleOwner) { resource ->
-            if (resource is Resource.Success) contentAdapter.submitList(resource.data.map { ContentItem.Category(it.categoryId, it.categoryName) })
+            if (resource is Resource.Success) {
+                isShowingStreams = false // ⬅️ تحديث الحالة: عدنا إلى أقسام المسلسلات
+                contentAdapter.submitList(resource.data.map { ContentItem.Category(it.categoryId, it.categoryName) })
+            }
         }
+        
         viewModel.seriesList.observe(viewLifecycleOwner) { resource ->
             if (resource is Resource.Success) contentAdapter.submitList(resource.data.map { ContentItem.SeriesItem(it) })
         }
+        
         viewModel.seriesInfo.observe(viewLifecycleOwner) { resource ->
             if (currentSelectedSeriesId != null && resource is Resource.Success) {
                 showEpisodesDialog(resource.data)
@@ -80,6 +89,11 @@ class SeriesFragment : Fragment() {
                 currentSelectedSeriesId = null
             }
         }
+    }
+
+    // 🔙 دالة العودة للأقسام (تستدعى من MainActivity عند ضغط زر الرجوع)
+    fun goBackToCategories() {
+        viewModel.loadSeriesCategories()
     }
 
     private fun showEpisodesDialog(seriesInfo: SeriesInfo) {
