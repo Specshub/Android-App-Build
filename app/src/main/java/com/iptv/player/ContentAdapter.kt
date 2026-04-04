@@ -50,7 +50,6 @@ class ContentAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContentViewHolder {
-        // ✅ التصحيح النهائي هنا
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_content_card, parent, false)
         return ContentViewHolder(view)
@@ -66,32 +65,48 @@ class ContentAdapter(
         private val tvMeta: TextView = itemView.findViewById(R.id.tv_content_meta)
 
         fun bind(item: ContentItem) {
+            // إعادة ضبط الإعدادات الافتراضية للكارد (مهم عند تدوير العناصر)
+            ivThumbnail.setPadding(0, 0, 0, 0)
+            ivThumbnail.setBackgroundResource(0)
+            tvMeta.visibility = View.VISIBLE
+
             when (item) {
                 is ContentItem.Category -> {
                     tvTitle.text = item.name
-                    tvMeta.text = "📁 باقة"
-                    ivThumbnail.setImageResource(android.R.drawable.ic_menu_agenda)
+                    tvMeta.text = "📁 FOLDER"
+                    
+                    // 🎨 سحر الباقات: نستخدم التدرج اللوني الذي صنعناه وأيقونة أنيقة
+                    ivThumbnail.setImageResource(android.R.drawable.ic_menu_agenda) // يفضل استبدالها بأيقونة مجلد حديثة لاحقاً
+                    ivThumbnail.setBackgroundResource(R.drawable.bg_category_gradient)
+                    ivThumbnail.setPadding(60, 60, 60, 60) // جعل الأيقونة في المنتصف بشكل جميل
+                    
                     itemView.setOnClickListener { onItemClick(item) }
                     itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
                 }
+                
                 is ContentItem.Live -> {
                     tvTitle.text = item.stream.name
                     tvMeta.text = "🔴 LIVE"
                     loadThumbnail(item.stream.streamIcon)
+                    
                     itemView.setOnClickListener { onItemClick(item) }
                     itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
                 }
+                
                 is ContentItem.Vod -> {
                     tvTitle.text = item.stream.name
-                    tvMeta.text = item.stream.rating?.let { "⭐ $it" } ?: ""
+                    tvMeta.text = item.stream.rating?.let { "⭐ $it" } ?: "VOD"
                     loadThumbnail(item.stream.streamIcon)
+                    
                     itemView.setOnClickListener { onItemClick(item) }
                     itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
                 }
+                
                 is ContentItem.SeriesItem -> {
                     tvTitle.text = item.series.name
-                    tvMeta.text = item.series.genre ?: ""
+                    tvMeta.text = "📺 SERIES"
                     loadThumbnail(item.series.cover)
+                    
                     itemView.setOnClickListener { onItemClick(item) }
                     itemView.setOnLongClickListener { onItemLongClick?.invoke(item) ?: false }
                 }
@@ -101,8 +116,8 @@ class ContentAdapter(
         private fun loadThumbnail(url: String?) {
             Glide.with(itemView.context)
                 .load(url)
-                .placeholder(android.R.drawable.ic_menu_gallery)
-                .error(android.R.drawable.stat_notify_error)
+                .placeholder(R.drawable.bg_category_gradient) // استخدام التدرج كخلفية انتظار
+                .error(R.drawable.bg_category_gradient)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .centerCrop()
                 .into(ivThumbnail)
