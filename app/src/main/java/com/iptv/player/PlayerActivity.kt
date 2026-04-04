@@ -1,4 +1,4 @@
-package com.iptv.player // ✅ الهوية الجديدة الموحدة
+package com.iptv.player
 
 import android.os.Bundle
 import android.view.View
@@ -14,8 +14,6 @@ import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.ui.AspectRatioFrameLayout
-// ✅ تأكد من تعديل حزمة PrefsManager لتكون هكذا:
-// import com.iptv.player.data.local.PrefsManager
 import com.iptv.player.databinding.ActivityPlayerBinding
 
 class PlayerActivity : AppCompatActivity() {
@@ -30,12 +28,16 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
     private var player: ExoPlayer? = null
     
-    // ملاحظة: إذا لم تنقل PrefsManager بعد، سنستخدم قيماً ثابتة لتجاوز خطأ البناء حالياً
     private var streamUrl: String = ""
     private var streamTitle: String = ""
 
-    // قيم افتراضية لتجاوز أخطاء PrefsManager إذا لم يكن جاهزاً
-    private val aspectRatios = listOf("16:9", "4:3", "Stretch")
+    // للتحكم في أبعاد الشاشة
+    private val aspectRatios = listOf(
+        AspectRatioFrameLayout.RESIZE_MODE_FIT,
+        AspectRatioFrameLayout.RESIZE_MODE_FILL,
+        AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+    )
+    private var currentAspectRatioIndex = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,9 +70,12 @@ class PlayerActivity : AppCompatActivity() {
         player = ExoPlayer.Builder(this).build().also { exo ->
             binding.playerView.player = exo
 
+            // ─── 🚀 سحر التخفي: نرتدي قناع متصفح جوجل كروم لتخطي حظر السيرفر ───
             val dataSourceFactory = DefaultHttpDataSource.Factory()
-                .setUserAgent("IPTVPlayer/1.0")
+                .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
                 .setAllowCrossProtocolRedirects(true)
+                .setConnectTimeoutMs(15000) // إعطاء السيرفر وقتاً كافياً للرد
+                .setReadTimeoutMs(15000)
 
             val mediaSource: MediaSource = if (streamUrl.contains(".m3u8", ignoreCase = true) || streamUrl.contains("/live/", ignoreCase = true)) {
                 HlsMediaSource.Factory(dataSourceFactory)
@@ -86,7 +91,7 @@ class PlayerActivity : AppCompatActivity() {
 
             exo.addListener(object : Player.Listener {
                 override fun onPlayerError(error: PlaybackException) {
-                    showError("Playback error: ${error.localizedMessage}")
+                    showError("حدث خطأ في التشغيل: تأكد من جودة الإنترنت أو صلاحية الاشتراك")
                 }
 
                 override fun onPlaybackStateChanged(playbackState: Int) {
@@ -107,8 +112,16 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun setupAspectRatioToggle() {
         binding.btnAspectRatio.setOnClickListener {
-            // منطق تبديل بسيط لتجاوز أخطاء الحزمة حالياً
-            Toast.makeText(this, "Changing Aspect Ratio...", Toast.LENGTH_SHORT).show()
+            // برمجة زر تغيير أبعاد الشاشة (16:9, ملء الشاشة، تكبير)
+            currentAspectRatioIndex = (currentAspectRatioIndex + 1) % aspectRatios.size
+            binding.playerView.resizeMode = aspectRatios[currentAspectRatioIndex]
+            
+            val ratioName = when(currentAspectRatioIndex) {
+                0 -> "تلقائي (Fit)"
+                1 -> "تمدد (Stretch)"
+                else -> "تكبير (Zoom)"
+            }
+            Toast.makeText(this, "وضع الشاشة: $ratioName", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -121,6 +134,7 @@ class PlayerActivity : AppCompatActivity() {
         binding.btnRetry.setOnClickListener {
             binding.tvError.visibility = View.GONE
             binding.btnRetry.visibility = View.GONE
+            binding.progressBar.visibility = View.VISIBLE
             releasePlayer()
             initializePlayer()
         }
