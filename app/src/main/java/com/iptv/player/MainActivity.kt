@@ -162,3 +162,56 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun performLogout() {
         getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE).edit().clear().apply()
         startActivity(Intent(this, LoginActivity::class.java))
+        finish()
+    }
+
+    private fun showLanguageDialog() {
+        val languages = arrayOf("العربية", "English", "Français")
+        val langCodes = arrayOf("ar", "en", "fr")
+        val sharedPref = getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE)
+        val currentLang = sharedPref.getString("APP_LANG", "ar")
+        val checkedItem = langCodes.indexOf(currentLang).takeIf { it >= 0 } ?: 0
+
+        AlertDialog.Builder(this)
+            .setTitle("اختر لغة التطبيق")
+            .setSingleChoiceItems(languages, checkedItem) { dialog, which ->
+                sharedPref.edit().putString("APP_LANG", langCodes[which]).apply()
+                dialog.dismiss()
+                finish()
+                startActivity(intent)
+            }
+            .show()
+    }
+
+    private fun toggleTheme() {
+        val sharedPref = getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE)
+        val isDark = sharedPref.getBoolean("IS_DARK_MODE", true)
+        if (isDark) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            sharedPref.edit().putBoolean("IS_DARK_MODE", false).apply()
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            sharedPref.edit().putBoolean("IS_DARK_MODE", true).apply()
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun applySavedSettings() {
+        val sharedPref = getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE)
+        val locale = Locale(sharedPref.getString("APP_LANG", "ar") ?: "ar")
+        Locale.setDefault(locale)
+        val config = Configuration()
+        config.setLocale(locale)
+        resources.updateConfiguration(config, resources.displayMetrics)
+
+        AppCompatDelegate.setDefaultNightMode(
+            if (sharedPref.getBoolean("IS_DARK_MODE", true)) AppCompatDelegate.MODE_NIGHT_YES 
+            else AppCompatDelegate.MODE_NIGHT_NO
+        )
+    }
+
+    override fun onBackPressed() {
+        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) binding.drawerLayout.closeDrawer(GravityCompat.START)
+        else super.onBackPressed()
+    }
+}
