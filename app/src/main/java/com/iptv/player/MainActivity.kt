@@ -100,10 +100,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 return true
             }
 
-            // ─── الميزات المعقدة (تحتاج شاشات جديدة سنصنعها معاً) ───
+            // ─── 🚀 ميزة الشاشات المتعددة الحقيقية ───
+            R.id.nav_multi_screen -> {
+                val intent = Intent(this, MultiScreenActivity::class.java)
+                startActivity(intent)
+                binding.drawerLayout.closeDrawer(GravityCompat.START)
+                return true
+            }
+
+            // ─── الميزات المعقدة (تحتاج شاشات جديدة سنصنعها معاً لاحقاً) ───
             R.id.nav_favorites, 
             R.id.nav_downloads, 
-            R.id.nav_multi_screen, 
             R.id.nav_schedule, 
             R.id.nav_kids_mode -> {
                 Toast.makeText(this, "جاري برمجة هذه الميزة وإضافتها للتطبيق...", Toast.LENGTH_LONG).show()
@@ -154,10 +161,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    // ─── ✅ دالة فحص السرعة ───
     private fun openSpeedTest() {
         try {
-            // نفتح موقع Fast.com الشهير لفحص السرعة مباشرة من التطبيق
             val intent = Intent(Intent.ACTION_VIEW)
             intent.data = Uri.parse("https://fast.com/ar/")
             startActivity(intent)
@@ -166,9 +171,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    // ─── ✅ دالة الدعم الفني (رقمك الحقيقي) ───
     private fun openLiveSupport() {
-        val phoneNumber = "212772863204" // رقمك المغربي لطلب الاشتراكات
+        val phoneNumber = "212772863204" 
         val message = "مرحباً، أريد الاشتراك في تطبيق IPTV الخاص بك 📺"
         val url = "https://api.whatsapp.com/send?phone=$phoneNumber&text=${Uri.encode(message)}"
         try {
@@ -224,7 +228,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     @Suppress("DEPRECATION")
     private fun applySavedSettings() {
         val sharedPref = getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE)
-        val langCode = sharedPref.getString("APP_LANG", "ar") ?: "ar" // جعلت العربية الافتراضية
+        val langCode = sharedPref.getString("APP_LANG", "ar") ?: "ar" 
         val locale = Locale(langCode)
         Locale.setDefault(locale)
         val config = Configuration()
