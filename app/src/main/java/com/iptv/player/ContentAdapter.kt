@@ -1,4 +1,4 @@
-package com.iptv.player // ✅ الهوية الموحدة
+package com.iptv.player
 
 import android.view.LayoutInflater
 import android.view.View
@@ -16,13 +16,15 @@ import com.iptv.player.data.model.Series
 import com.iptv.player.data.model.VodStream
 
 sealed class ContentItem {
+    // ✅ أضفنا هذا السطر لكي يفهم النادل معنى كلمة "باقة"
+    data class Category(val id: String, val name: String) : ContentItem()
     data class Live(val stream: LiveStream) : ContentItem()
     data class Vod(val stream: VodStream) : ContentItem()
     data class SeriesItem(val series: Series) : ContentItem()
 }
 
 class ContentAdapter(
-    private val onItemClick: (Any) -> Unit
+    private val onItemClick: (ContentItem) -> Unit // ✅ حددنا نوع العنصر بدقة
 ) : ListAdapter<ContentItem, ContentAdapter.ContentViewHolder>(ContentDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContentViewHolder {
@@ -42,23 +44,30 @@ class ContentAdapter(
 
         fun bind(item: ContentItem) {
             when (item) {
+                is ContentItem.Category -> {
+                    tvTitle.text = item.name
+                    tvMeta.text = "📁 باقة قنوات"
+                    // نضع أيقونة مجلد أو ملف افتراضية للباقات
+                    ivThumbnail.setImageResource(android.R.drawable.ic_menu_agenda)
+                    itemView.setOnClickListener { onItemClick(item) }
+                }
                 is ContentItem.Live -> {
                     tvTitle.text = item.stream.name
                     tvMeta.text = "🔴 LIVE"
                     loadThumbnail(item.stream.streamIcon)
-                    itemView.setOnClickListener { onItemClick(item.stream) }
+                    itemView.setOnClickListener { onItemClick(item) }
                 }
                 is ContentItem.Vod -> {
                     tvTitle.text = item.stream.name
                     tvMeta.text = item.stream.rating?.let { "⭐ $it" } ?: ""
                     loadThumbnail(item.stream.streamIcon)
-                    itemView.setOnClickListener { onItemClick(item.stream) }
+                    itemView.setOnClickListener { onItemClick(item) }
                 }
                 is ContentItem.SeriesItem -> {
                     tvTitle.text = item.series.name
                     tvMeta.text = item.series.genre ?: ""
                     loadThumbnail(item.series.cover)
-                    itemView.setOnClickListener { onItemClick(item.series) }
+                    itemView.setOnClickListener { onItemClick(item) }
                 }
             }
         }
@@ -66,7 +75,6 @@ class ContentAdapter(
         private fun loadThumbnail(url: String?) {
             Glide.with(itemView.context)
                 .load(url)
-                // ✅ استخدمنا صوراً من النظام لضمان نجاح البناء إذا كانت صورك مفقودة
                 .placeholder(android.R.drawable.ic_menu_gallery)
                 .error(android.R.drawable.stat_notify_error)
                 .transition(DrawableTransitionOptions.withCrossFade())
@@ -77,6 +85,7 @@ class ContentAdapter(
 
     class ContentDiffCallback : DiffUtil.ItemCallback<ContentItem>() {
         override fun areItemsTheSame(old: ContentItem, new: ContentItem) = when {
+            old is ContentItem.Category && new is ContentItem.Category -> old.id == new.id
             old is ContentItem.Live && new is ContentItem.Live -> old.stream.streamId == new.stream.streamId
             old is ContentItem.Vod && new is ContentItem.Vod -> old.stream.streamId == new.stream.streamId
             old is ContentItem.SeriesItem && new is ContentItem.SeriesItem -> old.series.seriesId == new.series.seriesId
