@@ -1,6 +1,7 @@
 package com.iptv.player
 
 import android.content.Intent
+import android.net.Uri // ✅ تم إضافة هذا الاستيراد الضروري
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -41,7 +42,7 @@ class MoviesFragment : Fragment() {
                     val username = activity?.intent?.getStringExtra(EXTRA_USERNAME) ?: ""
                     val password = activity?.intent?.getStringExtra(EXTRA_PASSWORD) ?: ""
                     
-                    // ─── 🚀 تم التحديث هنا: تنظيف الرابط لمنع خطأ التحميل ───
+                    // ─── تنظيف الرابط لمنع خطأ التحميل ───
                     val cleanHost = if (host.endsWith("/")) host.dropLast(1) else host
                     val baseUrl = if (cleanHost.startsWith("http")) cleanHost else "http://$cleanHost"
                     val streamUrl = "$baseUrl/movie/$username/$password/${clickedItem.stream.streamId}.mp4"
@@ -59,14 +60,10 @@ class MoviesFragment : Fragment() {
                                 }
                                 startActivity(intent)
                             } else {
-                                // الخيار الثاني: إرسال الفيلم لمدير التحميلات
-                                OfflineManager.startDownload(
-                                    requireContext(),
-                                    streamUrl,
-                                    clickedItem.stream.name ?: "Movie",
-                                    clickedItem.stream.streamId.toString(),
-                                    clickedItem.stream.streamIcon
-                                )
+                                // ─── 🚀 الحل السحري: إرسال الرابط لمتصفح الهاتف أو تطبيقات التحميل ───
+                                Toast.makeText(context, "جاري فتح الرابط للتحميل...", Toast.LENGTH_LONG).show()
+                                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(streamUrl))
+                                startActivity(browserIntent)
                             }
                         }
                         .show()
