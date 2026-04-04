@@ -10,13 +10,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.iptv.player.R 
 import com.iptv.player.data.model.LiveStream
 import com.iptv.player.data.model.Series
 import com.iptv.player.data.model.VodStream
 
 sealed class ContentItem {
-    // ✅ أضفنا هذا السطر لكي يفهم النادل معنى كلمة "باقة"
     data class Category(val id: String, val name: String) : ContentItem()
     data class Live(val stream: LiveStream) : ContentItem()
     data class Vod(val stream: VodStream) : ContentItem()
@@ -24,7 +22,9 @@ sealed class ContentItem {
 }
 
 class ContentAdapter(
-    private val onItemClick: (ContentItem) -> Unit // ✅ حددنا نوع العنصر بدقة
+    private val onItemClick: (ContentItem) -> Unit,
+    // ✅ تمت إضافة الضغطة المطولة هنا
+    private val onItemLongClick: (ContentItem) -> Boolean = { false } 
 ) : ListAdapter<ContentItem, ContentAdapter.ContentViewHolder>(ContentDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContentViewHolder {
@@ -46,28 +46,35 @@ class ContentAdapter(
             when (item) {
                 is ContentItem.Category -> {
                     tvTitle.text = item.name
-                    tvMeta.text = "📁 باقة قنوات"
-                    // نضع أيقونة مجلد أو ملف افتراضية للباقات
+                    tvMeta.text = "📁 باقة"
                     ivThumbnail.setImageResource(android.R.drawable.ic_menu_agenda)
+                    
                     itemView.setOnClickListener { onItemClick(item) }
+                    itemView.setOnLongClickListener { onItemLongClick(item) } // ✅ تفعيل الضغطة المطولة
                 }
                 is ContentItem.Live -> {
                     tvTitle.text = item.stream.name
                     tvMeta.text = "🔴 LIVE"
                     loadThumbnail(item.stream.streamIcon)
+                    
                     itemView.setOnClickListener { onItemClick(item) }
+                    itemView.setOnLongClickListener { onItemLongClick(item) } // ✅ تفعيل الضغطة المطولة
                 }
                 is ContentItem.Vod -> {
                     tvTitle.text = item.stream.name
                     tvMeta.text = item.stream.rating?.let { "⭐ $it" } ?: ""
                     loadThumbnail(item.stream.streamIcon)
+                    
                     itemView.setOnClickListener { onItemClick(item) }
+                    itemView.setOnLongClickListener { onItemLongClick(item) }
                 }
                 is ContentItem.SeriesItem -> {
                     tvTitle.text = item.series.name
                     tvMeta.text = item.series.genre ?: ""
                     loadThumbnail(item.series.cover)
+                    
                     itemView.setOnClickListener { onItemClick(item) }
+                    itemView.setOnLongClickListener { onItemLongClick(item) }
                 }
             }
         }
