@@ -1,4 +1,4 @@
-package com.iptvplayer.app.ui
+package com.iptv.player // ✅ الهوية الجديدة الموحدة
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import com.iptvplayer.app.R
-import com.iptvplayer.app.databinding.FragmentLiveTvBinding // This requires a new XML
+import com.iptv.player.R // ✅ استيراد الموارد من المسار الصحيح
+import com.iptv.player.databinding.FragmentLiveTvBinding // ✅ استيراد الربط من المسار الصحيح
 
 class LiveTvFragment : Fragment() {
     private var _binding: FragmentLiveTvBinding? = null
@@ -24,9 +24,9 @@ class LiveTvFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
-        // Setup RecyclerView for Live TV grid
+        // إعداد شبكة العرض (3 أعمدة)
         binding.recyclerView.layoutManager = GridLayoutManager(context, 3)
-        // Add your adapter and load data here
+        // هنا سيتم ربط الـ Adapter لاحقاً
     }
 
     override fun onDestroyView() {
