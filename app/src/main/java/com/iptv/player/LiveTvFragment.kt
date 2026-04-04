@@ -11,6 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.iptv.player.databinding.FragmentLiveTvBinding
 import com.iptv.player.data.model.Resource
+import com.iptv.player.FavoritesManager // ✅ استيراد مدير المفضلة
 
 class LiveTvFragment : Fragment() {
     private var _binding: FragmentLiveTvBinding? = null
@@ -32,6 +33,7 @@ class LiveTvFragment : Fragment() {
         
         binding.recyclerView.layoutManager = GridLayoutManager(context, 3)
 
+        // ─── 1. الضغطة العادية (الدخول للباقة أو تشغيل القناة) ───
         contentAdapter = ContentAdapter { clickedItem ->
             when (clickedItem) {
                 is ContentItem.Category -> {
@@ -58,6 +60,29 @@ class LiveTvFragment : Fragment() {
                 else -> {}
             }
         }
+
+        // ─── 2. ✅ الضغطة المطولة (إضافة أو إزالة من المفضلة بذكاء) ───
+        contentAdapter.onItemLongClick = { item ->
+            if (item is ContentItem.Live) {
+                // نتحقق أولاً: هل القناة موجودة في المفضلة؟
+                val currentFavs = FavoritesManager.getFavorites(requireContext())
+                val isAlreadyFav = currentFavs.any { it.streamId == item.stream.streamId }
+
+                if (isAlreadyFav) {
+                    // إذا كانت موجودة، نقوم بحذفها
+                    FavoritesManager.removeFavorite(requireContext(), item.stream)
+                    Toast.makeText(context, "🗑️ تم إزالة ${item.stream.name} من المفضلة", Toast.LENGTH_SHORT).show()
+                } else {
+                    // إذا لم تكن موجودة، نقوم بإضافتها
+                    FavoritesManager.addFavorite(requireContext(), item.stream)
+                    Toast.makeText(context, "🌟 تم إضافة ${item.stream.name} للمفضلة", Toast.LENGTH_SHORT).show()
+                }
+                true // نجاح التعامل مع الضغطة
+            } else {
+                false
+            }
+        }
+
         binding.recyclerView.adapter = contentAdapter
 
         viewModel.liveCategories.observe(viewLifecycleOwner) { resource ->
