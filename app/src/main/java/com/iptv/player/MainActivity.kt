@@ -92,34 +92,32 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         handler.post(runnable)
     }
 
-    // ─── إعداد الأزرار والأيقونات الجديدة ───
     private fun setupDashboardButtons() {
         findViewById<View>(R.id.mainBtnLive).apply {
             findViewById<TextView>(R.id.btnText).text = "البث المباشر"
-            findViewById<ImageView>(R.id.btnIcon).setImageResource(android.R.drawable.ic_menu_slideshow) // أيقونة عرض
+            findViewById<ImageView>(R.id.btnIcon).setImageResource(android.R.drawable.ic_menu_slideshow)
             setOnClickListener { navigateToSection(R.id.nav_live_tv) }
         }
 
         findViewById<View>(R.id.mainBtnMovies).apply {
             findViewById<TextView>(R.id.btnText).text = "الأفلام (VOD)"
-            findViewById<ImageView>(R.id.btnIcon).setImageResource(android.R.drawable.ic_menu_gallery) // أيقونة صور/أفلام
+            findViewById<ImageView>(R.id.btnIcon).setImageResource(android.R.drawable.ic_menu_gallery)
             setOnClickListener { navigateToSection(R.id.nav_movies) }
         }
 
         findViewById<View>(R.id.mainBtnSeries).apply {
             findViewById<TextView>(R.id.btnText).text = "المسلسلات"
-            findViewById<ImageView>(R.id.btnIcon).setImageResource(android.R.drawable.ic_menu_recent_history) // أيقونة متسلسلة
+            findViewById<ImageView>(R.id.btnIcon).setImageResource(android.R.drawable.ic_menu_recent_history)
             setOnClickListener { navigateToSection(R.id.nav_series) }
         }
 
         findViewById<View>(R.id.mainBtnSchedule).apply {
             findViewById<TextView>(R.id.btnText).text = "جدول المباريات"
-            findViewById<ImageView>(R.id.btnIcon).setImageResource(android.R.drawable.ic_menu_today) // أيقونة جدول/تقويم
+            findViewById<ImageView>(R.id.btnIcon).setImageResource(android.R.drawable.ic_menu_today)
             setOnClickListener { navigateToSection(R.id.nav_schedule) }
         }
     }
 
-    // ─── الدالة القوية للانتقال ───
     private fun navigateToSection(itemId: Int) {
         binding.dashboardView.visibility = View.GONE
         binding.fragmentContainer.visibility = View.VISIBLE
@@ -129,25 +127,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         var title = ""
 
         when (itemId) {
-            R.id.nav_live_tv -> {
-                fragment = LiveTvFragment()
-                title = "Live TV"
-                viewModel.loadLiveCategories()
-            }
-            R.id.nav_movies -> {
-                fragment = MoviesFragment()
-                title = "Movies"
-                viewModel.loadVodCategories()
-            }
-            R.id.nav_series -> {
-                fragment = SeriesFragment()
-                title = "Series"
-                viewModel.loadSeriesCategories()
-            }
-            R.id.nav_schedule -> {
-                fragment = MatchScheduleFragment()
-                title = "جدول المباريات"
-            }
+            R.id.nav_live_tv -> { fragment = LiveTvFragment(); title = "Live TV"; viewModel.loadLiveCategories() }
+            R.id.nav_movies -> { fragment = MoviesFragment(); title = "Movies"; viewModel.loadVodCategories() }
+            R.id.nav_series -> { fragment = SeriesFragment(); title = "Series"; viewModel.loadSeriesCategories() }
+            R.id.nav_schedule -> { fragment = MatchScheduleFragment(); title = "جدول المباريات" }
         }
 
         if (fragment != null) {
@@ -157,14 +140,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        // إذا كان الاختيار من الأقسام الأساسية، نستخدم دالة الانتقال القوية
         if (item.itemId in listOf(R.id.nav_live_tv, R.id.nav_movies, R.id.nav_series, R.id.nav_schedule)) {
             navigateToSection(item.itemId)
             binding.drawerLayout.closeDrawer(GravityCompat.START)
             return true
         }
 
-        // للأزرار الأخرى في القائمة الجانبية
         var fragment: Fragment? = null
         var title = ""
 
@@ -175,19 +156,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 fragment = FavoritesFragment()
                 title = "المفضلة / Favorites"
             }
-            R.id.nav_speed_test -> { openSpeedTest(); binding.drawerLayout.closeDrawer(GravityCompat.START); return true }
-            R.id.nav_clear_cache -> { clearAppCache(); binding.drawerLayout.closeDrawer(GravityCompat.START); return true }
-            R.id.nav_support -> { openLiveSupport(); binding.drawerLayout.closeDrawer(GravityCompat.START); return true }
+            R.id.nav_speed_test -> { openSpeedTest(); return true }
+            R.id.nav_clear_cache -> { clearAppCache(); return true }
+            R.id.nav_support -> { openLiveSupport(); return true }
             R.id.nav_multi_screen -> {
                 startActivity(Intent(this, MultiScreenActivity::class.java))
-                binding.drawerLayout.closeDrawer(GravityCompat.START)
                 return true
             }
             R.id.nav_language -> { showLanguageDialog(); return true }
             R.id.nav_theme -> { toggleTheme(); return true }
             R.id.nav_settings -> {
                 Toast.makeText(this, "الإعدادات قيد التطوير ⚙️", Toast.LENGTH_SHORT).show()
-                binding.drawerLayout.closeDrawer(GravityCompat.START)
                 return true
             }
             R.id.nav_logout -> { performLogout(); return true }
@@ -207,14 +186,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             cacheDir.deleteRecursively()
             Toast.makeText(this, "تم تنظيف الذاكرة المؤقتة بنجاح! 🚀", Toast.LENGTH_LONG).show()
         } catch (e: Exception) {}
+        binding.drawerLayout.closeDrawer(GravityCompat.START)
     }
 
     private fun openSpeedTest() {
         try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://fast.com/ar/"))) } catch (e: Exception) {}
+        binding.drawerLayout.closeDrawer(GravityCompat.START)
     }
 
     private fun openLiveSupport() {
         try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://api.whatsapp.com/send?phone=212772863204&text=مرحباً"))) } catch (e: Exception) {}
+        binding.drawerLayout.closeDrawer(GravityCompat.START)
     }
 
     private fun performLogout() {
@@ -223,6 +205,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         finish()
     }
 
+    // ─── تحديث حل مشكلة تغيير اللغة (آمن وبدون كراش) ───
     private fun showLanguageDialog() {
         val languages = arrayOf("العربية", "English", "Français")
         val langCodes = arrayOf("ar", "en", "fr")
@@ -235,37 +218,46 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             .setSingleChoiceItems(languages, checkedItem) { dialog, which ->
                 sharedPref.edit().putString("APP_LANG", langCodes[which]).apply()
                 dialog.dismiss()
-                finish()
+                
+                // إعادة تشغيل النشاط بشكل نظيف لتطبيق اللغة الجديدة
+                val intent = Intent(this, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
+                finish()
             }
             .show()
     }
 
+    // ─── تحديث حل مشكلة تغيير المظهر (آمن وبدون كراش) ───
     private fun toggleTheme() {
         val sharedPref = getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE)
         val isDark = sharedPref.getBoolean("IS_DARK_MODE", true)
-        if (isDark) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            sharedPref.edit().putBoolean("IS_DARK_MODE", false).apply()
-        } else {
+        val newMode = !isDark
+        
+        sharedPref.edit().putBoolean("IS_DARK_MODE", newMode).apply()
+        
+        if (newMode) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            sharedPref.edit().putBoolean("IS_DARK_MODE", true).apply()
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         }
+        
+        // إعادة رسم الواجهة لتطبيق الثيم الجديد
+        recreate()
     }
 
     @Suppress("DEPRECATION")
     private fun applySavedSettings() {
         val sharedPref = getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE)
-        val locale = Locale(sharedPref.getString("APP_LANG", "ar") ?: "ar")
+        val localeCode = sharedPref.getString("APP_LANG", "ar") ?: "ar"
+        val locale = Locale(localeCode)
         Locale.setDefault(locale)
         val config = Configuration()
         config.setLocale(locale)
         resources.updateConfiguration(config, resources.displayMetrics)
 
-        AppCompatDelegate.setDefaultNightMode(
-            if (sharedPref.getBoolean("IS_DARK_MODE", true)) AppCompatDelegate.MODE_NIGHT_YES 
-            else AppCompatDelegate.MODE_NIGHT_NO
-        )
+        val isDark = sharedPref.getBoolean("IS_DARK_MODE", true)
+        AppCompatDelegate.setDefaultNightMode(if (isDark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO)
     }
 
     override fun onBackPressed() {
@@ -273,7 +265,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             binding.drawerLayout.closeDrawer(GravityCompat.START)
         } else if (binding.fragmentContainer.visibility == View.VISIBLE) {
             val fragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
-
             when {
                 fragment is LiveTvFragment && fragment.isShowingStreams -> fragment.goBackToCategories()
                 fragment is MoviesFragment && fragment.isShowingStreams -> fragment.goBackToCategories()
