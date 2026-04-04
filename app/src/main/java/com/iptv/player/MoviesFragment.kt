@@ -11,27 +11,24 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.iptv.player.databinding.FragmentMoviesBinding
 import com.iptv.player.data.model.Resource
+import com.iptv.player.FavoritesManager // ✅ إضافة المفضلة
 
 class MoviesFragment : Fragment() {
     private var _binding: FragmentMoviesBinding? = null
     private val binding get() = _binding!!
-
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var contentAdapter: ContentAdapter
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentMoviesBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
         binding.recyclerView.layoutManager = GridLayoutManager(context, 3)
 
+        // 1. الضغطة العادية (تشغيل الفيلم)
         contentAdapter = ContentAdapter { clickedItem ->
             when (clickedItem) {
                 is ContentItem.Category -> {
@@ -39,13 +36,10 @@ class MoviesFragment : Fragment() {
                     viewModel.loadVodStreams(clickedItem.id)
                 }
                 is ContentItem.Vod -> {
-                    // ─── ✅ تشغيل الفيلم ───
                     val host = activity?.intent?.getStringExtra(EXTRA_HOST) ?: ""
                     val username = activity?.intent?.getStringExtra(EXTRA_USERNAME) ?: ""
                     val password = activity?.intent?.getStringExtra(EXTRA_PASSWORD) ?: ""
-
                     val baseUrl = if (host.startsWith("http")) host else "http://$host"
-                    // سيرفرات الأي بي تي في للأفلام تكون بصيغة: host/movie/user/pass/id.mp4
                     val streamUrl = "$baseUrl/movie/$username/$password/${clickedItem.stream.streamId}.mp4"
 
                     val intent = Intent(requireContext(), PlayerActivity::class.java).apply {
@@ -57,28 +51,30 @@ class MoviesFragment : Fragment() {
                 else -> {}
             }
         }
+
+        // 2. ✅ الضغطة المطولة (حفظ أو إزالة الفيلم)
+        contentAdapter.onItemLongClick = { item ->
+            if (item is ContentItem.Vod) {
+                val isAlreadyFav = FavoritesManager.getVodFavorites(requireContext()).any { it.streamId == item.stream.streamId }
+                if (isAlreadyFav) {
+                    FavoritesManager.removeVodFavorite(requireContext(), item.stream)
+                    Toast.makeText(context, "🗑️ تم إزالة ${item.stream.name}", Toast.LENGTH_SHORT).show()
+                } else {
+                    FavoritesManager.addVodFavorite(requireContext(), item.stream)
+                    Toast.makeText(context, "🌟 تم إضافة ${item.stream.name} للمفضلة", Toast.LENGTH_SHORT).show()
+                }
+                true
+            } else false
+        }
+
         binding.recyclerView.adapter = contentAdapter
 
         viewModel.vodCategories.observe(viewLifecycleOwner) { resource ->
-            if (resource is Resource.Success) {
-                val categories = resource.data
-                val items = categories.map { ContentItem.Category(it.categoryId, it.categoryName) }
-                contentAdapter.submitList(items)
-            }
+            if (resource is Resource.Success) contentAdapter.submitList(resource.data.map { ContentItem.Category(it.categoryId, it.categoryName) })
         }
-
         viewModel.vodStreams.observe(viewLifecycleOwner) { resource ->
-            when (resource) {
-                is Resource.Loading -> { }
-                is Resource.Success -> {
-                    val streams = resource.data
-                    val items = streams.map { ContentItem.Vod(it) }
-                    contentAdapter.submitList(items)
-                }
-                is Resource.Error -> {
-                    Toast.makeText(context, "خطأ: ${resource.message}", Toast.LENGTH_LONG).show()
-                }
-            }
+            if (resource is Resource.Success) contentAdapter.submitList(resource.data.map { ContentItem.Vod(it) })
+            else if (resource is Resource.Error) Toast.makeText(context, "خطأ: ${resource.message}", Toast.LENGTH_LONG).show()
         }
     }
 
