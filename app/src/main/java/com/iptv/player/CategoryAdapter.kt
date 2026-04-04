@@ -1,4 +1,4 @@
-package com.iptvplayer.app.ui.adapter
+package com.iptv.player // ✅ تم تصحيح اسم الحزمة
 
 import android.view.LayoutInflater
 import android.view.View
@@ -8,9 +8,9 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.iptvplayer.app.R
+import com.iptv.player.R // تأكد من المسار الصحيح للـ R
 
-// ✅ تعريف الفئة مباشرة داخل الملف لحل مشكلة Unresolved reference
+// ✅ تعريف الفئة مباشرة لحل المشكلة
 data class GenericCategory(
     val categoryId: String,
     val categoryName: String
