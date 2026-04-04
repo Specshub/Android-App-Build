@@ -18,10 +18,6 @@
             android:id="@+id/nav_favorites"
             android:icon="@android:drawable/btn_star"
             android:title="المفضلة / Favorites" />
-        <item
-            android:id="@+id/nav_downloads"
-            android:icon="@android:drawable/ic_menu_save"
-            android:title="التحميلات / Offline Downloads" />
     </group>
 
     <item android:title="ميزات حصرية / Premium Features">
