@@ -39,10 +39,10 @@ class MultiScreenActivity : AppCompatActivity() {
     }
 
     private fun setupScreens(count: Int) {
-        releasePlayers()
+        releasePlayers() // تنظيف الذاكرة قبل إنشاء شاشات جديدة
         binding.screensGrid.removeAllViews()
         
-        // توزيع الشاشات: 2 في الصف دائماً
+        // التوزيع الاحترافي: عمودين دائماً
         binding.screensGrid.columnCount = 2
         binding.screensGrid.rowCount = if (count <= 2) 1 else 2
 
@@ -53,6 +53,7 @@ class MultiScreenActivity : AppCompatActivity() {
     }
 
     private fun createVideoPlayer(index: Int): FrameLayout {
+        // 1. حاوية الشاشة (Container)
         val container = FrameLayout(this).apply {
             layoutParams = GridLayout.LayoutParams().apply {
                 width = 0
@@ -64,6 +65,7 @@ class MultiScreenActivity : AppCompatActivity() {
             setBackgroundColor(android.graphics.Color.BLACK)
         }
 
+        // 2. مشغل الفيديو (PlayerView)
         val playerView = PlayerView(this).apply {
             useController = false
             layoutParams = FrameLayout.LayoutParams(
@@ -72,18 +74,19 @@ class MultiScreenActivity : AppCompatActivity() {
             )
         }
 
+        // 3. إنشاء ExoPlayer
         val player = ExoPlayer.Builder(this).build()
         playerView.player = player
         players.add(player)
 
-        // نص إرشادي يظهر عندما تكون الشاشة فارغة
+        // 4. نص توضيحي (Hint)
         val hintText = TextView(this).apply {
-            text = "انقر لاختيار قناة"
+            text = "شاشة ${index + 1}\nانقر للاختيار"
             setTextColor(android.graphics.Color.GRAY)
             gravity = Gravity.CENTER
         }
 
-        // زر إغلاق الشاشة
+        // 5. زر الإغلاق (X)
         val closeBtn = ImageButton(this).apply {
             setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
             setBackgroundResource(android.R.drawable.screen_background_dark_transparent)
@@ -97,7 +100,7 @@ class MultiScreenActivity : AppCompatActivity() {
             }
         }
 
-        // زر التحكم في الصوت (كتم/تشغيل)
+        // 6. زر الصوت (Mute/Unmute) - Solo Mode
         val muteBtn = ImageButton(this).apply {
             setImageResource(android.R.drawable.ic_lock_silent_mode)
             setBackgroundResource(android.R.drawable.screen_background_dark_transparent)
@@ -107,20 +110,21 @@ class MultiScreenActivity : AppCompatActivity() {
             }
             setOnClickListener {
                 if (player.volume == 0f) {
-                    players.forEach { it.volume = 0f } // كتم الجميع
-                    player.volume = 1f // تشغيل صوت هذه الشاشة فقط
-                    Toast.makeText(context, "صوت الشاشة ${index + 1} يعمل الآن", Toast.LENGTH_SHORT).show()
+                    players.forEach { it.volume = 0f } // كتم الجميع أولاً
+                    player.volume = 1f // تشغيل هذه الشاشة فقط
+                    Toast.makeText(context, "تم تشغيل صوت الشاشة ${index + 1}", Toast.LENGTH_SHORT).show()
                 } else {
                     player.volume = 0f
                 }
             }
         }
 
-        // عند النقر على الشاشة، نفتح قائمة القنوات
+        // 7. فتح قائمة القنوات عند النقر
         playerView.setOnClickListener {
             showChannelPickerDialog(player, hintText)
         }
 
+        // إضافة العناصر للحاوية
         container.addView(playerView)
         container.addView(hintText)
         container.addView(closeBtn)
@@ -136,17 +140,15 @@ class MultiScreenActivity : AppCompatActivity() {
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         
-        // استخدام الـ Adapter الخاص بك لعرض القنوات
         val adapter = ChannelsAdapter { selectedChannel ->
             val url = viewModel.buildStreamUrl(selectedChannel.streamId, "m3u8")
             playVideo(player, url)
-            hint.visibility = View.GONE // إخفاء النص بمجرد بدء البث
+            hint.visibility = View.GONE // إخفاء النص عند بدء البث
             dialog.dismiss()
         }
 
         recyclerView.adapter = adapter
         
-        // جلب القنوات المباشرة المخزنة في الـ ViewModel
         viewModel.allLiveChannels.value?.let {
             adapter.submitList(it)
         }
@@ -160,7 +162,7 @@ class MultiScreenActivity : AppCompatActivity() {
         player.setMediaItem(mediaItem)
         player.prepare()
         player.playWhenReady = true
-        player.volume = 0f // كتم افتراضي لتجنب فوضى الأصوات
+        player.volume = 0f // كتم افتراضي لمنع التداخل
     }
 
     private fun releasePlayers() {
