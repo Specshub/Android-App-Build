@@ -26,18 +26,17 @@ class MultiScreenActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels()
     private val players = mutableListOf<ExoPlayer>()
 
-    // استخدام نفس الـ Adapter الموجود في مشروعك
-    private lateinit var contentAdapter: ContentAdapter
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMultiScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // إعداد أزرار التقسيم
         binding.btn2Screens.setOnClickListener { setupScreens(2) }
         binding.btn3Screens.setOnClickListener { setupScreens(3) }
         binding.btn4Screens.setOnClickListener { setupScreens(4) }
 
+        // تشغيل شاشتين عند البداية
         setupScreens(2) 
     }
 
@@ -108,7 +107,7 @@ class MultiScreenActivity : AppCompatActivity() {
                 if (player.volume == 0f) {
                     players.forEach { it.volume = 0f } 
                     player.volume = 1f 
-                    Toast.makeText(context, "صوت الشاشة ${index + 1} يعمل", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MultiScreenActivity, "صوت الشاشة ${index + 1} يعمل", Toast.LENGTH_SHORT).show()
                 } else {
                     player.volume = 0f
                 }
@@ -134,10 +133,9 @@ class MultiScreenActivity : AppCompatActivity() {
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         
-        // ─── إعداد الـ ContentAdapter المتوافق مع مشروعك ───
-        contentAdapter = ContentAdapter { clickedItem ->
+        // استخدام الـ ContentAdapter الخاص بك
+        val contentAdapter = ContentAdapter { clickedItem ->
             if (clickedItem is ContentItem.Live) {
-                // استخدام دالة بناء الرابط الموجودة في MainViewModel
                 val streamUrl = viewModel.buildStreamUrl(clickedItem.stream.streamId)
                 playVideo(player, streamUrl)
                 hint.visibility = View.GONE
@@ -147,22 +145,21 @@ class MultiScreenActivity : AppCompatActivity() {
 
         recyclerView.adapter = contentAdapter
         
-        // مراقبة القنوات المباشرة
-        viewModel.liveStreams.observe(this) { resource ->
-            when (resource) {
-                is Resource.Success -> {
+        // جلب البيانات من الـ Success مباشرة إذا كانت محملة مسبقاً لتوفير الوقت والجهد
+        val currentData = viewModel.liveStreams.value
+        if (currentData is Resource.Success) {
+            val items = currentData.data.map { ContentItem.Live(it) }
+            contentAdapter.setAllItems(items)
+        } else {
+            // مراقبة القنوات فقط إذا لم تكن موجودة
+            viewModel.liveStreams.observe(this) { resource ->
+                if (resource is Resource.Success) {
                     val items = resource.data.map { ContentItem.Live(it) }
                     contentAdapter.setAllItems(items)
                 }
-                is Resource.Error -> {
-                    Toast.makeText(this, "خطأ: ${resource.message}", Toast.LENGTH_SHORT).show()
-                }
-                else -> {}
             }
+            viewModel.loadAllLiveStreams()
         }
-
-        // طلب جلب كافة القنوات المباشرة
-        viewModel.loadAllLiveStreams()
 
         dialog.setContentView(view)
         dialog.show()
@@ -180,6 +177,11 @@ class MultiScreenActivity : AppCompatActivity() {
     private fun releasePlayers() {
         players.forEach { it.release() }
         players.clear()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        players.forEach { it.pause() }
     }
 
     override fun onDestroy() {
