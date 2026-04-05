@@ -16,29 +16,31 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val apiService = RetrofitClient.instance.create(XtreamApiService::class.java)
     private val repository = XtreamRepository(apiService)
 
-    // ✅ حفظ بيانات الدخول
+    // ✅ حفظ بيانات الدخول الحالية لاستخدامها في بناء الروابط وجلب البيانات
     private var currentCreds: LoginCredentials? = null
 
     fun setCredentials(creds: LoginCredentials) {
         currentCreds = creds
     }
 
-    // ── Live TV ─────────────────────────────────────────────────────────────
-    // ✅ هذه هي الصناديق التي كان يبحث عنها المترجم ولم يجدها!
+    // دالة لاسترجاع بيانات الدخول عند الحاجة (مثل الشاشات المتعددة)
+    fun getCredentials(): LoginCredentials? = currentCreds
+
+    // ── Live TV (البث المباشر) ─────────────────────────────────────────────
     private val _liveCategories = MutableLiveData<Resource<List<LiveCategory>>>()
     val liveCategories: LiveData<Resource<List<LiveCategory>>> = _liveCategories
 
     private val _liveStreams = MutableLiveData<Resource<List<LiveStream>>>()
     val liveStreams: LiveData<Resource<List<LiveStream>>> = _liveStreams
 
-    // ── VOD ─────────────────────────────────────────────────────────────────
+    // ── VOD (الأفلام) ──────────────────────────────────────────────────────
     private val _vodCategories = MutableLiveData<Resource<List<VodCategory>>>()
     val vodCategories: LiveData<Resource<List<VodCategory>>> = _vodCategories
 
     private val _vodStreams = MutableLiveData<Resource<List<VodStream>>>()
     val vodStreams: LiveData<Resource<List<VodStream>>> = _vodStreams
 
-    // ── Series ──────────────────────────────────────────────────────────────
+    // ── Series (المسلسلات) ─────────────────────────────────────────────────
     private val _seriesCategories = MutableLiveData<Resource<List<SeriesCategory>>>()
     val seriesCategories: LiveData<Resource<List<SeriesCategory>>> = _seriesCategories
 
@@ -48,7 +50,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _seriesInfo = MutableLiveData<Resource<SeriesInfo>>()
     val seriesInfo: LiveData<Resource<SeriesInfo>> = _seriesInfo
 
-    // ── Loaders ─────────────────────────────────────────────────────────────
+    // ── الدوال البرمجية (Loaders) ──────────────────────────────────────────
 
     fun loadLiveCategories() {
         val creds = currentCreds ?: return
@@ -64,6 +66,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _liveStreams.value = repository.getLiveStreams(creds, categoryId)
         }
+    }
+
+    // دالة خاصة لميزة الشاشات المتعددة لجلب كل القنوات
+    fun loadAllLiveStreams() {
+        loadLiveStreams(null)
     }
 
     fun loadVodCategories() {
@@ -104,5 +111,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _seriesInfo.value = repository.getSeriesInfo(creds, seriesId)
         }
+    }
+
+    // ── أدوات المساعدة (Helpers) ──────────────────────────────────────────
+
+    /**
+     * بناء رابط البث المباشر بصيغة Xtream
+     * التنسيق: http://domain:port/live/username/password/stream_id.m3u8
+     */
+    fun buildStreamUrl(streamId: Int, extension: String = "m3u8"): String {
+        val creds = currentCreds ?: return ""
+        val host = creds.host.removeSuffix("/")
+        return "$host/live/${creds.username}/${creds.password}/$streamId.$extension"
     }
 }
