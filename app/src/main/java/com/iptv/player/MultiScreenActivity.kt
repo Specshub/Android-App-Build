@@ -26,14 +26,13 @@ class MultiScreenActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels()
     private val players = mutableListOf<ExoPlayer>()
 
+    // استخدام نفس الـ Adapter الموجود في مشروعك
+    private lateinit var contentAdapter: ContentAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMultiScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // جلب بيانات المستخدم من الـ Intent الممرر من القائمة الجانبية (اختياري حسب طريقتك)
-        // ولكن الـ MainViewModel يحتاج لـ setCredentials ليعمل buildStreamUrl
-        // إذا كنت قد استدعيتها في MainActivity، فالبيانات محفوظة في الـ ViewModel
 
         binding.btn2Screens.setOnClickListener { setupScreens(2) }
         binding.btn3Screens.setOnClickListener { setupScreens(3) }
@@ -109,7 +108,7 @@ class MultiScreenActivity : AppCompatActivity() {
                 if (player.volume == 0f) {
                     players.forEach { it.volume = 0f } 
                     player.volume = 1f 
-                    Toast.makeText(context, "صوت الشاشة ${index + 1} مفعّل", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "صوت الشاشة ${index + 1} يعمل", Toast.LENGTH_SHORT).show()
                 } else {
                     player.volume = 0f
                 }
@@ -135,33 +134,34 @@ class MultiScreenActivity : AppCompatActivity() {
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         
-        // استخدم اسم الـ Adapter الذي تعتمده في مشروعك (ChannelsAdapter)
-        val adapter = ChannelsAdapter { selectedStream ->
-            // استخدام buildStreamUrl المحدثة في MainViewModel
-            val url = viewModel.buildStreamUrl(selectedStream.streamId)
-            playVideo(player, url)
-            hint.visibility = View.GONE
-            dialog.dismiss()
-        }
-
-        recyclerView.adapter = adapter
-        
-        // جلب القنوات المباشرة بنظام الـ Resource
-        viewModel.liveStreams.observe(this) { resource ->
-            when (resource) {
-                is Resource.Success -> {
-                    adapter.submitList(resource.data)
-                }
-                is Resource.Error -> {
-                    Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show()
-                }
-                is Resource.Loading -> {
-                    // القائمة قيد التحميل
-                }
+        // ─── إعداد الـ ContentAdapter المتوافق مع مشروعك ───
+        contentAdapter = ContentAdapter { clickedItem ->
+            if (clickedItem is ContentItem.Live) {
+                // استخدام دالة بناء الرابط الموجودة في MainViewModel
+                val streamUrl = viewModel.buildStreamUrl(clickedItem.stream.streamId)
+                playVideo(player, streamUrl)
+                hint.visibility = View.GONE
+                dialog.dismiss()
             }
         }
 
-        // استدعاء جلب القنوات إذا لم تكن محملة
+        recyclerView.adapter = contentAdapter
+        
+        // مراقبة القنوات المباشرة
+        viewModel.liveStreams.observe(this) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    val items = resource.data.map { ContentItem.Live(it) }
+                    contentAdapter.setAllItems(items)
+                }
+                is Resource.Error -> {
+                    Toast.makeText(this, "خطأ: ${resource.message}", Toast.LENGTH_SHORT).show()
+                }
+                else -> {}
+            }
+        }
+
+        // طلب جلب كافة القنوات المباشرة
         viewModel.loadAllLiveStreams()
 
         dialog.setContentView(view)
