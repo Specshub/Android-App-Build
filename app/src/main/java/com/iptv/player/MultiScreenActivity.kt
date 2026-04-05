@@ -18,6 +18,7 @@ import androidx.media3.ui.PlayerView
 import androidx.gridlayout.widget.GridLayout
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.iptv.player.databinding.ActivityMultiScreenBinding
+import com.iptv.player.data.model.Resource
 
 class MultiScreenActivity : AppCompatActivity() {
 
@@ -30,19 +31,21 @@ class MultiScreenActivity : AppCompatActivity() {
         binding = ActivityMultiScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // إعداد الأزرار العلوية لاختيار عدد الشاشات
+        // جلب بيانات المستخدم من الـ Intent الممرر من القائمة الجانبية (اختياري حسب طريقتك)
+        // ولكن الـ MainViewModel يحتاج لـ setCredentials ليعمل buildStreamUrl
+        // إذا كنت قد استدعيتها في MainActivity، فالبيانات محفوظة في الـ ViewModel
+
         binding.btn2Screens.setOnClickListener { setupScreens(2) }
         binding.btn3Screens.setOnClickListener { setupScreens(3) }
         binding.btn4Screens.setOnClickListener { setupScreens(4) }
 
-        setupScreens(2) // البدء بشاشتين افتراضياً
+        setupScreens(2) 
     }
 
     private fun setupScreens(count: Int) {
-        releasePlayers() // تنظيف الذاكرة قبل إنشاء شاشات جديدة
+        releasePlayers()
         binding.screensGrid.removeAllViews()
         
-        // التوزيع الاحترافي: عمودين دائماً
         binding.screensGrid.columnCount = 2
         binding.screensGrid.rowCount = if (count <= 2) 1 else 2
 
@@ -53,7 +56,6 @@ class MultiScreenActivity : AppCompatActivity() {
     }
 
     private fun createVideoPlayer(index: Int): FrameLayout {
-        // 1. حاوية الشاشة (Container)
         val container = FrameLayout(this).apply {
             layoutParams = GridLayout.LayoutParams().apply {
                 width = 0
@@ -65,7 +67,6 @@ class MultiScreenActivity : AppCompatActivity() {
             setBackgroundColor(android.graphics.Color.BLACK)
         }
 
-        // 2. مشغل الفيديو (PlayerView)
         val playerView = PlayerView(this).apply {
             useController = false
             layoutParams = FrameLayout.LayoutParams(
@@ -74,19 +75,16 @@ class MultiScreenActivity : AppCompatActivity() {
             )
         }
 
-        // 3. إنشاء ExoPlayer
         val player = ExoPlayer.Builder(this).build()
         playerView.player = player
         players.add(player)
 
-        // 4. نص توضيحي (Hint)
         val hintText = TextView(this).apply {
             text = "شاشة ${index + 1}\nانقر للاختيار"
             setTextColor(android.graphics.Color.GRAY)
             gravity = Gravity.CENTER
         }
 
-        // 5. زر الإغلاق (X)
         val closeBtn = ImageButton(this).apply {
             setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
             setBackgroundResource(android.R.drawable.screen_background_dark_transparent)
@@ -100,7 +98,6 @@ class MultiScreenActivity : AppCompatActivity() {
             }
         }
 
-        // 6. زر الصوت (Mute/Unmute) - Solo Mode
         val muteBtn = ImageButton(this).apply {
             setImageResource(android.R.drawable.ic_lock_silent_mode)
             setBackgroundResource(android.R.drawable.screen_background_dark_transparent)
@@ -110,21 +107,19 @@ class MultiScreenActivity : AppCompatActivity() {
             }
             setOnClickListener {
                 if (player.volume == 0f) {
-                    players.forEach { it.volume = 0f } // كتم الجميع أولاً
-                    player.volume = 1f // تشغيل هذه الشاشة فقط
-                    Toast.makeText(context, "تم تشغيل صوت الشاشة ${index + 1}", Toast.LENGTH_SHORT).show()
+                    players.forEach { it.volume = 0f } 
+                    player.volume = 1f 
+                    Toast.makeText(context, "صوت الشاشة ${index + 1} مفعّل", Toast.LENGTH_SHORT).show()
                 } else {
                     player.volume = 0f
                 }
             }
         }
 
-        // 7. فتح قائمة القنوات عند النقر
         playerView.setOnClickListener {
             showChannelPickerDialog(player, hintText)
         }
 
-        // إضافة العناصر للحاوية
         container.addView(playerView)
         container.addView(hintText)
         container.addView(closeBtn)
@@ -140,29 +135,46 @@ class MultiScreenActivity : AppCompatActivity() {
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         
-        val adapter = ChannelsAdapter { selectedChannel ->
-            val url = viewModel.buildStreamUrl(selectedChannel.streamId, "m3u8")
+        // استخدم اسم الـ Adapter الذي تعتمده في مشروعك (ChannelsAdapter)
+        val adapter = ChannelsAdapter { selectedStream ->
+            // استخدام buildStreamUrl المحدثة في MainViewModel
+            val url = viewModel.buildStreamUrl(selectedStream.streamId)
             playVideo(player, url)
-            hint.visibility = View.GONE // إخفاء النص عند بدء البث
+            hint.visibility = View.GONE
             dialog.dismiss()
         }
 
         recyclerView.adapter = adapter
         
-        viewModel.allLiveChannels.value?.let {
-            adapter.submitList(it)
+        // جلب القنوات المباشرة بنظام الـ Resource
+        viewModel.liveStreams.observe(this) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    adapter.submitList(resource.data)
+                }
+                is Resource.Error -> {
+                    Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Loading -> {
+                    // القائمة قيد التحميل
+                }
+            }
         }
+
+        // استدعاء جلب القنوات إذا لم تكن محملة
+        viewModel.loadAllLiveStreams()
 
         dialog.setContentView(view)
         dialog.show()
     }
 
     private fun playVideo(player: ExoPlayer, url: String) {
+        if (url.isEmpty()) return
         val mediaItem = MediaItem.fromUri(Uri.parse(url))
         player.setMediaItem(mediaItem)
         player.prepare()
         player.playWhenReady = true
-        player.volume = 0f // كتم افتراضي لمنع التداخل
+        player.volume = 0f 
     }
 
     private fun releasePlayers() {
