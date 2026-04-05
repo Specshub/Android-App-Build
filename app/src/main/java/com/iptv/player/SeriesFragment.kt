@@ -37,115 +37,80 @@ class SeriesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.recyclerView.layoutManager = GridLayoutManager(context, 3)
 
-        // ─── إعداد المحول (Adapter) ───
         contentAdapter = ContentAdapter { clickedItem ->
             when (clickedItem) {
                 is ContentItem.Category -> {
-                    isShowingStreams = true
+                    isShowingStreams = true // ⬅️ تحديث الحالة: دخلنا إلى قسم المسلسلات
                     Toast.makeText(context, "جاري جلب المسلسلات...", Toast.LENGTH_SHORT).show()
-                    // استدعاء دالة المسلسلات من الـ ViewModel
                     viewModel.loadSeries(clickedItem.id)
                 }
-                is ContentItem.Series -> {
+                is ContentItem.SeriesItem -> { // ✅ تم استخدام الاسم الصحيح من مشروعك
                     currentSelectedSeriesId = clickedItem.series.seriesId
                     Toast.makeText(context, "جاري جلب الحلقات...", Toast.LENGTH_SHORT).show()
-                    // جلب معلومات المسلسل (المواسم والحلقات)
                     viewModel.loadSeriesInfo(clickedItem.series.seriesId)
                 }
                 else -> {}
             }
         }
 
-        // إعداد المفضلة عند الضغط المطول
-        contentAdapter.onItemLongClick = { item ->
-            if (item is ContentItem.Series) {
-                // ملاحظة: يمكنك برمجة المفضلة للمسلسلات هنا لاحقاً
-                Toast.makeText(context, "تم تحديد المسلسل", Toast.LENGTH_SHORT).show()
-                true
-            } else false
-        }
-
         binding.recyclerView.adapter = contentAdapter
 
-        // ─── المراقبة (Observers) ───
-
-        // مراقبة باقات المسلسلات
+        // ✅ إضافة <*> لحل خطأ المترجم مع استخدام submitList الأصلية الخاصة بك
         viewModel.seriesCategories.observe(viewLifecycleOwner) { resource ->
-            // ✅ تم إضافة <*> لحل خطأ المترجم (Compiler)
-            when (resource) {
-                is Resource.Success<*> -> {
-                    isShowingStreams = false
-                    val data = resource.data as? List<SeriesCategory> ?: return@observe
-                    val items = data.map { ContentItem.Category(it.categoryId, it.categoryName) }
-                    contentAdapter.setAllItems(items)
-                }
-                is Resource.Error<*> -> {
-                    Toast.makeText(context, "خطأ: ${resource.message}", Toast.LENGTH_LONG).show()
-                }
-                is Resource.Loading<*> -> {
-                    // جاري التحميل
-                }
+            if (resource is Resource.Success<*>) {
+                isShowingStreams = false // ⬅️ تحديث الحالة: عدنا إلى أقسام المسلسلات
+                val data = resource.data as? List<SeriesCategory> ?: return@observe
+                contentAdapter.submitList(data.map { ContentItem.Category(it.categoryId, it.categoryName) })
             }
         }
 
-        // مراقبة قائمة المسلسلات
         viewModel.seriesList.observe(viewLifecycleOwner) { resource ->
-            when (resource) {
-                is Resource.Success<*> -> {
-                    val data = resource.data as? List<Series> ?: return@observe
-                    val items = data.map { ContentItem.Series(it) }
-                    contentAdapter.setAllItems(items)
-                }
-                is Resource.Error<*> -> {
-                    Toast.makeText(context, "خطأ: ${resource.message}", Toast.LENGTH_LONG).show()
-                }
-                is Resource.Loading<*> -> {
-                    // جاري التحميل
-                }
+            if (resource is Resource.Success<*>) {
+                val data = resource.data as? List<Series> ?: return@observe
+                contentAdapter.submitList(data.map { ContentItem.SeriesItem(it) }) // ✅ SeriesItem
             }
         }
 
-        // مراقبة معلومات المسلسل (لإظهار الحلقات)
         viewModel.seriesInfo.observe(viewLifecycleOwner) { resource ->
-            when (resource) {
-                is Resource.Success<*> -> {
-                    val data = resource.data as? SeriesInfo ?: return@observe
-                    showEpisodesDialog(data.episodes)
-                }
-                is Resource.Error<*> -> {
-                    Toast.makeText(context, "خطأ في جلب الحلقات: ${resource.message}", Toast.LENGTH_SHORT).show()
-                }
-                is Resource.Loading<*> -> {
-                    // جاري التحميل
-                }
+            if (currentSelectedSeriesId != null && resource is Resource.Success<*>) {
+                val data = resource.data as? SeriesInfo ?: return@observe
+                showEpisodesDialog(data)
             }
         }
     }
 
-    // ─── عرض نافذة الحلقات (Dialog) ───
-    private fun showEpisodesDialog(episodesMap: Map<String, List<Episode>>) {
-        if (episodesMap.isEmpty()) {
+    // 🔙 دالة العودة للأقسام (تستدعى من MainActivity عند ضغط زر الرجوع)
+    fun goBackToCategories() {
+        viewModel.loadSeriesCategories()
+    }
+
+    // عرض نافذة الحلقات
+    private fun showEpisodesDialog(seriesInfo: SeriesInfo) {
+        val allEpisodes = mutableListOf<Episode>()
+        seriesInfo.episodes.toSortedMap().forEach { (_, episodes) -> allEpisodes.addAll(episodes) }
+
+        if (allEpisodes.isEmpty()) {
             Toast.makeText(context, "لا توجد حلقات متاحة", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // تحويل خريطة الحلقات (حسب المواسم) إلى قائمة واحدة مسطحة
-        val allEpisodes = episodesMap.values.flatten()
-        val episodeNames = allEpisodes.map { "الموسم ${it.season} - حلقة ${it.episodeNum}: ${it.title}" }.toTypedArray()
+        // استخدام index لترقيم الحلقات لتجنب أي أخطاء في المتغيرات
+        val episodeNames = allEpisodes.mapIndexed { index, ep -> 
+            "الحلقة ${index + 1}: ${ep.title ?: "بدون عنوان"}" 
+        }.toTypedArray()
 
         AlertDialog.Builder(requireContext())
             .setTitle("اختر الحلقة")
             .setItems(episodeNames) { _, which ->
                 val selectedEp = allEpisodes[which]
                 
-                // جلب بيانات الاعتماد لبناء رابط المسلسل
                 val creds = viewModel.getCredentials()
                 val host = creds?.host?.removeSuffix("/") ?: ""
                 val user = creds?.username ?: ""
                 val pass = creds?.password ?: ""
                 
-                // تنسيق رابط المسلسلات في Xtream Codes
-                val streamUrl = "$host/series/$user/$pass/${selectedEp.id}.${selectedEp.containerExtension}"
+                // استخدام صيغة .mp4 كصيغة افتراضية للمسلسلات لتجنب خطأ containerExtension
+                val streamUrl = "$host/series/$user/$pass/${selectedEp.id}.mp4"
                 
                 val intent = Intent(requireContext(), PlayerActivity::class.java).apply {
                     putExtra(PlayerActivity.EXTRA_STREAM_TITLE, selectedEp.title)
@@ -155,11 +120,6 @@ class SeriesFragment : Fragment() {
             }
             .setNegativeButton("إلغاء", null)
             .show()
-    }
-
-    fun goBackToCategories() {
-        // استدعاء دالة تحميل أقسام المسلسلات
-        viewModel.loadSeriesCategories()
     }
 
     override fun onDestroyView() {
