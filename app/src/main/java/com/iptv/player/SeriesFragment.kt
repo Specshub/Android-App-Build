@@ -14,6 +14,8 @@ import com.iptv.player.databinding.FragmentSeriesBinding
 import com.iptv.player.data.model.Resource
 import com.iptv.player.data.model.Episode
 import com.iptv.player.data.model.SeriesInfo
+import com.iptv.player.data.model.Series
+import com.iptv.player.data.model.SeriesCategory
 import com.iptv.player.FavoritesManager
 
 class SeriesFragment : Fragment() {
@@ -35,92 +37,129 @@ class SeriesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.recyclerView.layoutManager = GridLayoutManager(context, 3)
 
-        // 1. الضغطة العادية (جلب الحلقات)
+        // ─── إعداد المحول (Adapter) ───
         contentAdapter = ContentAdapter { clickedItem ->
             when (clickedItem) {
                 is ContentItem.Category -> {
-                    isShowingStreams = true // ⬅️ تحديث الحالة: دخلنا إلى قسم المسلسلات
+                    isShowingStreams = true
                     Toast.makeText(context, "جاري جلب المسلسلات...", Toast.LENGTH_SHORT).show()
+                    // استدعاء دالة المسلسلات من الـ ViewModel
                     viewModel.loadSeries(clickedItem.id)
                 }
-                is ContentItem.SeriesItem -> {
-                    Toast.makeText(context, "جاري جلب الحلقات...", Toast.LENGTH_SHORT).show()
+                is ContentItem.Series -> {
                     currentSelectedSeriesId = clickedItem.series.seriesId
+                    Toast.makeText(context, "جاري جلب الحلقات...", Toast.LENGTH_SHORT).show()
+                    // جلب معلومات المسلسل (المواسم والحلقات)
                     viewModel.loadSeriesInfo(clickedItem.series.seriesId)
                 }
                 else -> {}
             }
         }
 
-        // 2. ✅ الضغطة المطولة (حفظ أو إزالة المسلسل)
+        // إعداد المفضلة عند الضغط المطول
         contentAdapter.onItemLongClick = { item ->
-            if (item is ContentItem.SeriesItem) {
-                val isAlreadyFav = FavoritesManager.getSeriesFavorites(requireContext()).any { it.seriesId == item.series.seriesId }
-                if (isAlreadyFav) {
-                    FavoritesManager.removeSeriesFavorite(requireContext(), item.series)
-                    Toast.makeText(context, "🗑️ تم إزالة ${item.series.name}", Toast.LENGTH_SHORT).show()
-                } else {
-                    FavoritesManager.addSeriesFavorite(requireContext(), item.series)
-                    Toast.makeText(context, "🌟 تم إضافة ${item.series.name} للمفضلة", Toast.LENGTH_SHORT).show()
-                }
+            if (item is ContentItem.Series) {
+                // ملاحظة: يمكنك برمجة المفضلة للمسلسلات هنا لاحقاً
+                Toast.makeText(context, "تم تحديد المسلسل", Toast.LENGTH_SHORT).show()
                 true
             } else false
         }
 
         binding.recyclerView.adapter = contentAdapter
 
+        // ─── المراقبة (Observers) ───
+
+        // مراقبة باقات المسلسلات
         viewModel.seriesCategories.observe(viewLifecycleOwner) { resource ->
-            if (resource is Resource.Success) {
-                isShowingStreams = false // ⬅️ تحديث الحالة: عدنا إلى أقسام المسلسلات
-                contentAdapter.submitList(resource.data.map { ContentItem.Category(it.categoryId, it.categoryName) })
+            // ✅ تم إضافة <*> لحل خطأ المترجم (Compiler)
+            when (resource) {
+                is Resource.Success<*> -> {
+                    isShowingStreams = false
+                    val data = resource.data as? List<SeriesCategory> ?: return@observe
+                    val items = data.map { ContentItem.Category(it.categoryId, it.categoryName) }
+                    contentAdapter.setAllItems(items)
+                }
+                is Resource.Error<*> -> {
+                    Toast.makeText(context, "خطأ: ${resource.message}", Toast.LENGTH_LONG).show()
+                }
+                is Resource.Loading<*> -> {
+                    // جاري التحميل
+                }
             }
         }
-        
+
+        // مراقبة قائمة المسلسلات
         viewModel.seriesList.observe(viewLifecycleOwner) { resource ->
-            if (resource is Resource.Success) contentAdapter.submitList(resource.data.map { ContentItem.SeriesItem(it) })
+            when (resource) {
+                is Resource.Success<*> -> {
+                    val data = resource.data as? List<Series> ?: return@observe
+                    val items = data.map { ContentItem.Series(it) }
+                    contentAdapter.setAllItems(items)
+                }
+                is Resource.Error<*> -> {
+                    Toast.makeText(context, "خطأ: ${resource.message}", Toast.LENGTH_LONG).show()
+                }
+                is Resource.Loading<*> -> {
+                    // جاري التحميل
+                }
+            }
         }
-        
+
+        // مراقبة معلومات المسلسل (لإظهار الحلقات)
         viewModel.seriesInfo.observe(viewLifecycleOwner) { resource ->
-            if (currentSelectedSeriesId != null && resource is Resource.Success) {
-                showEpisodesDialog(resource.data)
-                currentSelectedSeriesId = null
-            } else if (currentSelectedSeriesId != null && resource is Resource.Error) {
-                Toast.makeText(context, "خطأ في جلب الحلقات", Toast.LENGTH_SHORT).show()
-                currentSelectedSeriesId = null
+            when (resource) {
+                is Resource.Success<*> -> {
+                    val data = resource.data as? SeriesInfo ?: return@observe
+                    showEpisodesDialog(data.episodes)
+                }
+                is Resource.Error<*> -> {
+                    Toast.makeText(context, "خطأ في جلب الحلقات: ${resource.message}", Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Loading<*> -> {
+                    // جاري التحميل
+                }
             }
         }
     }
 
-    // 🔙 دالة العودة للأقسام (تستدعى من MainActivity عند ضغط زر الرجوع)
-    fun goBackToCategories() {
-        viewModel.loadSeriesCategories()
-    }
+    // ─── عرض نافذة الحلقات (Dialog) ───
+    private fun showEpisodesDialog(episodesMap: Map<String, List<Episode>>) {
+        if (episodesMap.isEmpty()) {
+            Toast.makeText(context, "لا توجد حلقات متاحة", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-    private fun showEpisodesDialog(seriesInfo: SeriesInfo) {
-        val allEpisodes = mutableListOf<Episode>()
-        seriesInfo.episodes.toSortedMap().forEach { (_, episodes) -> allEpisodes.addAll(episodes) }
-        if (allEpisodes.isEmpty()) return
-        val episodeTitles = allEpisodes.map { "الموسم ${it.season} | الحلقة ${it.id} - ${it.title}" }.toTypedArray()
+        // تحويل خريطة الحلقات (حسب المواسم) إلى قائمة واحدة مسطحة
+        val allEpisodes = episodesMap.values.flatten()
+        val episodeNames = allEpisodes.map { "الموسم ${it.season} - حلقة ${it.episodeNum}: ${it.title}" }.toTypedArray()
 
         AlertDialog.Builder(requireContext())
-            .setTitle(seriesInfo.info.name ?: "اختر الحلقة")
-            .setItems(episodeTitles) { _, which -> playEpisode(allEpisodes[which]) }
+            .setTitle("اختر الحلقة")
+            .setItems(episodeNames) { _, which ->
+                val selectedEp = allEpisodes[which]
+                
+                // جلب بيانات الاعتماد لبناء رابط المسلسل
+                val creds = viewModel.getCredentials()
+                val host = creds?.host?.removeSuffix("/") ?: ""
+                val user = creds?.username ?: ""
+                val pass = creds?.password ?: ""
+                
+                // تنسيق رابط المسلسلات في Xtream Codes
+                val streamUrl = "$host/series/$user/$pass/${selectedEp.id}.${selectedEp.containerExtension}"
+                
+                val intent = Intent(requireContext(), PlayerActivity::class.java).apply {
+                    putExtra(PlayerActivity.EXTRA_STREAM_TITLE, selectedEp.title)
+                    putExtra(PlayerActivity.EXTRA_STREAM_URL, streamUrl)
+                }
+                startActivity(intent)
+            }
             .setNegativeButton("إلغاء", null)
             .show()
     }
 
-    private fun playEpisode(episode: Episode) {
-        val host = activity?.intent?.getStringExtra(EXTRA_HOST) ?: ""
-        val username = activity?.intent?.getStringExtra(EXTRA_USERNAME) ?: ""
-        val password = activity?.intent?.getStringExtra(EXTRA_PASSWORD) ?: ""
-        val baseUrl = if (host.startsWith("http")) host else "http://$host"
-        val streamUrl = "$baseUrl/series/$username/$password/${episode.id}.mp4"
-
-        val intent = Intent(requireContext(), PlayerActivity::class.java).apply {
-            putExtra(PlayerActivity.EXTRA_STREAM_TITLE, episode.title)
-            putExtra(PlayerActivity.EXTRA_STREAM_URL, streamUrl)
-        }
-        startActivity(intent)
+    fun goBackToCategories() {
+        // استدعاء دالة تحميل أقسام المسلسلات
+        viewModel.loadSeriesCategories()
     }
 
     override fun onDestroyView() {
