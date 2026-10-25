@@ -1,69 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_live_tv"
-            android:icon="@android:drawable/ic_menu_view"
-            android:title="البث المباشر / Live TV" />
-        <item
-            android:id="@+id/nav_movies"
-            android:icon="@android:drawable/ic_menu_slideshow"
-            android:title="الأفلام / Movies" />
-        <item
-            android:id="@+id/nav_series"
-            android:icon="@android:drawable/ic_menu_gallery"
-            android:title="المسلسلات / Series" />
-        <item
-            android:id="@+id/nav_favorites"
-            android:icon="@android:drawable/btn_star"
-            android:title="المفضلة / Favorites" />
-    </group>
-
-    <item android:title="ميزات حصرية / Premium Features">
-        <menu>
-            <item
-                android:id="@+id/nav_multi_screen"
-                android:icon="@android:drawable/ic_menu_crop"
-                android:title="شاشات متعددة / Multi-Screen" />
-            <item
-                android:id="@+id/nav_schedule"
-                android:icon="@android:drawable/ic_menu_today"
-                android:title="جدول المباريات / Match Schedule" />
-            <item
-                android:id="@+id/nav_speed_test"
-                android:icon="@android:drawable/stat_sys_download"
-                android:title="فحص السرعة / Speed Test" />
-            <item
-                android:id="@+id/nav_clear_cache"
-                android:icon="@android:drawable/ic_menu_delete"
-                android:title="تسريع التطبيق / Clear Cache" />
-        </menu>
-    </item>
-
-    <item android:title="الإعدادات والدعم / Settings &amp; Support">
-        <menu>
-            <item
-                android:id="@+id/nav_language"
-                android:icon="@android:drawable/ic_menu_sort_alphabetically"
-                android:title="تغيير اللغة / Language" />
-            <item
-                android:id="@+id/nav_theme"
-                android:icon="@android:drawable/ic_menu_day"
-                android:title="الوضع الليلي / Dark Mode" />
-            <item
-                android:id="@+id/nav_settings"
-                android:icon="@android:drawable/ic_menu_preferences"
-                android:title="الإعدادات / Settings" />
-            <item
-                android:id="@+id/nav_support"
-                android:icon="@android:drawable/ic_menu_call"
-                android:title="الدعم الفني / Live Support" />
-            <item
-                android:id="@+id/nav_logout"
-                android:icon="@android:drawable/ic_lock_power_off"
-                android:title="تسجيل الخروج / Logout" />
-        </menu>
-    </item>
-
+<group android:checkableBehavior="single">
+<item android:id="@+id/nav_live_tv" android:icon="@android:drawable/ic_menu_view" android:title="البث المباشر / Live TV" />
+<item android:id="@+id/nav_movies" android:icon="@android:drawable/ic_menu_slideshow" android:title="الأفلام / Movies" />
+<item android:id="@+id/nav_series" android:icon="@android:drawable/ic_menu_gallery" android:title="المسلسلات / Series" />
+<item android:id="@+id/nav_favorites" android:icon="@android:drawable/btn_star" android:title="المفضلة / Favorites" />
+</group>
+<item android:title="ميزات حصرية / Premium Features">
+<menu>
+<item android:id="@+id/nav_multi_screen" android:icon="@android:drawable/ic_menu_crop" android:title="شاشات متعددة / Multi-Screen" />
+<item android:id="@+id/nav_speed_test" android:icon="@android:drawable/stat_sys_download" android:title="فحص السرعة / Speed Test" />
+<item android:id="@+id/nav_clear_cache" android:icon="@android:drawable/ic_menu_delete" android:title="تسريع التطبيق / Clear Cache" />
+</menu>
+</item>
+<item android:title="الإعدادات والدعم / Settings &amp; Support">
+<menu>
+<item android:id="@+id/nav_language" android:icon="@android:drawable/ic_menu_sort_alphabetically" android:title="تغيير اللغة / Language" />
+<item android:id="@+id/nav_theme" android:icon="@android:drawable/ic_menu_day" android:title="الوضع الليلي / Dark Mode" />
+<item android:id="@+id/nav_settings" android:icon="@android:drawable/ic_menu_preferences" android:title="الإعدادات / Settings" />
+<item android:id="@+id/nav_support" android:icon="@android:drawable/ic_menu_call" android:title="الدعم الفني / Live Support" />
+<item android:id="@+id/nav_logout" android:icon="@android:drawable/ic_lock_power_off" android:title="تسجيل الخروج / Logout" />
+</menu>
+</item>
 </menu>
