@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 
-data class PosterItem(val id: String, val title: String, val imageUrl: String?)
+data class PosterItem(val id: String, val title: String, val imageUrl: String?, val ext: String? = null)
 
 class PosterAdapter(private val layoutRes: Int = R.layout.item_poster, private val onClick: (PosterItem) -> Unit) : ListAdapter<PosterItem, PosterAdapter.VH>(Diff()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = VH(LayoutInflater.from(parent.context).inflate(layoutRes, parent, false))
