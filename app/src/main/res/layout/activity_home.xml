@@ -1,41 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- res/layout/activity_home.xml -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#0A0A0A"
-    android:orientation="vertical"
-    android:paddingTop="8dp">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="12dp"
-        android:text="أحدث الأفلام"
-        android:textColor="#FFFFFF"
-        android:textSize="15sp"
-        android:textStyle="bold" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvMovies"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingHorizontal="8dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="12dp"
-        android:text="أحدث المسلسلات"
-        android:textColor="#FFFFFF"
-        android:textSize="15sp"
-        android:textStyle="bold" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvSeries"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:background="#0A0A0A" android:orientation="vertical" android:paddingTop="8dp">
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginHorizontal="12dp" android:text="أحدث الأفلام" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" />
+<androidx.recyclerview.widget.RecyclerView android:id="@+id/rvMovies" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:clipToPadding="false" android:paddingHorizontal="8dp" />
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginHorizontal="12dp" android:text="أحدث المسلسلات" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" />
+<androidx.recyclerview.widget.RecyclerView android:id="@+id/rvSeries" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:clipToPadding="false" android:paddingHorizontal="8dp" />
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal" android:paddingHorizontal="8dp">
+<ImageView android:id="@+id/ivLogo" android:layout_width="72dp" android:layout_height="72dp" android:src="@drawable/ic_logo" />
+<HorizontalScrollView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:scrollbars="none">
+<LinearLayout android:id="@+id/buttonsContainer" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" />
+</HorizontalScrollView>
+</LinearLayout>
+<TextView android:id="@+id/tvExpiry" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:paddingBottom="6dp" android:textColor="#888888" android:textSize="13sp" />
+</LinearLayout>
