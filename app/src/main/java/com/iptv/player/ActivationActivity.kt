@@ -3,6 +3,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.*
 import com.iptv.player.data.api.DeviceApi
@@ -18,6 +19,8 @@ class ActivationActivity : AppCompatActivity() {
         mac = DeviceManager.getMac(this); key = DeviceManager.getKey(this)
         b.tvAppName.text = Constants.APP_NAME.uppercase(); b.tvSite.text = Constants.ACTIVATION_SITE
         b.tvMac.text = mac; b.tvKey.text = key; b.tvPhone.text = Constants.SUPPORT_PHONE; b.btnContact.text = "تواصل عبر واتساب"
+        b.tvPhone.textDirection = View.TEXT_DIRECTION_LTR
+        addDemoButton(this, (b.root as ViewGroup).getChildAt(0) as ViewGroup)
         b.btnRefresh.setOnClickListener { lifecycleScope.launch { checkOnce() } }
         b.btnContact.setOnClickListener { runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Constants.SUPPORT_WHATSAPP))) } }
         lifecycleScope.launch { repeatOnLifecycle(Lifecycle.State.STARTED) { while (true) { checkOnce(); delay(Constants.POLL_INTERVAL_MS) } } }
