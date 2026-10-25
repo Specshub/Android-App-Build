@@ -1,36 +1,28 @@
 package com.iptv.player
-
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.view.MenuItem
-import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
+import android.view.*
 import androidx.activity.viewModels
-import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.view.GravityCompat
-import androidx.fragment.app.Fragment
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.iptv.player.databinding.ActivityMainBinding
+import androidx.appcompat.app.*
 import com.google.android.material.navigation.NavigationView
 import com.iptv.player.data.model.LoginCredentials
-import java.util.Locale
+import com.iptv.player.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
-
-    private lateinit var binding: ActivityMainBinding
-    private val viewModel: MainViewModel by viewModels()
-
-    // هل فُتحت هذه الشاشة من الواجهة الرئيسية (HomeActivity)؟
-    private var openedFromHome = false
-
-    private val bannerHandler = Handler(Looper.getMainLooper())
-    private var bannerRunnable: Runnable? = null
+    lateinit var binding: ActivityMainBinding
+    val viewModel: MainViewModel by viewModels()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        applySavedSettings(this); super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater); setContentView(binding.root)
+        val h = intent.getStringExtra("EXTRA_HOST") ?: ""; val u = intent.getStringExtra("EXTRA_USERNAME") ?: ""; val p = intent.getStringExtra("EXTRA_PASSWORD") ?: ""
+        if (h.isNotEmpty() && u.isNotEmpty()) viewModel.setCredentials(LoginCredentials(h, u, p))
+        setSupportActionBar(binding.toolbar); binding.navView.setNavigationItemSelectedListener(this)
+        val toggle = ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        binding.drawerLayout.addDrawerListener(toggle); toggle.syncState()
+        binding.dashboardView.visibility = View.GONE; binding.fragmentContainer.visibility = View.VISIBLE
+        val section = intent.getStringExtra("EXTRA_SECTION")
+        if (section != null && savedInstanceState == null) openSectionByName(this, section)
+    }
+    override fun onNavigationItemSelected(item: MenuItem): Boolean = handleNavItem(this, item)
+    @Suppress("DEPRECATION")
+    override fun onBackPressed() { handleBack(this) }
+}
