@@ -10,8 +10,8 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 
 data class PosterItem(val id: String, val title: String, val imageUrl: String?)
 
-class PosterAdapter(private val onClick: (PosterItem) -> Unit) : ListAdapter<PosterItem, PosterAdapter.VH>(Diff()) {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = VH(LayoutInflater.from(parent.context).inflate(R.layout.item_poster, parent, false))
+class PosterAdapter(private val layoutRes: Int = R.layout.item_poster, private val onClick: (PosterItem) -> Unit) : ListAdapter<PosterItem, PosterAdapter.VH>(Diff()) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = VH(LayoutInflater.from(parent.context).inflate(layoutRes, parent, false))
     override fun onBindViewHolder(holder: VH, position: Int) = holder.bind(getItem(position))
     inner class VH(view: View) : RecyclerView.ViewHolder(view) {
         private val iv: ImageView = view.findViewById(R.id.ivPoster)
