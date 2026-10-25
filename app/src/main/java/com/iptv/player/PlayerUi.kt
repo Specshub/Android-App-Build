@@ -5,7 +5,7 @@ import androidx.media3.ui.AspectRatioFrameLayout
 
 fun setupPlayerUi(a: PlayerActivity) {
     val modes = listOf(AspectRatioFrameLayout.RESIZE_MODE_FIT, AspectRatioFrameLayout.RESIZE_MODE_FILL, AspectRatioFrameLayout.RESIZE_MODE_ZOOM)
-    a.binding.btnBack.setOnClickListener { a.finish() }
+    a.binding.btnBack.setOnClickListener { a.finish() }; a.binding.btnTracks.setOnClickListener { showTracks(a) }
     a.binding.btnAspectRatio.setOnClickListener {
         a.ratioIdx = (a.ratioIdx + 1) % modes.size; a.binding.playerView.resizeMode = modes[a.ratioIdx]
         Toast.makeText(a, "وضع الشاشة: " + listOf("تلقائي (Fit)", "تمدد (Stretch)", "تكبير (Zoom)")[a.ratioIdx], Toast.LENGTH_SHORT).show()
