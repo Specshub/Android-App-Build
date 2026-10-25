@@ -3,13 +3,15 @@ import android.view.View
 import android.widget.Toast
 import androidx.media3.common.*
 import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import com.iptv.player.data.model.LiveStream
 
 fun initPlayer(a: LiveActivity) {
     val ds = DefaultHttpDataSource.Factory().setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36").setAllowCrossProtocolRedirects(true).setConnectTimeoutMs(15000).setReadTimeoutMs(15000)
-    val exo = ExoPlayer.Builder(a).setMediaSourceFactory(DefaultMediaSourceFactory(ds)).build()
+    val lc = DefaultLoadControl.Builder().setBufferDurationsMs(15000, 50000, 1000, 2500).build()
+    val exo = ExoPlayer.Builder(a).setLoadControl(lc).setMediaSourceFactory(DefaultMediaSourceFactory(ds)).build()
     exo.addListener(object : Player.Listener {
         override fun onPlaybackStateChanged(state: Int) { a.b.progress.visibility = if (state == Player.STATE_BUFFERING) View.VISIBLE else View.GONE }
         override fun onPlayerError(error: PlaybackException) { onPlayError(a) }
