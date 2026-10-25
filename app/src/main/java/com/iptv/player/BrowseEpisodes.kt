@@ -11,6 +11,6 @@ fun showEpisodes(a: BrowseActivity, info: SeriesInfo) {
     if (eps.isEmpty()) { Toast.makeText(a, "لا توجد حلقات متاحة", Toast.LENGTH_SHORT).show(); return }
     val names = eps.mapIndexed { n, e -> "الحلقة ${n + 1}: ${e.title}" }.toTypedArray()
     AlertDialog.Builder(a).setTitle(info.info.name).setItems(names) { _, w ->
-        a.startActivity(Intent(a, PlayerActivity::class.java).putExtra(PlayerActivity.EXTRA_STREAM_TITLE, eps[w].title).putExtra(PlayerActivity.EXTRA_STREAM_URL, XtreamUrlBuilder.episodeStreamUrl(c, eps[w].id)))
+        a.startActivity(Intent(a, PlayerActivity::class.java).putExtra(PlayerActivity.EXTRA_STREAM_TITLE, eps[w].title).putExtra(PlayerActivity.EXTRA_STREAM_URL, XtreamUrlBuilder.episodeStreamUrl(c, eps[w].id, eps[w].containerExtension ?: "mp4")))
     }.setNegativeButton("إلغاء", null).show()
 }
