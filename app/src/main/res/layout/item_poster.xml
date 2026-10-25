@@ -1,27 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- res/layout/item_poster.xml -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="120dp"
-    android:layout_height="170dp"
-    android:layout_marginHorizontal="5dp"
-    android:background="#141414"
-    android:focusable="true"
-    android:focusableInTouchMode="true">
-
-    <ImageView
-        android:id="@+id/ivPoster"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop" />
-
-    <TextView
-        android:id="@+id/tvPosterTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="#99000000"
-        android:maxLines="2"
-        android:padding="6dp"
-        android:textColor="#FFFFFF"
-        android:textSize="12sp" />
-</FrameLayout>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="100dp" android:layout_height="150dp" android:layout_margin="5dp" android:focusable="true" android:foreground="@drawable/bg_focus_ring" app:cardBackgroundColor="#1A1A1A" app:cardCornerRadius="10dp" app:cardElevation="4dp">
+<ImageView android:id="@+id/ivPoster" android:layout_width="match_parent" android:layout_height="match_parent" android:scaleType="centerCrop" />
+<TextView android:id="@+id/tvPosterTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="bottom" android:background="@drawable/bg_poster_gradient" android:ellipsize="end" android:maxLines="2" android:paddingStart="6dp" android:paddingEnd="6dp" android:paddingTop="16dp" android:paddingBottom="6dp" android:textColor="#FFFFFF" android:textSize="11sp" />
+</androidx.cardview.widget.CardView>
