@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/layout/item_poster.xml -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="120dp"
+    android:layout_height="170dp"
+    android:layout_marginHorizontal="5dp"
+    android:background="#141414"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <ImageView
+        android:id="@+id/ivPoster"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/tvPosterTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="#99000000"
+        android:maxLines="2"
+        android:padding="6dp"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp" />
+</FrameLayout>
