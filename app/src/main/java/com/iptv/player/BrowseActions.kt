@@ -19,5 +19,5 @@ fun browseError(a: BrowseActivity, m: String) { a.b.progress.visibility = View.G
 fun onBrowseItem(a: BrowseActivity, i: PosterItem) {
     val c = a.vm.getCredentials() ?: return
     if (a.kind == "series") { a.pendingSeries = i.id.toInt(); a.vm.loadSeriesInfo(i.id.toInt()); Toast.makeText(a, "جاري جلب الحلقات...", Toast.LENGTH_SHORT).show() }
-    else a.startActivity(Intent(a, PlayerActivity::class.java).putExtra(PlayerActivity.EXTRA_STREAM_TITLE, i.title).putExtra(PlayerActivity.EXTRA_STREAM_URL, XtreamUrlBuilder.vodStreamUrl(c, i.id.toInt())))
+    else a.startActivity(Intent(a, PlayerActivity::class.java).putExtra(PlayerActivity.EXTRA_STREAM_TITLE, i.title).putExtra(PlayerActivity.EXTRA_STREAM_URL, XtreamUrlBuilder.vodStreamUrl(c, i.id.toInt(), i.ext ?: "mp4")))
 }
