@@ -1,41 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ضعه في app/src/main/res/drawable/ic_logo.xml -->
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:aapt="http://schemas.android.com/aapt"
-    android:width="108dp"
-    android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
-
-    <!-- التاج -->
-    <path android:pathData="M24,44 L28,20 L42,32 L54,14 L66,32 L80,20 L84,44 Z">
-        <aapt:attr name="android:fillColor">
-            <gradient android:startX="24" android:startY="14" android:endX="84" android:endY="44" android:type="linear">
-                <item android:offset="0" android:color="#FFF3B0"/>
-                <item android:offset="0.45" android:color="#E0A81E"/>
-                <item android:offset="1" android:color="#8A5A00"/>
-            </gradient>
-        </aapt:attr>
-    </path>
-
-    <!-- قاعدة التاج -->
-    <path android:pathData="M26,47 H82 Q84,47 84,49 V51 Q84,53 82,53 H26 Q24,53 24,51 V49 Q24,47 26,47 Z">
-        <aapt:attr name="android:fillColor">
-            <gradient android:startX="24" android:startY="47" android:endX="84" android:endY="53" android:type="linear">
-                <item android:offset="0" android:color="#FFF3B0"/>
-                <item android:offset="0.5" android:color="#E0A81E"/>
-                <item android:offset="1" android:color="#8A5A00"/>
-            </gradient>
-        </aapt:attr>
-    </path>
-
-    <!-- الحلقة -->
-    <path
-        android:pathData="M54,59 A20,20 0 1,1 53.99,59 Z"
-        android:strokeWidth="3.5">
-        <aapt:attr name="android:strokeColor">
-            <gradient android:startX="34" android:startY="59" android:endX="74" android:endY="99" android:type="linear">
-                <item android:offset="0" android:color="#FFF3B0"/>
-                <item android:offset="0.5" android:color="#E0A81E"/>
-                <item android:offset="1" android:color="#8A5A00"/>
-            </gradient>
+<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt" android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+<path android:pathData="M24,44 L28,20 L42,32 L54,14 L66,32 L80,20 L84,44 Z">
+<aapt:attr name="android:fillColor"><gradient android:startX="24" android:startY="14" android:endX="84" android:endY="44" android:type="linear"><item android:offset="0" android:color="#FFF3B0"/><item android:offset="0.5" android:color="#E0A81E"/><item android:offset="1" android:color="#8A5A00"/></gradient></aapt:attr>
+</path>
+<path android:fillColor="#E0A81E" android:pathData="M24,47 H84 V53 H24 Z"/>
+<path android:strokeColor="#E0A81E" android:strokeWidth="3.5" android:pathData="M54,59 A20,20 0 1,1 53.99,59 Z"/>
+<path android:fillColor="#F5C842" android:pathData="M47,69 L47,89 L65,79 Z"/>
+<path android:fillColor="#FFF3B0" android:pathData="M28,17.5 a2.5,2.5 0 1,0 0.01,0 Z"/>
+<path android:fillColor="#FFF3B0" android:pathData="M54,11.2 a2.8,2.8 0 1,0 0.01,0 Z"/>
+<path android:fillColor="#FFF3B0" android:pathData="M80,17.5 a2.5,2.5 0 1,0 0.01,0 Z"/>
+</vector>
