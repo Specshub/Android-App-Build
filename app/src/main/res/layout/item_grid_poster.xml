@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="5dp" android:focusable="true" android:foreground="@drawable/bg_focus_ring" app:cardBackgroundColor="#1A1A1A" app:cardCornerRadius="10dp" app:cardElevation="4dp">
+<androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+<ImageView android:id="@+id/ivPoster" android:layout_width="0dp" android:layout_height="0dp" android:scaleType="centerCrop" app:layout_constraintDimensionRatio="H,2:3" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" />
+<TextView android:id="@+id/tvPosterTitle" android:layout_width="0dp" android:layout_height="wrap_content" android:background="@drawable/bg_poster_gradient" android:ellipsize="end" android:maxLines="2" android:paddingStart="6dp" android:paddingEnd="6dp" android:paddingTop="16dp" android:paddingBottom="6dp" android:textColor="#FFFFFF" android:textSize="11sp" app:layout_constraintBottom_toBottomOf="@id/ivPoster" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
