@@ -4,7 +4,7 @@ import androidx.core.view.GravityCompat
 
 fun handleNavItem(a: MainActivity, item: MenuItem): Boolean {
     when (item.itemId) {
-        R.id.nav_live_tv, R.id.nav_movies, R.id.nav_series, R.id.nav_schedule -> navigateToSection(a, item.itemId)
+        R.id.nav_live_tv, R.id.nav_movies, R.id.nav_series -> navigateToSection(a, item.itemId)
         R.id.nav_favorites -> loadFragment(a, FavoritesFragment(), "المفضلة")
         R.id.nav_speed_test -> openUrl(a, "https://fast.com/ar/")
         R.id.nav_support -> openUrl(a, Constants.SUPPORT_WHATSAPP)
