@@ -20,15 +20,12 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="28">
 
-        <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
-
+        <!-- شاشة التفعيل: نقطة الدخول الجديدة -->
         <activity
-            android:name=".LoginActivity"
+            android:name=".ActivationActivity"
             android:exported="true"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize">
+            android:screenOrientation="fullSensor"
+            android:configChanges="orientation|screenSize|keyboardHidden|screenLayout|smallestScreenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -36,31 +33,9 @@
             </intent-filter>
         </activity>
 
-        <activity 
-            android:name=".MainActivity" 
-            android:exported="false" 
+        <!-- الواجهة الرئيسية الجديدة -->
+        <activity
+            android:name=".HomeActivity"
+            android:exported="false"
             android:screenOrientation="fullSensor"
-            android:configChanges="uiMode|locale|layoutDirection|orientation|screenSize|keyboardHidden|screenLayout|smallestScreenSize"
-            android:launchMode="singleTask" />
-        
-        <activity android:name=".DisclaimerActivity" android:exported="false" android:screenOrientation="portrait" />
-        
-        <activity 
-            android:name=".ChannelListActivity" 
-            android:exported="false" 
-            android:screenOrientation="fullSensor"
-            android:configChanges="orientation|screenSize|screenLayout" />
-
-        <activity android:name=".PlayerActivity" 
-                  android:exported="false" 
-                  android:screenOrientation="landscape" 
-                  android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout" />
-
-        <activity 
-            android:name=".MultiScreenActivity" 
-            android:exported="false" 
-            android:screenOrientation="landscape" 
-            android:configChanges="orientation|screenSize|keyboardHidden" />
-
-    </application>
-</manifest>
+            android:configChanges="orientation|screenSize|keyboardHidden|screenLayout|smallestScreenSize" />
