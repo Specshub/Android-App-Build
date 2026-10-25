@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/drawable/bg_circle_ring.xml -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape android:shape="oval">
+            <solid android:color="#33C62828" />
+            <stroke android:width="3dp" android:color="#E0A81E" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#0A0A0A" />
+            <stroke android:width="2.5dp" android:color="#C62828" />
+        </shape>
+    </item>
+</selector>
