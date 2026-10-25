@@ -1,41 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- app/src/main/res/layout/activity_activation.xml -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#0A0A0A"
-    android:fillViewport="true">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        android:padding="24dp">
-
-        <ImageView
-            android:id="@+id/ivLogo"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:src="@drawable/ic_logo" />
-
-        <TextView
-            android:id="@+id/tvAppName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="AURUM PLAYER"
-            android:textColor="#E0A81E"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:letterSpacing="0.15" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="لتفعيل التطبيق، زر الموقع وأدخل بيانات جهازك"
-            android:textColor="#BBBBBB"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/tvSite"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:background="#0A0A0A" android:fillViewport="true">
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_horizontal" android:orientation="vertical" android:padding="24dp">
+<ImageView android:id="@+id/ivLogo" android:layout_width="120dp" android:layout_height="120dp" android:src="@drawable/ic_logo" />
+<TextView android:id="@+id/tvAppName" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#E0A81E" android:textSize="26sp" android:textStyle="bold" />
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="لتفعيل التطبيق، زر الموقع وأدخل بيانات جهازك" android:textColor="#BBBBBB" android:textSize="14sp" />
+<TextView android:id="@+id/tvSite" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textColor="#FFFFFF" android:textSize="16sp" android:textStyle="bold" />
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:background="@drawable/bg_activation_card" android:orientation="vertical" android:padding="16dp">
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="MAC Address" android:textColor="#E0A81E" android:textSize="12sp" />
+<TextView android:id="@+id/tvMac" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FFFFFF" android:textSize="22sp" android:textStyle="bold" android:textIsSelectable="true" />
+</LinearLayout>
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:background="@drawable/bg_activation_card" android:orientation="vertical" android:padding="16dp">
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Device Key" android:textColor="#E0A81E" android:textSize="12sp" />
+<TextView android:id="@+id/tvKey" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FFFFFF" android:textSize="22sp" android:textStyle="bold" android:textIsSelectable="true" />
+</LinearLayout>
+<TextView android:id="@+id/tvStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:text="في انتظار التفعيل..." android:textColor="#FF5252" android:textSize="15sp" />
+<ProgressBar android:id="@+id/progress" style="?android:attr/progressBarStyleSmall" android:layout_width="24dp" android:layout_height="24dp" android:layout_marginTop="8dp" />
+<Button android:id="@+id/btnRefresh" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:backgroundTint="#C62828" android:text="تحديث الحالة" android:textColor="#FFFFFF" />
+<Button android:id="@+id/btnContact" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:backgroundTint="#25D366" android:textColor="#FFFFFF" />
+<TextView android:id="@+id/tvPhone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:textColor="#BBBBBB" android:textSize="14sp" />
+</LinearLayout>
+</ScrollView>
