@@ -6,18 +6,17 @@ import androidx.appcompat.app.AppCompatActivity
 import com.iptv.player.data.model.LoginCredentials
 
 fun openSection(a: AppCompatActivity, c: LoginCredentials, section: String) {
-    a.startActivity(Intent(a, MainActivity::class.java).putExtra(EXTRA_HOST, c.host).putExtra(EXTRA_USERNAME, c.username).putExtra(EXTRA_PASSWORD, c.password).putExtra("EXTRA_SECTION", section))
+    val target = when (section) { "live" -> LiveActivity::class.java; "movies", "series", "kids" -> BrowseActivity::class.java; else -> MainActivity::class.java }
+    a.startActivity(Intent(a, target).putExtra(EXTRA_HOST, c.host).putExtra(EXTRA_USERNAME, c.username).putExtra(EXTRA_PASSWORD, c.password).putExtra("EXTRA_SECTION", section))
 }
 fun setupHomeButtons(a: AppCompatActivity, box: LinearLayout, c: LoginCredentials) {
-    val items = listOf(Triple("القنوات", android.R.drawable.ic_menu_slideshow, "live"), Triple("أفلام", android.R.drawable.ic_menu_gallery, "movies"),
-        Triple("مسلسلات", android.R.drawable.ic_menu_recent_history, "series"), Triple("اطفال", android.R.drawable.ic_menu_myplaces, ""),
-        Triple("الأكثر مشاهدة", android.R.drawable.ic_menu_sort_by_size, ""), Triple("جدول المباريات", android.R.drawable.ic_menu_today, "schedule"),
-        Triple("المفضلة", android.R.drawable.btn_star_big_on, "favorites"), Triple("إعدادات", android.R.drawable.ic_menu_preferences, "settings"))
+    val items = listOf(Triple("القنوات", R.drawable.ic_nav_live, "live"), Triple("أفلام", R.drawable.ic_nav_movies, "movies"), Triple("مسلسلات", R.drawable.ic_nav_series, "series"),
+        Triple("اطفال", R.drawable.ic_nav_kids, "kids"), Triple("جدول المباريات", R.drawable.ic_nav_schedule, "schedule"), Triple("المفضلة", R.drawable.ic_nav_fav, "favorites"), Triple("إعدادات", R.drawable.ic_nav_settings, "settings"))
     items.forEach { (label, icon, section) ->
         val v = LayoutInflater.from(a).inflate(R.layout.item_home_button, box, false)
         v.findViewById<TextView>(R.id.btnText).text = label
-        v.findViewById<ImageView>(R.id.btnIcon).apply { setImageResource(icon); setColorFilter(0xFFFFFFFF.toInt()) }
-        v.setOnClickListener { if (section.isNotEmpty()) openSection(a, c, section) else Toast.makeText(a, "قريبًا", Toast.LENGTH_SHORT).show() }
+        v.findViewById<ImageView>(R.id.btnIcon).setImageResource(icon)
+        v.setOnClickListener { openSection(a, c, section) }
         v.setOnFocusChangeListener { view, f -> val s = if (f) 1.12f else 1f; view.animate().scaleX(s).scaleY(s).setDuration(150).start() }
         box.addView(v)
     }
