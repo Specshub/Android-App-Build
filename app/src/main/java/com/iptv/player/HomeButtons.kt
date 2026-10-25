@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.iptv.player.data.model.LoginCredentials
 
 fun openSection(a: AppCompatActivity, c: LoginCredentials, section: String) {
-    val target = when (section) { "live" -> LiveActivity::class.java; "movies", "series", "kids" -> BrowseActivity::class.java; else -> MainActivity::class.java }
+    val target = when (section) { "live" -> LiveActivity::class.java; "movies", "series", "kids" -> BrowseActivity::class.java; "settings" -> SettingsActivity::class.java; else -> MainActivity::class.java }
     a.startActivity(Intent(a, target).putExtra(EXTRA_HOST, c.host).putExtra(EXTRA_USERNAME, c.username).putExtra(EXTRA_PASSWORD, c.password).putExtra("EXTRA_SECTION", section))
 }
 fun setupHomeButtons(a: AppCompatActivity, box: LinearLayout, c: LoginCredentials) {
