@@ -18,7 +18,7 @@ class PosterAdapter(private val layoutRes: Int = R.layout.item_poster, private v
         private val tv: TextView = view.findViewById(R.id.tvPosterTitle)
         fun bind(item: PosterItem) {
             tv.text = item.title
-            Glide.with(itemView.context).load(item.imageUrl).diskCacheStrategy(DiskCacheStrategy.ALL).centerCrop().into(iv)
+            Glide.with(itemView.context).load(item.imageUrl).diskCacheStrategy(DiskCacheStrategy.ALL).override(240, 360).centerCrop().into(iv)
             itemView.setOnClickListener { onClick(item) }
             itemView.setOnFocusChangeListener { v, f -> val s = if (f) 1.08f else 1f; v.animate().scaleX(s).scaleY(s).setDuration(150).start() }
         }
