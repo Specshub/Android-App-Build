@@ -11,7 +11,7 @@ fun observeBrowse(a: BrowseActivity) {
     }
     a.vm.vodCategories.observe(a) { r -> if (r is Resource.Success) setCats(r.data.map { Row(nm(it.categoryId), nm(it.categoryName)) }) else if (r is Resource.Error) browseError(a, r.message) }
     a.vm.seriesCategories.observe(a) { r -> if (r is Resource.Success) setCats(r.data.map { Row(nm(it.categoryId), nm(it.categoryName)) }) else if (r is Resource.Error) browseError(a, r.message) }
-    a.vm.vodStreams.observe(a) { r -> if (r is Resource.Success) showItems(a, r.data.map { PosterItem(it.streamId.toString(), nm(it.name), it.streamIcon) }) else if (r is Resource.Error) browseError(a, r.message) }
+    a.vm.vodStreams.observe(a) { r -> if (r is Resource.Success) showItems(a, r.data.map { PosterItem(it.streamId.toString(), nm(it.name), it.streamIcon, it.containerExtension) }) else if (r is Resource.Error) browseError(a, r.message) }
     a.vm.seriesList.observe(a) { r -> if (r is Resource.Success) showItems(a, r.data.map { PosterItem(it.seriesId.toString(), nm(it.name), it.cover) }) else if (r is Resource.Error) browseError(a, r.message) }
     a.vm.seriesInfo.observe(a) { r -> if (r is Resource.Success && a.pendingSeries != null) showEpisodes(a, r.data) }
 }
