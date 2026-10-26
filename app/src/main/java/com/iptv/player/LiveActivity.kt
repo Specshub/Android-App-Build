@@ -14,6 +14,7 @@ class LiveActivity : AppCompatActivity() {
     var player: ExoPlayer? = null; var url: String? = null; var current: LiveStream? = null; var altTried = false
     var streams: List<LiveStream> = emptyList(); var shown: List<LiveStream> = emptyList(); var catsLoaded = false
     val handler = Handler(Looper.getMainLooper()); val hideNow = Runnable { b.tvNow.visibility = View.GONE }
+    val epgCache = HashMap<Int, List<EpgItem>>(); val hideEpg = Runnable { b.epgBar.visibility = View.GONE }
     val prefs by lazy { getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
