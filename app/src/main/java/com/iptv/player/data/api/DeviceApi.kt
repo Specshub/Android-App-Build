@@ -13,16 +13,16 @@ data class ActivationResult(val active: Boolean, val expires: String? = null, va
 
 object DeviceApi {
     private val client = OkHttpClient.Builder().connectTimeout(15, TimeUnit.SECONDS).readTimeout(15, TimeUnit.SECONDS).build()
-    private fun JSONObject.str(k: String): String? = optString(k).ifEmpty { null }
-    suspend fun check(mac: String, key: String): ActivationResult = withContext(Dispatchers.IO) {
+    suspend fun check(mac: String, key: String, device: Map<String, String> = emptyMap()): ActivationResult = withContext(Dispatchers.IO) {
         try {
-            val body = JSONObject().put("mac", mac).put("key", key).toString().toRequestBody("application/json".toMediaType())
-            val request = Request.Builder().url(Constants.ACTIVATION_API_URL).post(body).build()
-            client.newCall(request).execute().use { r ->
-                if (!r.isSuccessful) return@use ActivationResult(false, error = "HTTP ${r.code}")
-                val j = JSONObject(r.body?.string() ?: "{}")
-                if (j.optString("status") == "active") ActivationResult(true, j.str("expires"), j.str("host"), j.str("username"), j.str("password")) else ActivationResult(false)
+            val json = JSONObject().put("mac", mac).put("key", key).put("device", JSONObject(device)).toString()
+            val request = Request.Builder().url(Constants.ACTIVATION_API_URL).post(json.toRequestBody("application/json".toMediaType())).build()
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) return@use ActivationResult(false, error = "HTTP ${response.code}")
+                val body = JSONObject(response.body?.string() ?: "{}")
+                if (body.optString("status") == "active") ActivationResult(true, body.optString("expires").ifEmpty { null }, body.optString("host").ifEmpty { null }, body.optString("username").ifEmpty { null }, body.optString("password").ifEmpty { null })
+                else ActivationResult(false)
             }
-        } catch (e: Exception) { ActivationResult(false, error = e.localizedMessage ?: "error") }
+        } catch (e: Exception) { ActivationResult(false, error = e.localizedMessage) }
     }
 }
