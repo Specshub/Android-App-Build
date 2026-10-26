@@ -21,7 +21,7 @@ fun initPlayer(a: LiveActivity) {
 fun releasePlayer(a: LiveActivity) { a.b.playerView.player = null; a.player?.release(); a.player = null }
 fun startUrl(a: LiveActivity, u: String) { a.url = u; a.b.progress.visibility = View.VISIBLE; a.player?.let { it.setMediaItem(MediaItem.fromUri(u)); it.prepare(); it.playWhenReady = true } }
 fun playStream(a: LiveActivity, s: LiveStream) {
-    a.current = s; a.altTried = false; a.prefs.edit().putInt("LAST_LIVE_ID", s.streamId).apply(); a.chAdapter.select(s.streamId.toString()); showNow(a, nm(s.name))
+    a.current = s; a.altTried = false; a.prefs.edit().putInt("LAST_LIVE_ID", s.streamId).apply(); a.chAdapter.select(s.streamId.toString()); loadEpg(a, s)
     startUrl(a, a.vm.buildStreamUrl(s.streamId, "ts"))
 }
 fun onPlayError(a: LiveActivity) {
@@ -29,4 +29,3 @@ fun onPlayError(a: LiveActivity) {
     if (!a.altTried) { a.altTried = true; startUrl(a, "${c.host.trimEnd('/')}/${c.username}/${c.password}/${s.streamId}.ts"); return }
     a.b.progress.visibility = View.GONE; Toast.makeText(a, "تعذر تشغيل القناة", Toast.LENGTH_SHORT).show()
 }
-fun showNow(a: LiveActivity, name: String) { a.b.tvNow.text = name; a.b.tvNow.visibility = View.VISIBLE; a.handler.removeCallbacks(a.hideNow); a.handler.postDelayed(a.hideNow, 3000) }
