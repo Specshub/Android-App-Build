@@ -26,7 +26,7 @@ class ActivationActivity : AppCompatActivity() {
         lifecycleScope.launch { repeatOnLifecycle(Lifecycle.State.STARTED) { while (true) { checkOnce(); delay(Constants.POLL_INTERVAL_MS) } } }
     }
     private suspend fun checkOnce() {
-        b.progress.visibility = View.VISIBLE; val r = DeviceApi.check(mac, key); b.progress.visibility = View.GONE
+        b.progress.visibility = View.VISIBLE; val r = DeviceApi.check(mac, key, DeviceManager.info(this)); b.progress.visibility = View.GONE
         if (r.active && r.host != null && r.username != null && r.password != null) saveAndOpenHome(this, r)
         else b.tvStatus.text = if (r.error != null) "تعذر الاتصال بالسيرفر" else "في انتظار التفعيل..."
     }
