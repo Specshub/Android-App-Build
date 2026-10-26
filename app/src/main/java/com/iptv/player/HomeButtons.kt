@@ -6,12 +6,12 @@ import androidx.appcompat.app.AppCompatActivity
 import com.iptv.player.data.model.LoginCredentials
 
 fun openSection(a: AppCompatActivity, c: LoginCredentials, section: String) {
-    val target = when (section) { "live" -> LiveActivity::class.java; "movies", "series", "kids" -> BrowseActivity::class.java; "settings" -> SettingsActivity::class.java; else -> MainActivity::class.java }
+    val target = when (section) { "live" -> LiveActivity::class.java; "movies", "series", "kids" -> BrowseActivity::class.java; "settings" -> SettingsActivity::class.java; "search" -> SearchActivity::class.java; "favorites" -> FavoritesActivity::class.java; else -> MainActivity::class.java }
     a.startActivity(Intent(a, target).putExtra(EXTRA_HOST, c.host).putExtra(EXTRA_USERNAME, c.username).putExtra(EXTRA_PASSWORD, c.password).putExtra("EXTRA_SECTION", section))
 }
 fun setupHomeButtons(a: AppCompatActivity, box: LinearLayout, c: LoginCredentials) {
     val items = listOf(Triple("القنوات", R.drawable.ic_nav_live, "live"), Triple("أفلام", R.drawable.ic_nav_movies, "movies"), Triple("مسلسلات", R.drawable.ic_nav_series, "series"),
-        Triple("اطفال", R.drawable.ic_nav_kids, "kids"), Triple("المفضلة", R.drawable.ic_nav_fav, "favorites"), Triple("إعدادات", R.drawable.ic_nav_settings, "settings"))
+        Triple("اطفال", R.drawable.ic_nav_kids, "kids"), Triple("بحث", R.drawable.ic_nav_search, "search"), Triple("المفضلة", R.drawable.ic_nav_fav, "favorites"), Triple("إعدادات", R.drawable.ic_nav_settings, "settings"))
     items.forEach { (label, icon, section) ->
         val v = LayoutInflater.from(a).inflate(R.layout.item_home_button, box, false)
         v.findViewById<TextView>(R.id.btnText).text = label
