@@ -11,6 +11,7 @@ fun handleLiveKey(a: LiveActivity, k: Int): Boolean {
     if (a.b.overlay.visibility == View.VISIBLE) return false
     when (k) {
         KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER, KeyEvent.KEYCODE_NUMPAD_ENTER, KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_DPAD_RIGHT -> showOverlay(a)
+        KeyEvent.KEYCODE_MENU, KeyEvent.KEYCODE_INFO -> cycleVideoMode(a)
         KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_CHANNEL_UP -> zap(a, -1)
         KeyEvent.KEYCODE_DPAD_DOWN, KeyEvent.KEYCODE_CHANNEL_DOWN -> zap(a, 1)
         else -> return false
