@@ -15,6 +15,7 @@ fun showOverlay(a: LiveActivity) {
 fun hideOverlay(a: LiveActivity) { if (!a.portrait) a.b.overlay.visibility = View.GONE }
 fun setupTouch(a: LiveActivity) {
     a.b.touchLayer.setOnClickListener { if (a.portrait) return@setOnClickListener; if (a.b.overlay.visibility == View.VISIBLE) hideOverlay(a) else showOverlay(a) }
+    a.b.touchLayer.setOnLongClickListener { cycleVideoMode(a); true }
     a.onBackPressedDispatcher.addCallback(a, object : OnBackPressedCallback(true) { override fun handleOnBackPressed() { if (!a.portrait && a.b.overlay.visibility == View.VISIBLE) hideOverlay(a) else a.finish() } })
 }
 @Suppress("DEPRECATION")
