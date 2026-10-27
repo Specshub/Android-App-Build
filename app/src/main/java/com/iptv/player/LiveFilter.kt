@@ -7,6 +7,7 @@ fun setStreams(a: LiveActivity, list: List<LiveStream>) {
     if (a.current == null && list.isNotEmpty() && a.prefs.getBoolean("AUTO_PLAY", true)) { val last = a.prefs.getInt("LAST_LIVE_ID", -1); playStream(a, list.firstOrNull { it.streamId == last } ?: list.first()) }
 }
 fun filterLive(a: LiveActivity, q: String) {
-    a.shown = if (q.isBlank()) a.streams else a.streams.filter { nm(it.name).contains(q, true) }
+    val t = q.trim(); val src = if (t.length >= 2) { if (a.allLive == null) loadAllLive(a); a.allLive ?: a.streams } else a.streams
+    a.shown = if (t.isEmpty()) a.streams else src.filter { nm(it.name).contains(t, true) }
     a.chAdapter.submitList(a.shown.map { Row(it.streamId.toString(), nm(it.name), it.streamIcon) }); a.chAdapter.select(a.current?.streamId?.toString())
 }
