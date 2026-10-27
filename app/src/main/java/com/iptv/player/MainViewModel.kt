@@ -21,7 +21,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val _seriesList = MutableLiveData<Resource<List<Series>>>(); val seriesList: LiveData<Resource<List<Series>>> = _seriesList
     val _seriesInfo = MutableLiveData<Resource<SeriesInfo>>(); val seriesInfo: LiveData<Resource<SeriesInfo>> = _seriesInfo
     fun loadLiveCategories() { val c = currentCreds ?: return; cached(_liveCategories, "lc_${cid(c)}", DiskCache.typeOf<List<LiveCategory>>()) { repository.getLiveCategories(c) } }
-    fun loadLiveStreams(categoryId: String? = null) { val c = currentCreds ?: return; Prefetch.liveMem[cid(c)]?.let { all -> reqKey[_liveStreams] = "mem"; _liveStreams.value = Resource.Success(if (categoryId == null) all else all.filter { nm(it.categoryId) == categoryId }); return }; cached(_liveStreams, "ls_${cid(c)}_$categoryId", DiskCache.typeOf<List<LiveStream>>()) { repository.getLiveStreams(c, categoryId) } }
+    fun loadLiveStreams(categoryId: String? = null) { val c = currentCreds ?: return; cached(_liveStreams, "ls_${cid(c)}_$categoryId", DiskCache.typeOf<List<LiveStream>>()) { repository.getLiveStreams(c, categoryId) } }
     fun loadAllLiveStreams() { loadLiveStreams(null) }
     fun loadVodCategories() { val c = currentCreds ?: return; cached(_vodCategories, "vc_${cid(c)}", DiskCache.typeOf<List<VodCategory>>()) { repository.getVodCategories(c) } }
     fun loadVodStreams(categoryId: String? = null) { val c = currentCreds ?: return; cached(_vodStreams, "vs_${cid(c)}_$categoryId", DiskCache.typeOf<List<VodStream>>()) { repository.getVodStreams(c, categoryId) } }
