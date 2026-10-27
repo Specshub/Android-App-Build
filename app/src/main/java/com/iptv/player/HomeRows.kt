@@ -12,6 +12,6 @@ fun setupHomeRows(a: AppCompatActivity, b: ActivityHomeBinding, c: LoginCredenti
     val series = PosterAdapter { openSection(a, c, "series") }
     b.rvMovies.layoutManager = LinearLayoutManager(a, LinearLayoutManager.HORIZONTAL, false); b.rvMovies.adapter = movies
     b.rvSeries.layoutManager = LinearLayoutManager(a, LinearLayoutManager.HORIZONTAL, false); b.rvSeries.adapter = series
-    loadRow(a, "hm_${cid(c)}", movies) { Prefetch.vod(a, c)?.sortedByDescending { it.num }?.take(30)?.map { PosterItem(it.streamId.toString(), it.name, it.streamIcon, it.containerExtension) } }
-    loadRow(a, "hs_${cid(c)}", series) { Prefetch.series(a, c)?.sortedByDescending { it.num }?.take(30)?.map { PosterItem(it.seriesId.toString(), it.name, it.cover) } }
+    loadRow(a, "hm2_${cid(c)}", movies) { latestMovies(a, c) }
+    loadRow(a, "hs2_${cid(c)}", series) { latestSeries(a, c) }
 }
