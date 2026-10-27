@@ -9,7 +9,7 @@ class BrowseActivity : AppCompatActivity() {
     lateinit var b: ActivityBrowseBinding; lateinit var catAdapter: RowAdapter; lateinit var gridAdapter: PosterAdapter
     val vm: MainViewModel by viewModels()
     lateinit var kind: String
-    var items: List<PosterItem> = emptyList(); var pendingSeries: Int? = null
+    var items: List<PosterItem> = emptyList(); var pendingSeries: Int? = null; var all: List<PosterItem>? = null; var loadingAll = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         b = ActivityBrowseBinding.inflate(layoutInflater); setContentView(b.root)
