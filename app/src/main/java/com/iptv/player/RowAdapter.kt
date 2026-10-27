@@ -6,11 +6,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 
-class RowAdapter(private val numbered: Boolean, private val onClick: (Row, Int) -> Unit) : ListAdapter<Row, RowAdapter.VH>(RowDiff()) {
+class RowAdapter(private val numbered: Boolean, private val layoutRes: Int = R.layout.item_row, private val onClick: (Row, Int) -> Unit) : ListAdapter<Row, RowAdapter.VH>(RowDiff()) {
     var onLong: ((Row) -> Boolean)? = null
     var selectedId: String? = null
     fun select(id: String?) { val o = currentList.indexOfFirst { it.id == selectedId }; selectedId = id; val n = currentList.indexOfFirst { it.id == id }; if (o >= 0) notifyItemChanged(o); if (n >= 0) notifyItemChanged(n) }
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = VH(LayoutInflater.from(parent.context).inflate(R.layout.item_row, parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = VH(LayoutInflater.from(parent.context).inflate(layoutRes, parent, false))
     override fun onBindViewHolder(holder: VH, position: Int) = holder.bind(getItem(position), position)
     inner class VH(v: View) : RecyclerView.ViewHolder(v) {
         private val num: TextView = v.findViewById(R.id.tvNum)
