@@ -2,9 +2,11 @@ package com.iptv.player
 import android.view.View
 import android.widget.Toast
 import androidx.media3.ui.AspectRatioFrameLayout
+import androidx.media3.ui.PlayerView
 
 fun setupPlayerUi(a: PlayerActivity) {
     val modes = listOf(AspectRatioFrameLayout.RESIZE_MODE_FIT, AspectRatioFrameLayout.RESIZE_MODE_FILL, AspectRatioFrameLayout.RESIZE_MODE_ZOOM)
+    a.binding.playerView.setControllerShowTimeoutMs(3000); a.binding.playerView.setControllerVisibilityListener(PlayerView.ControllerVisibilityListener { v -> a.binding.topBar.visibility = v })
     a.binding.btnBack.setOnClickListener { a.finish() }; a.binding.btnTracks.setOnClickListener { showTracks(a) }
     a.binding.btnAspectRatio.setOnClickListener {
         a.ratioIdx = (a.ratioIdx + 1) % modes.size; a.binding.playerView.resizeMode = modes[a.ratioIdx]
