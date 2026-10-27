@@ -6,7 +6,6 @@ import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
-import androidx.media3.ui.AspectRatioFrameLayout
 import com.iptv.player.data.model.LiveStream
 
 fun initPlayer(a: LiveActivity) {
@@ -16,8 +15,9 @@ fun initPlayer(a: LiveActivity) {
     exo.addListener(object : Player.Listener {
         override fun onPlaybackStateChanged(state: Int) { a.b.progress.visibility = if (state == Player.STATE_BUFFERING) View.VISIBLE else View.GONE }
         override fun onPlayerError(error: PlaybackException) { onPlayError(a) }
+        override fun onVideoSizeChanged(v: VideoSize) { a.videoRatio = if (v.height > 0) v.width * v.pixelWidthHeightRatio / v.height else 0f; applyVideoMode(a) }
     })
-    a.b.playerView.resizeMode = if (a.prefs.getBoolean("FILL_SCREEN", true)) AspectRatioFrameLayout.RESIZE_MODE_ZOOM else AspectRatioFrameLayout.RESIZE_MODE_FIT
+    applyVideoMode(a)
     a.player = exo; a.b.playerView.player = exo
 }
 fun releasePlayer(a: LiveActivity) { a.b.playerView.player = null; a.player?.release(); a.player = null }
