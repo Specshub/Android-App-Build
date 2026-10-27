@@ -1,0 +1,10 @@
+-keepattributes Signature, *Annotation*, InnerClasses, EnclosingMethod, SourceFile, LineNumberTable
+-keep class com.iptv.player.data.** { *; }
+-keep class com.iptv.player.PosterItem { *; }
+-keep class com.iptv.player.Row { *; }
+-keepclassmembers class * { @com.google.gson.annotations.SerializedName <fields>; }
+-keep interface com.iptv.player.data.api.** { *; }
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-dontwarn retrofit2.**
+-dontwarn javax.annotation.**
