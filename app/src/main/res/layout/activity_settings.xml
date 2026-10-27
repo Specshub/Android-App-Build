@@ -13,13 +13,12 @@
 <LinearLayout style="@style/SettingRow"><TextView style="@style/SettingLabel" android:text="مفتاح الجهاز" /><TextView android:id="@+id/vKey" style="@style/SettingValue" /></LinearLayout>
 <LinearLayout style="@style/SettingRow"><TextView style="@style/SettingLabel" android:text="MAC Address" /><TextView android:id="@+id/vMac" style="@style/SettingValue" /></LinearLayout>
 <LinearLayout style="@style/SettingRow"><TextView style="@style/SettingLabel" android:text="الجهاز" /><TextView android:id="@+id/vDevice" style="@style/SettingValue" /></LinearLayout>
+<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp" android:text="هذا التطبيق مشغّل وسائط فقط ولا يوفّر أي محتوى." android:textColor="#99FFFFFF" android:textSize="12sp" />
 <LinearLayout style="@style/SettingRow"><TextView style="@style/SettingLabel" android:text="الإصدار" /><TextView android:id="@+id/vVersion" style="@style/SettingValue" /></LinearLayout>
-<LinearLayout style="@style/SettingRow"><TextView style="@style/SettingLabel" android:text="الدعم الفني" /><TextView android:id="@+id/vPhone" style="@style/SettingValue" /></LinearLayout>
 </LinearLayout></ScrollView>
 <LinearLayout android:id="@+id/paneGeneral" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:visibility="gone">
 <TextView android:id="@+id/btnLang" style="@style/SettingBtn" android:text="تغيير اللغة" />
 <TextView android:id="@+id/btnTheme" style="@style/SettingBtn" android:text="الوضع الليلي / النهاري" />
-<TextView android:id="@+id/btnSupport" style="@style/SettingBtn" android:text="الدعم الفني (واتساب)" />
 <TextView android:id="@+id/btnLogout" style="@style/SettingBtn" android:text="تسجيل الخروج" android:textColor="#FF5252" />
 </LinearLayout>
 <LinearLayout android:id="@+id/panePlayer" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:visibility="gone">
