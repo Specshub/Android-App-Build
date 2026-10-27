@@ -5,7 +5,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import android.graphics.drawable.ColorDrawable
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DecodeFormat
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 
 data class PosterItem(val id: String, val title: String, val imageUrl: String?, val ext: String? = null)
@@ -18,7 +20,7 @@ class PosterAdapter(private val layoutRes: Int = R.layout.item_poster, private v
         private val tv: TextView = view.findViewById(R.id.tvPosterTitle)
         fun bind(item: PosterItem) {
             tv.text = item.title
-            Glide.with(itemView.context).load(item.imageUrl).diskCacheStrategy(DiskCacheStrategy.ALL).override(240, 360).centerCrop().into(iv)
+            Glide.with(itemView.context).load(item.imageUrl).diskCacheStrategy(DiskCacheStrategy.ALL).override(200, 300).format(DecodeFormat.PREFER_RGB_565).placeholder(ColorDrawable(0xFF1E1E1E.toInt())).dontAnimate().centerCrop().into(iv)
             itemView.setOnClickListener { onClick(item) }
             itemView.setOnFocusChangeListener { v, f -> val s = if (f) 1.08f else 1f; v.animate().scaleX(s).scaleY(s).setDuration(150).start() }
         }
