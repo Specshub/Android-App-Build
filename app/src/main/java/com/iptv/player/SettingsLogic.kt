@@ -17,6 +17,6 @@ fun setupSettings(a: SettingsActivity) {
     a.b.btnSupport.setOnClickListener { openUrl(a, Constants.SUPPORT_WHATSAPP) }; a.b.btnLogout.setOnClickListener { performLogout(a) }
     a.b.swAuto.isChecked = p.getBoolean("AUTO_PLAY", true); a.b.swAuto.setOnCheckedChangeListener { _, on -> p.edit().putBoolean("AUTO_PLAY", on).apply() }
     a.b.vDevice.text = android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL
-    a.b.swFill.isChecked = p.getBoolean("FILL_SCREEN", true); a.b.swFill.setOnCheckedChangeListener { _, on -> p.edit().putBoolean("FILL_SCREEN", on).apply() }
+    a.b.swFill.isChecked = p.getBoolean("FILL_SCREEN", true); a.b.swFill.setOnCheckedChangeListener { _, on -> p.edit().putBoolean("FILL_SCREEN", on).remove("VIDEO_MODE").apply() }
     showPane(a, 0)
 }
