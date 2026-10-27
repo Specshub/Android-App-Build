@@ -1,4 +1,5 @@
 package com.iptv.player
+import android.content.res.Configuration
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -6,10 +7,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 
 fun setupBrowse(a: BrowseActivity) {
-    a.catAdapter = RowAdapter(false) { r, _ -> selectBrowseCat(a, r.id) }
+    val port = a.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+    a.catAdapter = RowAdapter(false, if (port) R.layout.item_chip else R.layout.item_row) { r, _ -> selectBrowseCat(a, r.id) }
     a.gridAdapter = PosterAdapter(R.layout.item_grid_poster) { i -> onBrowseItem(a, i) }
-    val span = ((a.resources.configuration.screenWidthDp - 250) / 110).coerceIn(2, 8)
-    a.b.rvCats.layoutManager = LinearLayoutManager(a); a.b.rvCats.adapter = a.catAdapter; a.b.rvCats.itemAnimator = null
+    val span = ((a.resources.configuration.screenWidthDp - (if (port) 20 else 250)) / 110).coerceIn(2, 8)
+    a.b.rvCats.layoutManager = LinearLayoutManager(a, if (port) LinearLayoutManager.HORIZONTAL else LinearLayoutManager.VERTICAL, false); a.b.rvCats.adapter = a.catAdapter; a.b.rvCats.itemAnimator = null
     a.b.rvGrid.layoutManager = GridLayoutManager(a, span); a.b.rvGrid.adapter = a.gridAdapter
     a.b.etSearch.addTextChangedListener(object : TextWatcher {
         override fun afterTextChanged(s: Editable?) { filterBrowse(a, s?.toString() ?: "") }
