@@ -12,10 +12,10 @@ fun showOverlay(a: LiveActivity) {
         a.b.rvChannels.postDelayed({ (if (i >= 0) a.b.rvChannels.findViewHolderForAdapterPosition(i)?.itemView else null)?.requestFocus() ?: a.b.rvChannels.requestFocus() }, 150)
     }
 }
-fun hideOverlay(a: LiveActivity) { a.b.overlay.visibility = View.GONE }
+fun hideOverlay(a: LiveActivity) { if (!a.portrait) a.b.overlay.visibility = View.GONE }
 fun setupTouch(a: LiveActivity) {
-    a.b.touchLayer.setOnClickListener { if (a.b.overlay.visibility == View.VISIBLE) hideOverlay(a) else showOverlay(a) }
-    a.onBackPressedDispatcher.addCallback(a, object : OnBackPressedCallback(true) { override fun handleOnBackPressed() { if (a.b.overlay.visibility == View.VISIBLE) hideOverlay(a) else a.finish() } })
+    a.b.touchLayer.setOnClickListener { if (a.portrait) return@setOnClickListener; if (a.b.overlay.visibility == View.VISIBLE) hideOverlay(a) else showOverlay(a) }
+    a.onBackPressedDispatcher.addCallback(a, object : OnBackPressedCallback(true) { override fun handleOnBackPressed() { if (!a.portrait && a.b.overlay.visibility == View.VISIBLE) hideOverlay(a) else a.finish() } })
 }
 @Suppress("DEPRECATION")
-fun hideSystemBars(a: LiveActivity) { a.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY }
+fun hideSystemBars(a: LiveActivity) { if (a.portrait) return; a.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY }
