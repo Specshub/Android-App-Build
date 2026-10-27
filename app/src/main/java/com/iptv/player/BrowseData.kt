@@ -12,7 +12,7 @@ fun setupBrowse(a: BrowseActivity) {
     a.gridAdapter = PosterAdapter(R.layout.item_grid_poster) { i -> onBrowseItem(a, i) }
     val span = ((a.resources.configuration.screenWidthDp - (if (port) 20 else 250)) / 110).coerceIn(2, 8)
     a.b.rvCats.layoutManager = LinearLayoutManager(a, if (port) LinearLayoutManager.HORIZONTAL else LinearLayoutManager.VERTICAL, false); a.b.rvCats.adapter = a.catAdapter; a.b.rvCats.itemAnimator = null
-    a.b.rvGrid.layoutManager = GridLayoutManager(a, span); a.b.rvGrid.adapter = a.gridAdapter
+    a.b.rvGrid.layoutManager = GridLayoutManager(a, span); a.b.rvGrid.adapter = a.gridAdapter; a.b.rvGrid.setHasFixedSize(true); a.b.rvGrid.setItemViewCacheSize(24)
     a.b.etSearch.addTextChangedListener(object : TextWatcher {
         override fun afterTextChanged(s: Editable?) { filterBrowse(a, s?.toString() ?: "") }
         override fun beforeTextChanged(s: CharSequence?, st: Int, c: Int, n: Int) {}
