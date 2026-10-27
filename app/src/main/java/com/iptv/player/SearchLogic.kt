@@ -18,14 +18,5 @@ fun runSearch(a: SearchActivity) {
     val rows = a.live.filter { nm(it.name).contains(q, true) }.take(40).map { Row("L${it.streamId}", "📺 " + nm(it.name), it.streamIcon) } +
         a.vod.filter { nm(it.name).contains(q, true) }.take(40).map { Row("M${it.streamId}", "🎬 " + nm(it.name), it.streamIcon) } +
         a.series.filter { nm(it.name).contains(q, true) }.take(40).map { Row("S${it.seriesId}", "📚 " + nm(it.name), it.cover) }
-    a.adapter.submitList(rows); a.b.tvEmpty.text = "لا توجد نتائج"; a.b.tvEmpty.visibility = if (rows.isEmpty() && loaded) View.VISIBLE else View.GONE
-}
-fun onSearchClick(a: SearchActivity, id: String) {
-    val c = a.vm.getCredentials() ?: return; val n = id.drop(1).toInt()
-    fun play(t: String, u: String) = a.startActivity(Intent(a, PlayerActivity::class.java).putExtra(PlayerActivity.EXTRA_STREAM_TITLE, t).putExtra(PlayerActivity.EXTRA_STREAM_URL, u))
-    when (id[0]) {
-        'L' -> play(nm(a.live.firstOrNull { it.streamId == n }?.name), a.vm.buildStreamUrl(n, "ts"))
-        'M' -> { val v = a.vod.firstOrNull { it.streamId == n }; play(nm(v?.name), XtreamUrlBuilder.vodStreamUrl(c, n, v?.containerExtension ?: "mp4")) }
-        else -> { a.pendingSeries = true; a.vm.loadSeriesInfo(n); Toast.makeText(a, "جاري جلب الحلقات...", Toast.LENGTH_SHORT).show() }
-    }
+    a.adapter.submitList(rows); a.b.tvEmpty.text = "لا توجد نتائج"; a.b.tvEmpty.visibility = if (rows.isEmpty() && loaded) View.GONE.let { View.GONE } else View.GONE
 }
