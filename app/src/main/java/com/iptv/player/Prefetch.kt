@@ -9,8 +9,8 @@ import kotlinx.coroutines.sync.withPermit
 import java.util.concurrent.ConcurrentHashMap
 
 object BrowseMem { val cat = ConcurrentHashMap<String, List<PosterItem>>() }
-fun toV(l: List<VodStream>) = l.map { PosterItem(it.streamId.toString(), nm(it.name), it.streamIcon, it.containerExtension) }
-fun toS(l: List<Series>) = l.map { PosterItem(it.seriesId.toString(), nm(it.name), it.cover) }
+fun toV(l: List<VodStream>) = l.map { PosterItem(it.streamId.toString(), nm(it.name), thumb(it.streamIcon), it.containerExtension) }
+fun toS(l: List<Series>) = l.map { PosterItem(it.seriesId.toString(), nm(it.name), thumb(it.cover)) }
 object Prefetch {
     val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO); val sem = Semaphore(3)
     private val repo by lazy { XtreamRepository(RetrofitClient.instance.create(XtreamApiService::class.java)) }
