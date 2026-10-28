@@ -10,7 +10,7 @@ android {
     compileSdk 36
 
     defaultConfig {
-        applicationId "com.iptv.player"
+        applicationId "com.tajplayer.app"
         minSdk 21
         targetSdk 36
         versionCode Integer.parseInt(System.getenv("GITHUB_RUN_NUMBER") ?: "1")
