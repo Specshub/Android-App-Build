@@ -4,7 +4,7 @@ object Constants {
     const val APP_NAME = "Taj Player"
 
     const val ACTIVATION_SITE = "https://tajplayer.com"
-    const val ACTIVATION_API_URL = "https://tajplayer.com/api/device/check"
+    const val ACTIVATION_API_URL = "https://tajplayer.com/api/check.php"
 
     const val SUPPORT_PHONE = "+212772863204"
     const val SUPPORT_WHATSAPP = "https://wa.me/212772863204"
