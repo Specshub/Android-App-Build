@@ -9,7 +9,9 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
-data class ActivationResult(val active: Boolean, val expires: String? = null, val host: String? = null, val username: String? = null, val password: String? = null, val error: String? = null)
+data class ActivationResult(val active: Boolean, val expires: String? = null, val host: String? = null, val username: String? = null, val password: String? = null, val error: String? = null, val status: String = "", val state: String = "")
+
+private fun JSONObject.str(k: String): String? = if (isNull(k)) null else optString(k).ifEmpty { null }
 
 object DeviceApi {
     private val client = OkHttpClient.Builder().connectTimeout(15, TimeUnit.SECONDS).readTimeout(15, TimeUnit.SECONDS).build()
@@ -19,10 +21,10 @@ object DeviceApi {
             val request = Request.Builder().url(Constants.ACTIVATION_API_URL).post(json.toRequestBody("application/json".toMediaType())).build()
             client.newCall(request).execute().use { response ->
                 if (!response.isSuccessful) return@use ActivationResult(false, error = "HTTP ${response.code}")
-                val body = JSONObject(response.body?.string() ?: "{}")
-                if (body.optString("status") == "active") ActivationResult(true, body.optString("expires").ifEmpty { null }, body.optString("host").ifEmpty { null }, body.optString("username").ifEmpty { null }, body.optString("password").ifEmpty { null })
-                else ActivationResult(false)
+                val b = JSONObject(response.body?.string() ?: "{}"); val st = b.optString("status"); val state = b.optString("state")
+                if (st == "active") ActivationResult(true, b.str("expires"), b.str("host"), b.str("username"), b.str("password"), null, st, state)
+                else ActivationResult(false, b.str("expires"), status = st, state = state)
             }
-        } catch (e: Exception) { ActivationResult(false, error = e.localizedMessage) }
+        } catch (e: Exception) { ActivationResult(false, error = e.localizedMessage ?: "network") }
     }
 }
