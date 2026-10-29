@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Taj Player</string>
-    <string name="disclaimer_text">هذا التطبيق لا يوفر أي محتوى. يجب على المستخدمين توفير قائمة التشغيل الخاصة بهم.</string>
-
+    <string name="disclaimer_text">This app provides no content. Users must supply their own playlist.</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>
