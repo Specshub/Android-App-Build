@@ -6,12 +6,12 @@ import android.content.Intent
 const val OFFLINE_LIMIT = 7 * 86_400_000L
 fun ipPrefs(c: Context) = c.getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE)
 
-fun expiryLabel(c: Context, srv: Boolean, state: String?, exp: String?): String = when {
-    !srv -> if (exp.isNullOrEmpty()) "" else c.getString(R.string.exp_until, exp)
+fun expiryLabel(c: Context, srv: Boolean, state: String?, e: String?): String { val exp = e?.let { "⁦$it⁩" }; return when {
+    !srv -> if (e.isNullOrEmpty()) "" else c.getString(R.string.exp_until, exp)
     state == "trial" -> c.getString(R.string.exp_trial, exp)
-    exp.isNullOrEmpty() -> c.getString(R.string.exp_lifetime)
+    e.isNullOrEmpty() -> c.getString(R.string.exp_lifetime)
     else -> c.getString(R.string.exp_ends, exp)
-}
+} }
 fun savedLabel(c: Context): String { val p = ipPrefs(c); return expiryLabel(c, p.getBoolean("SRV", false), p.getString("STATE", null), p.getString("EXPIRES", null)) }
 fun endSession(a: Activity) {
     ipPrefs(a).edit().remove("HOST").remove("USER").remove("PASS").remove("EXPIRES").apply()
