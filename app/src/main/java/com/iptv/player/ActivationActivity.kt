@@ -23,7 +23,7 @@ class ActivationActivity : AppCompatActivity() {
     private suspend fun checkOnce() {
         b.progress.visibility = View.VISIBLE; val r = DeviceApi.check(mac, key, DeviceManager.info(this)); b.progress.visibility = View.GONE
         if (r.active && r.host != null && r.username != null && r.password != null) saveAndOpenHome(this, r)
-        else if (r.error != null) { if (!openSavedIfOffline(this)) b.tvStatus.text = "تعذر الاتصال بالسيرفر" }
-        else b.tvStatus.text = when (r.status) { "expired" -> "انتهى الاشتراك. فعّله من الموقع"; "banned" -> "هذا الجهاز موقوف"; "pending" -> "أضف قائمتك من الموقع للبدء"; else -> "في انتظار التفعيل..." }
+        else if (r.error != null) { if (!openSavedIfOffline(this)) b.tvStatus.text = getString(R.string.status_connect_fail) }
+        else b.tvStatus.text = when (r.status) { "expired" -> getString(R.string.status_expired); "banned" -> getString(R.string.status_banned); "pending" -> getString(R.string.status_pending); else -> getString(R.string.status_waiting) }
     }
 }
