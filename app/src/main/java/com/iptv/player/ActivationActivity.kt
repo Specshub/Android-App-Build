@@ -16,7 +16,6 @@ class ActivationActivity : AppCompatActivity() {
         mac = DeviceManager.getMac(this); key = DeviceManager.getKey(this)
         b.tvAppName.text = Constants.APP_NAME.uppercase(); b.tvSite.text = Constants.ACTIVATION_SITE
         b.tvMac.text = mac; b.tvKey.text = key
-        addDemoButton(this, b.demoHolder)
         b.btnRefresh.setOnClickListener { lifecycleScope.launch { checkOnce() } }
         lifecycleScope.launch { repeatOnLifecycle(Lifecycle.State.STARTED) { while (true) { checkOnce(); delay(Constants.POLL_INTERVAL_MS) } } }
     }
