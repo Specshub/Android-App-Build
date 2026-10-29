@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="demo_host">Server URL, e.g. http://example.com:8080</string>
+    <string name="demo_user">Username</string>
+    <string name="demo_pass">Password</string>
+    <string name="demo_title">Demo login</string>
+    <string name="demo_ok">Log in</string>
+    <string name="demo_fill">Fill in all fields</string>
+    <string name="act_badge">Premium entertainment</string>
+    <string name="act_tagline">A fast, elegant media player for your own playlists, designed for the best viewing experience.</string>
+    <string name="act_disc_short">This app is a media player only and does not include or provide any content. You must add your own playlist that you have the right to use.</string>
+    <string name="act_disc_long">This app is a media player only and does not include or provide any channels, movies, series or content. You must add your own playlist that you have the right to use.</string>
+    <string name="act_title">To activate the app</string>
+    <string name="act_sub">Add your playlist through our website and the app will work automatically</string>
+    <string name="act_visit">Visit the website:</string>
+    <string name="act_login_long">Sign in with your device ID and its unique key:</string>
+    <string name="act_login_short">Sign in with your device ID and key:</string>
+    <string name="act_device_id">Device ID</string>
+    <string name="act_device_key">Device key</string>
+    <string name="act_after">The app opens automatically after activation, or tap Refresh.</string>
+    <string name="act_refresh">Refresh status</string>
+    <string name="hint_search_all">Search all content..</string>
+    <string name="hint_search">Search..</string>
+    <string name="hint_search_live_all">Search all channels...</string>
+    <string name="hint_search_channel">Search for a channel...</string>
+    <string name="fav_hint">Long-press a channel to remove it</string>
+    <string name="fav_empty">No favorite channels yet</string>
+</resources>
