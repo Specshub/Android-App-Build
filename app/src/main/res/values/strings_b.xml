@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="play_channel_fail">Could not play the channel</string>
+    <string name="video_size">Picture size: %s</string>
+    <string name="vm_auto">Smart auto</string>
+    <string name="vm_orig">Original size</string>
+    <string name="vm_zoom">Zoom</string>
+    <string name="vm_stretch">Stretch</string>
+    <string name="season_n">Season %s</string>
+    <string name="search_min">Type at least 2 characters</string>
+    <string name="no_results">No results</string>
+    <string name="link_missing">Link is missing</string>
+    <string name="video_fail">Could not play the video (%s)</string>
+    <string name="no_tracks">No extra tracks</string>
+    <string name="track_audio">Audio: </string>
+    <string name="track_sub">Subtitles: </string>
+    <string name="track_n">Track %d</string>
+    <string name="sub_off">Turn subtitles off</string>
+    <string name="tracks_title">Audio / Subtitles</string>
+    <string name="screen_mode">Screen mode: %s</string>
+    <string name="sm_fit">Auto (Fit)</string>
+    <string name="sm_stretch">Stretch</string>
+    <string name="sm_zoom">Zoom</string>
+    <string name="epg_loading">Loading program guide...</string>
+    <string name="epg_none">No program information</string>
+    <string name="epg_next">Next  %1$s  %2$s</string>
+    <string name="demo_btn">Demo login (testing)</string>
+</resources>
