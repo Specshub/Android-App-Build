@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="status_connect_fail">تعذر الاتصال بالسيرفر</string>
+    <string name="status_waiting">في انتظار التفعيل...</string>
+    <string name="status_expired">انتهى الاشتراك. فعّله من الموقع</string>
+    <string name="status_banned">هذا الجهاز موقوف</string>
+    <string name="status_pending">أضف قائمتك من الموقع للبدء</string>
+    <string name="sec_series">المسلسلات</string>
+    <string name="sec_kids">الأطفال</string>
+    <string name="sec_movies">الأفلام</string>
+    <string name="no_episodes">لا توجد حلقات متاحة</string>
+    <string name="episode_n">الحلقة %1$d: %2$s</string>
+    <string name="cancel">إلغاء</string>
+    <string name="list_load_fail">تعذر تحميل القائمة</string>
+    <string name="exp_until">سينتهي الاشتراك خلال: %s</string>
+    <string name="exp_trial">التجربة المجانية تنتهي: %s</string>
+    <string name="exp_lifetime">اشتراك مدى الحياة</string>
+    <string name="exp_ends">الاشتراك ينتهي: %s</string>
+    <string name="nav_live">القنوات</string>
+    <string name="nav_movies">أفلام</string>
+    <string name="nav_series">مسلسلات</string>
+    <string name="nav_search">بحث</string>
+    <string name="nav_fav">المفضلة</string>
+    <string name="nav_settings">إعدادات</string>
+    <string name="cat_fav">المفضلة ⭐</string>
+    <string name="fav_removed">تمت الإزالة من المفضلة</string>
+    <string name="fav_added">تمت الإضافة إلى المفضلة ⭐</string>
+</resources>
