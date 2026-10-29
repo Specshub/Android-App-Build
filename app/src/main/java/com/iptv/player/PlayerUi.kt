@@ -10,7 +10,7 @@ fun setupPlayerUi(a: PlayerActivity) {
     a.binding.btnBack.setOnClickListener { a.finish() }; a.binding.btnTracks.setOnClickListener { showTracks(a) }
     a.binding.btnAspectRatio.setOnClickListener {
         a.ratioIdx = (a.ratioIdx + 1) % modes.size; a.binding.playerView.resizeMode = modes[a.ratioIdx]
-        Toast.makeText(a, "وضع الشاشة: " + listOf("تلقائي (Fit)", "تمدد (Stretch)", "تكبير (Zoom)")[a.ratioIdx], Toast.LENGTH_SHORT).show()
+        Toast.makeText(a, a.getString(R.string.screen_mode, a.getString(listOf(R.string.sm_fit, R.string.sm_stretch, R.string.sm_zoom)[a.ratioIdx])), Toast.LENGTH_SHORT).show()
     }
 }
 fun showError(a: PlayerActivity, message: String) {
