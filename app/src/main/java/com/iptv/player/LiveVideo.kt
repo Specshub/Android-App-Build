@@ -10,5 +10,5 @@ fun applyVideoMode(a: LiveActivity) {
 }
 fun cycleVideoMode(a: LiveActivity) {
     val n = (defMode(a) + 1) % 4; a.prefs.edit().putInt("VIDEO_MODE", n).apply(); applyVideoMode(a)
-    Toast.makeText(a, "حجم الصورة: " + listOf("تلقائي ذكي", "الحجم الأصلي", "تكبير", "تمدد")[n], Toast.LENGTH_SHORT).show()
+    Toast.makeText(a, a.getString(R.string.video_size, a.getString(listOf(R.string.vm_auto, R.string.vm_orig, R.string.vm_zoom, R.string.vm_stretch)[n])), Toast.LENGTH_SHORT).show()
 }
