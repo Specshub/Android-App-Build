@@ -10,7 +10,7 @@ fun observeSeries(a: SeriesActivity) {
         if (r is Resource.Success) {
             a.b.progress.visibility = View.GONE; a.seasons = r.data.episodes.toList().sortedBy { it.first.toIntOrNull() ?: 0 }.toMap()
             a.b.tvSeriesPlot.text = nm(r.data.info.plot); a.b.tvSeriesGenre.text = nm(r.data.info.genre)
-            a.seasonAdapter.submitList(a.seasons.keys.map { Row(it, "الموسم $it") })
+            a.seasonAdapter.submitList(a.seasons.keys.map { Row(it, a.getString(R.string.season_n, it)) })
             a.seasons.keys.firstOrNull()?.let { selectSeason(a, it) } ?: run { a.b.tvEmpty.visibility = View.VISIBLE }
         } else if (r is Resource.Error) { a.b.progress.visibility = View.GONE; Toast.makeText(a, r.message, Toast.LENGTH_LONG).show() }
     }
