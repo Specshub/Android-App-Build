@@ -15,7 +15,7 @@ fun loadCategoryFast(a: BrowseActivity, id: String) {
         if (shown != null) { BrowseMem.cat[key] = shown; show(shown) } else if (a.curCat == id) { a.items = emptyList(); a.gridAdapter.submitList(emptyList()); a.b.tvEmpty.visibility = View.GONE; a.b.progress.visibility = View.VISIBLE }
         val ok = if (s) Prefetch.seriesCat(a, c, id) != null else Prefetch.vodCat(a, c, id) != null
         val fresh = BrowseMem.cat[key]
-        if (fresh != null && fresh != shown) show(fresh) else if (!ok && shown == null && a.curCat == id) browseError(a, "تعذر تحميل القائمة")
+        if (fresh != null && fresh != shown) show(fresh) else if (!ok && shown == null && a.curCat == id) browseError(a, a.getString(R.string.list_load_fail))
         if (a.curCat == id) a.b.progress.visibility = View.GONE
     }
 }
