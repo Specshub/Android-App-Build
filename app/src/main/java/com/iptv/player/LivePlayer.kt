@@ -30,5 +30,5 @@ fun onPlayError(a: LiveActivity) {
     val s = a.current ?: return; val c = a.vm.getCredentials() ?: return
     if (!a.altTried) { a.altTried = true; startUrl(a, "${c.host.trimEnd('/')}/${c.username}/${c.password}/${s.streamId}.ts"); return }
     if (a.retries < 3) { a.retries++; a.handler.postDelayed({ if (a.current?.streamId == s.streamId) startUrl(a, a.vm.buildStreamUrl(s.streamId, "ts")) }, 2000L * a.retries); return }
-    a.b.progress.visibility = View.GONE; Toast.makeText(a, "تعذر تشغيل القناة", Toast.LENGTH_SHORT).show()
+    a.b.progress.visibility = View.GONE; Toast.makeText(a, a.getString(R.string.play_channel_fail), Toast.LENGTH_SHORT).show()
 }
