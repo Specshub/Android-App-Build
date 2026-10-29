@@ -14,5 +14,5 @@ fun playFav(a: FavoritesActivity, id: String) {
 }
 fun removeFav(a: FavoritesActivity, id: String): Boolean {
     val s = a.list.firstOrNull { it.streamId.toString() == id } ?: return false
-    FavoritesManager.removeFavorite(a, s); Toast.makeText(a, "تمت الإزالة من المفضلة", Toast.LENGTH_SHORT).show(); refreshFavs(a); return true
+    FavoritesManager.removeFavorite(a, s); Toast.makeText(a, a.getString(R.string.fav_removed), Toast.LENGTH_SHORT).show(); refreshFavs(a); return true
 }
