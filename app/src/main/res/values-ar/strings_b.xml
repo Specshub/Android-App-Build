@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="play_channel_fail">تعذر تشغيل القناة</string>
+    <string name="video_size">حجم الصورة: %s</string>
+    <string name="vm_auto">تلقائي ذكي</string>
+    <string name="vm_orig">الحجم الأصلي</string>
+    <string name="vm_zoom">تكبير</string>
+    <string name="vm_stretch">تمدد</string>
+    <string name="season_n">الموسم %s</string>
+    <string name="search_min">اكتب حرفين على الأقل</string>
+    <string name="no_results">لا توجد نتائج</string>
+    <string name="link_missing">الرابط مفقود</string>
+    <string name="video_fail">تعذر تشغيل الفيديو (%s)</string>
+    <string name="no_tracks">لا توجد مسارات إضافية</string>
+    <string name="track_audio">صوت: </string>
+    <string name="track_sub">ترجمة: </string>
+    <string name="track_n">مسار %d</string>
+    <string name="sub_off">إيقاف الترجمة</string>
+    <string name="tracks_title">صوت / ترجمة</string>
+    <string name="screen_mode">وضع الشاشة: %s</string>
+    <string name="sm_fit">تلقائي (Fit)</string>
+    <string name="sm_stretch">تمدد (Stretch)</string>
+    <string name="sm_zoom">تكبير (Zoom)</string>
+    <string name="epg_loading">جاري تحميل دليل البرامج...</string>
+    <string name="epg_none">لا توجد معلومات عن البرنامج</string>
+    <string name="epg_next">التالي  %1$s  %2$s</string>
+    <string name="demo_btn">دخول تجريبي (للاختبار)</string>
+</resources>
