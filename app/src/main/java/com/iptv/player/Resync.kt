@@ -9,7 +9,7 @@ private const val EVERY = 15 * 60_000L
 
 fun AppCompatActivity.resyncDevice(onLabel: (String) -> Unit) {
     val p = ipPrefs(this); if (!p.getBoolean("SRV", false)) return
-    val now = System.currentTimeMillis(); if (now - p.getLong("LAST_TRY", 0) < EVERY) return
+    val now = System.currentTimeMillis(); if (now - p.getLong("LAST_TRY", 0) < EVERY && p.getString("STATE", null) != "trial") return
     p.edit().putLong("LAST_TRY", now).apply()
     lifecycleScope.launch {
         val r = DeviceApi.check(DeviceManager.getMac(this@resyncDevice), DeviceManager.getKey(this@resyncDevice), DeviceManager.info(this@resyncDevice))
