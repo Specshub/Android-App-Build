@@ -15,7 +15,7 @@ class BrowseActivity : AppCompatActivity() {
         b = ActivityBrowseBinding.inflate(layoutInflater); setContentView(b.root)
         kind = intent.getStringExtra("EXTRA_SECTION") ?: "movies"
         vm.setCredentials(LoginCredentials(intent.getStringExtra(EXTRA_HOST) ?: "", intent.getStringExtra(EXTRA_USERNAME) ?: "", intent.getStringExtra(EXTRA_PASSWORD) ?: ""))
-        b.tvHeader.text = when (kind) { "series" -> "المسلسلات"; "kids" -> "الأطفال"; else -> "الأفلام" }
+        b.tvHeader.text = when (kind) { "series" -> getString(R.string.sec_series); "kids" -> getString(R.string.sec_kids); else -> getString(R.string.sec_movies) }
         setupBrowse(this); observeBrowse(this); loadCategories(this)
     }
 }
