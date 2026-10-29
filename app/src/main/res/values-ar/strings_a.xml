@@ -22,7 +22,7 @@
     <string name="nav_search">بحث</string>
     <string name="nav_fav">المفضلة</string>
     <string name="nav_settings">إعدادات</string>
-    <string name="cat_fav">المفضلة ⭐</string>
+    <string name="cat_fav">المفضلة</string>
     <string name="fav_removed">تمت الإزالة من المفضلة</string>
-    <string name="fav_added">تمت الإضافة إلى المفضلة ⭐</string>
+    <string name="fav_added">تمت الإضافة إلى المفضلة</string>
 </resources>
