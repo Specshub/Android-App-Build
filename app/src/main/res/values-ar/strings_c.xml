@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="demo_host">رابط السيرفر مثل http://example.com:8080</string>
+    <string name="demo_user">اسم المستخدم</string>
+    <string name="demo_pass">كلمة المرور</string>
+    <string name="demo_title">دخول تجريبي</string>
+    <string name="demo_ok">دخول</string>
+    <string name="demo_fill">املأ كل الحقول</string>
+    <string name="act_badge">تجربة ترفيهية فاخرة</string>
+    <string name="act_tagline">مشغّل وسائط سريع وأنيق لقوائم التشغيل الخاصة بك، بواجهة مصممة لأفضل تجربة مشاهدة.</string>
+    <string name="act_disc_short">هذا التطبيق مشغّل وسائط فقط، ولا يتضمن أو يوفّر أي محتوى. يجب عليك إضافة قائمة التشغيل الخاصة بك التي تملك حق استخدامها.</string>
+    <string name="act_disc_long">هذا التطبيق مشغّل وسائط فقط، ولا يتضمن أو يوفّر أي قنوات أو أفلام أو مسلسلات أو محتوى. يجب عليك إضافة قائمة التشغيل الخاصة بك التي تملك حق استخدامها.</string>
+    <string name="act_title">لتفعيل التطبيق</string>
+    <string name="act_sub">أضف قائمة التشغيل الخاصة بك عبر موقعنا وسيعمل التطبيق تلقائيًا</string>
+    <string name="act_visit">زُر الموقع:</string>
+    <string name="act_login_long">سجّل الدخول بمعرف جهازك ومفتاحه الفريد:</string>
+    <string name="act_login_short">سجّل الدخول بمعرف جهازك ومفتاحه:</string>
+    <string name="act_device_id">معرّف الجهاز</string>
+    <string name="act_device_key">مفتاح الجهاز</string>
+    <string name="act_after">بعد التفعيل يفتح التطبيق تلقائيًا، أو اضغط تحديث.</string>
+    <string name="act_refresh">تحديث الحالة</string>
+    <string name="hint_search_all">بحث في كل المحتوى..</string>
+    <string name="hint_search">بحث..</string>
+    <string name="hint_search_live_all">بحث في كل القنوات...</string>
+    <string name="hint_search_channel">بحث عن قناة...</string>
+    <string name="fav_hint">اضغط مطولاً على القناة لإزالتها</string>
+    <string name="fav_empty">لا توجد قنوات مفضلة بعد</string>
+</resources>
