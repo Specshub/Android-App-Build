@@ -11,7 +11,7 @@
 <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_marginTop="6dp" android:layout_weight="1">
 <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvEpisodes" android:layout_width="match_parent" android:layout_height="match_parent" />
 <ProgressBar android:id="@+id/progress" android:layout_width="48dp" android:layout_height="48dp" android:layout_gravity="center" />
-<TextView android:id="@+id/tvEmpty" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:text="لا توجد حلقات متاحة" android:textColor="#88FFFFFF" android:textSize="16sp" android:visibility="gone" />
+<TextView android:id="@+id/tvEmpty" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:text="@string/no_episodes" android:textColor="#88FFFFFF" android:textSize="16sp" android:visibility="gone" />
 </FrameLayout>
 </LinearLayout>
 </LinearLayout>
