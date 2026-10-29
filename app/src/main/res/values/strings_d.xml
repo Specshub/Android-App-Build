@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_latest_movies">Latest movies</string>
+    <string name="home_latest_series">Latest series</string>
+    <string name="screens_2">2 screens</string>
+    <string name="screens_3">3 screens</string>
+    <string name="screens_4">4 screens</string>
+    <string name="btn_aspect">Screen size</string>
+    <string name="btn_retry">Retry</string>
+    <string name="search_title">Global search</string>
+    <string name="search_hint">Search for a channel, movie or series...</string>
+    <string name="set_title">Settings</string>
+    <string name="set_account">Account</string>
+    <string name="set_general">General</string>
+    <string name="set_player">Player</string>
+    <string name="set_account_info">Account information</string>
+    <string name="set_expiry">Expiry date</string>
+    <string name="set_device">Device</string>
+    <string name="set_disc">This app is a media player only and provides no content.</string>
+    <string name="set_version">Version</string>
+    <string name="set_theme">Dark / light mode</string>
+    <string name="set_logout">Log out</string>
+    <string name="set_auto">Auto-play last channel</string>
+    <string name="set_fill">Fill screen in live channels</string>
+    <string name="set_support">Support</string>
+    <string name="set_support_wa">Support (WhatsApp)</string>
+    <string name="pick_channel">Choose a channel to display</string>
+</resources>
