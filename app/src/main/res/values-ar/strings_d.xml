@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_latest_movies">أحدث الأفلام</string>
+    <string name="home_latest_series">أحدث المسلسلات</string>
+    <string name="screens_2">2 شاشات</string>
+    <string name="screens_3">3 شاشات</string>
+    <string name="screens_4">4 شاشات</string>
+    <string name="btn_aspect">حجم الشاشة</string>
+    <string name="btn_retry">إعادة المحاولة</string>
+    <string name="search_title">بحث شامل</string>
+    <string name="search_hint">ابحث عن قناة أو فيلم أو مسلسل...</string>
+    <string name="set_title">الإعدادات</string>
+    <string name="set_account">الحساب</string>
+    <string name="set_general">عام</string>
+    <string name="set_player">المشغل</string>
+    <string name="set_account_info">معلومات الحساب</string>
+    <string name="set_expiry">تاريخ الانتهاء</string>
+    <string name="set_device">الجهاز</string>
+    <string name="set_disc">هذا التطبيق مشغّل وسائط فقط ولا يوفّر أي محتوى.</string>
+    <string name="set_version">الإصدار</string>
+    <string name="set_theme">الوضع الليلي / النهاري</string>
+    <string name="set_logout">تسجيل الخروج</string>
+    <string name="set_auto">تشغيل آخر قناة تلقائياً</string>
+    <string name="set_fill">ملء الشاشة في القنوات المباشرة</string>
+    <string name="set_support">الدعم الفني</string>
+    <string name="set_support_wa">الدعم الفني (واتساب)</string>
+    <string name="pick_channel">اختر قناة للعرض</string>
+</resources>
