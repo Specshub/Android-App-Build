@@ -9,7 +9,7 @@ data class WEntry(val k: String, val title: String, val img: String?, val url: S
     fun toJson(): JSONObject = JSONObject().put("k", k).put("t", title).put("i", img ?: "").put("u", url).put("p", pos).put("d", dur).put("s", ts).put("sid", sid).put("st", sTitle).put("sc", sCover ?: "").put("l", label)
 }
 private fun fromJson(o: JSONObject) = WEntry(o.optString("k"), o.optString("t"), o.optString("i").ifEmpty { null }, o.optString("u"), o.optLong("p"), o.optLong("d"), o.optLong("s"), o.optInt("sid"), o.optString("st"), o.optString("sc").ifEmpty { null }, o.optString("l"))
-fun entryFromJson(s: String?): WEntry? = try { fromJson(JSONObject(s ?: return null)) } catch (e: Exception) { null }
+fun entryFromJson(s: String?): WEntry? { if (s == null) return null; return try { fromJson(JSONObject(s)) } catch (e: Exception) { null } }
 private fun wsPrefs(c: Context) = c.getSharedPreferences("WATCH_PREFS", Context.MODE_PRIVATE)
 private fun wsKey(c: Context): String { val p = ipPrefs(c); return "W_" + (p.getString("SELK", null) ?: ((p.getString("HOST", "") ?: "") + "|" + (p.getString("USER", "") ?: ""))).hashCode() }
 fun wsAll(c: Context): List<WEntry> = try { val a = JSONArray(wsPrefs(c).getString(wsKey(c), "[]")); (0 until a.length()).map { fromJson(a.getJSONObject(it)) } } catch (e: Exception) { emptyList() }
