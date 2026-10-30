@@ -11,6 +11,10 @@ class HomeActivity : AppCompatActivity() {
     private var tv: TextView? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (intent.getBooleanExtra("EXTRA_EMPTY", false)) {
+            val e = ActivityHomeBinding.inflate(layoutInflater); setContentView(e.root)
+            e.tvExpiry.text = getString(R.string.empty_banner); setupHomeButtons(this, e.buttonsContainer, LoginCredentials("", "", "")); return
+        }
         val p = getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE)
         val host = intent.getStringExtra(EXTRA_HOST) ?: p.getString("HOST", null)
         val user = intent.getStringExtra(EXTRA_USERNAME) ?: p.getString("USER", null)
