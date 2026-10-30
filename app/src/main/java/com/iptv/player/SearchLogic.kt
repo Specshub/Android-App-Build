@@ -2,7 +2,6 @@ package com.iptv.player
 import android.content.Intent
 import android.view.View
 import android.widget.Toast
-import com.iptv.player.data.api.XtreamUrlBuilder
 import com.iptv.player.data.model.*
 
 fun observeSearch(a: SearchActivity) {
@@ -22,10 +21,9 @@ fun runSearch(a: SearchActivity) {
 }
 fun onSearchClick(a: SearchActivity, id: String) {
     val c = a.vm.getCredentials() ?: return; val n = id.drop(1).toInt()
-    fun play(t: String, u: String) = a.startActivity(Intent(a, PlayerActivity::class.java).putExtra(PlayerActivity.EXTRA_STREAM_TITLE, t).putExtra(PlayerActivity.EXTRA_STREAM_URL, u))
     when (id[0]) {
-        'L' -> play(nm(a.live.firstOrNull { it.streamId == n }?.name), a.vm.buildStreamUrl(n, "ts"))
-        'M' -> { val v = a.vod.firstOrNull { it.streamId == n }; play(nm(v?.name), XtreamUrlBuilder.vodStreamUrl(c, n, v?.containerExtension ?: "mp4")) }
+        'L' -> a.startActivity(Intent(a, PlayerActivity::class.java).putExtra(PlayerActivity.EXTRA_STREAM_TITLE, nm(a.live.firstOrNull { it.streamId == n }?.name)).putExtra(PlayerActivity.EXTRA_STREAM_URL, a.vm.buildStreamUrl(n, "ts")))
+        'M' -> { val v = a.vod.firstOrNull { it.streamId == n }; openMovie(a, c, n, nm(v?.name), v?.streamIcon, v?.containerExtension) }
         else -> { val s = a.series.firstOrNull { it.seriesId == n }; openSeries(a, c, n, nm(s?.name), s?.cover) }
     }
 }
