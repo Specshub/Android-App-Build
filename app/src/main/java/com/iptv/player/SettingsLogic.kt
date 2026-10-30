@@ -9,7 +9,7 @@ fun showPane(a: SettingsActivity, i: Int) {
 }
 fun setupSettings(a: SettingsActivity) {
     val p = a.getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE)
-    a.b.vExpiry.text = p.getString("EXPIRES", null)?.takeIf { it.isNotEmpty() } ?: "—"
+    a.b.vExpiry.text = p.getString("SUBTXT", null)?.takeIf { it.isNotEmpty() } ?: p.getString("EXPIRES", null)?.takeIf { it.isNotEmpty() } ?: "—"
     a.b.vKey.text = DeviceManager.getKey(a); a.b.vMac.text = DeviceManager.getMac(a)
     a.b.vVersion.text = a.packageManager.getPackageInfo(a.packageName, 0).versionName ?: "1.0"
     a.b.tabAccount.setOnClickListener { showPane(a, 0) }; a.b.tabGeneral.setOnClickListener { showPane(a, 1) }; a.b.tabPlayer.setOnClickListener { showPane(a, 2) }
