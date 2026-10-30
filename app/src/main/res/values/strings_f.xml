@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lists_sub">Choose the list you want to use</string>
+    <string name="act_ok">OK</string>
+    <string name="empty_banner">No content yet. Activate your device on the website</string>
+    <string name="no_content">Add a playlist from the website to see content</string>
+    <string name="md_play">Play</string>
+    <string name="md_back">Back</string>
+    <string name="md_plot">Story</string>
+    <string name="md_no_plot">No description available for this movie</string>
+    <string name="md_director">Director: %s</string>
+    <string name="md_cast">Cast: %s</string>
+</resources>
