@@ -14,13 +14,14 @@ class PlayerActivity : AppCompatActivity() {
         const val EXTRA_THUMBNAIL = "extra_thumbnail"
     }
     lateinit var binding: ActivityPlayerBinding
-    var player: ExoPlayer? = null; var streamUrl = ""; var streamTitle = ""; var ratioIdx = 0
+    var player: ExoPlayer? = null; var streamUrl = ""; var streamTitle = ""; var ratioIdx = 0; var watch: WEntry? = null
     val prefs by lazy { getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPlayerBinding.inflate(layoutInflater); setContentView(binding.root)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); hidePlayerBars(this)
         streamUrl = intent.getStringExtra(EXTRA_STREAM_URL) ?: ""; streamTitle = intent.getStringExtra(EXTRA_STREAM_TITLE) ?: "Now Playing"
+        watch = entryFromJson(intent.getStringExtra("W_JSON"))
         binding.tvTitle.text = streamTitle
         setupPlayerUi(this); initializePlayer(this)
     }
