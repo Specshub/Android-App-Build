@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.iptv.player.data.model.LoginCredentials
 
 fun openSection(a: AppCompatActivity, c: LoginCredentials, section: String) {
+    if (c.host.isEmpty() && section != "settings") { Toast.makeText(a, a.getString(R.string.no_content), Toast.LENGTH_SHORT).show(); return }
     if (section == "lists") { showListsDialog(a); return }
     val target = when (section) { "live" -> LiveActivity::class.java; "movies", "series", "kids" -> BrowseActivity::class.java; "settings" -> SettingsActivity::class.java; "search" -> SearchActivity::class.java; "favorites" -> FavoritesActivity::class.java; else -> MainActivity::class.java }
     a.startActivity(Intent(a, target).putExtra(EXTRA_HOST, c.host).putExtra(EXTRA_USERNAME, c.username).putExtra(EXTRA_PASSWORD, c.password).putExtra("EXTRA_SECTION", section))
