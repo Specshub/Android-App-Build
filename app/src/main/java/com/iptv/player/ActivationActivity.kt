@@ -19,7 +19,7 @@ class ActivationActivity : AppCompatActivity() {
         b.tvAppName.text = Constants.APP_NAME.uppercase(); b.tvSite.text = Constants.ACTIVATION_SITE
         b.tvMac.text = mac; b.tvKey.text = key
         showQr(Constants.ACTIVATION_SITE + "/login.php?mac=" + mac + "#k=" + key)
-        findViewById<LinearLayout>(R.id.demoHolder)?.let { h -> h.removeAllViews(); layoutInflater.inflate(R.layout.item_ok_btn, h, true).setOnClickListener { startActivity(Intent(this, HomeActivity::class.java).putExtra("EXTRA_EMPTY", true)) } }
+        findViewById<LinearLayout>(R.id.demoHolder)?.let { h -> h.removeAllViews(); val ok = layoutInflater.inflate(R.layout.item_ok_btn, h, false); ok.setOnClickListener { startActivity(Intent(this, HomeActivity::class.java).putExtra("EXTRA_EMPTY", true)) }; h.addView(ok) }
         b.btnRefresh.setOnClickListener { lifecycleScope.launch { checkOnce() } }
         lifecycleScope.launch { repeatOnLifecycle(Lifecycle.State.STARTED) { while (true) { checkOnce(); delay(Constants.POLL_INTERVAL_MS) } } }
     }
