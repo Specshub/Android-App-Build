@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nav_lists">My Lists</string>
+    <string name="lists_none">No lists available</string>
+    <string name="act_qr">Scan to sign in on the website</string>
+    <string name="sub_unlimited">Subscription: unlimited</string>
+</resources>
