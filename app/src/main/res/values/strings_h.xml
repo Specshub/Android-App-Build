@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sub_add">Add subscription</string>
+    <string name="sub_title">Add your subscription</string>
+    <string name="sub_sub">Enter the details your provider gave you</string>
+    <string name="sub_hint_url">Server URL (http://...)</string>
+    <string name="sub_hint_user">Username</string>
+    <string name="sub_hint_pass">Password</string>
+    <string name="sub_login">Sign in</string>
+    <string name="sub_fail">Could not sign in. Check the details</string>
+    <string name="sub_checking">Checking...</string>
+</resources>
