@@ -14,16 +14,17 @@ fun openSeries(a: AppCompatActivity, c: LoginCredentials, id: Int, title: String
 class SeriesActivity : AppCompatActivity() {
     lateinit var b: ActivitySeriesBinding; lateinit var seasonAdapter: RowAdapter; lateinit var epAdapter: RowAdapter; lateinit var title: String
     val vm: MainViewModel by viewModels()
-    var seasons: Map<String, List<Episode>> = emptyMap()
+    var seasons: Map<String, List<Episode>> = emptyMap(); var sid = 0; var cover: String? = null
+    var contEp: Episode? = null; var contSeason: String? = null; var contStart = 0L
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         b = ActivitySeriesBinding.inflate(layoutInflater); setContentView(b.root)
         vm.setCredentials(LoginCredentials(intent.getStringExtra(EXTRA_HOST) ?: "", intent.getStringExtra(EXTRA_USERNAME) ?: "", intent.getStringExtra(EXTRA_PASSWORD) ?: ""))
-        title = intent.getStringExtra("S_TITLE") ?: ""; b.tvSeriesTitle.text = title
-        Glide.with(this).load(intent.getStringExtra("S_COVER")).override(300, 450).centerCrop().into(b.ivCover)
+        title = intent.getStringExtra("S_TITLE") ?: ""; b.tvSeriesTitle.text = title; sid = intent.getIntExtra("S_ID", 0); cover = intent.getStringExtra("S_COVER")
+        Glide.with(this).load(cover).override(300, 450).centerCrop().into(b.ivCover)
         seasonAdapter = RowAdapter(false, R.layout.item_chip) { r, _ -> selectSeason(this, r.id) }; epAdapter = RowAdapter(true, R.layout.item_episode) { r, _ -> playEpisode(this, r.id) }
         b.rvSeasons.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false); b.rvSeasons.adapter = seasonAdapter; b.rvSeasons.itemAnimator = null
         b.rvEpisodes.layoutManager = LinearLayoutManager(this); b.rvEpisodes.adapter = epAdapter; b.rvEpisodes.itemAnimator = null
-        observeSeries(this); vm.loadSeriesInfo(intent.getIntExtra("S_ID", 0))
+        setupSeriesButtons(this); observeSeries(this); vm.loadSeriesInfo(sid)
     }
 }
