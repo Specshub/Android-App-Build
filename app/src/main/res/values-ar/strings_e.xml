@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nav_lists">قوائمي</string>
+    <string name="lists_none">لا توجد قوائم</string>
+    <string name="act_qr">امسح الرمز للدخول إلى الموقع</string>
+    <string name="sub_unlimited">الاشتراك: غير محدود</string>
+</resources>
