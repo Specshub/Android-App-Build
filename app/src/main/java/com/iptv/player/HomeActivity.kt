@@ -8,7 +8,7 @@ import com.iptv.player.data.model.LoginCredentials
 import com.iptv.player.databinding.ActivityHomeBinding
 
 class HomeActivity : AppCompatActivity() {
-    private var tv: TextView? = null
+    private var tv: TextView? = null; private var refreshCont: (() -> Unit)? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (intent.getBooleanExtra("EXTRA_EMPTY", false)) {
@@ -24,8 +24,8 @@ class HomeActivity : AppCompatActivity() {
         val b = ActivityHomeBinding.inflate(layoutInflater); setContentView(b.root)
         tv = b.tvExpiry; b.tvExpiry.text = subLabel(this)
         setupHomeButtons(this, b.buttonsContainer, creds)
-        setupHomeRows(this, b, creds)
+        setupHomeRows(this, b, creds); refreshCont = setupContinue(this, b)
         refreshSub(creds) { tv?.text = subLabel(this).ifEmpty { savedLabel(this) } }
     }
-    override fun onResume() { super.onResume(); resyncDevice { } }
+    override fun onResume() { super.onResume(); refreshCont?.invoke(); resyncDevice { } }
 }
