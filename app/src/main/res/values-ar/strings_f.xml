@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lists_sub">اختر القائمة التي تريد استخدامها</string>
+    <string name="act_ok">موافق</string>
+    <string name="empty_banner">لا يوجد محتوى بعد. فعّل جهازك من الموقع</string>
+    <string name="no_content">أضف قائمة من الموقع لعرض المحتوى</string>
+    <string name="md_play">تشغيل</string>
+    <string name="md_back">رجوع</string>
+    <string name="md_plot">القصة</string>
+    <string name="md_no_plot">لا تتوفر نبذة عن هذا الفيلم</string>
+    <string name="md_director">الإخراج: %s</string>
+    <string name="md_cast">الممثلون: %s</string>
+</resources>
