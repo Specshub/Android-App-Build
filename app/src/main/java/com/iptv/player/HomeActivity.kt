@@ -18,9 +18,10 @@ class HomeActivity : AppCompatActivity() {
         if (host.isNullOrEmpty() || user.isNullOrEmpty() || pass.isNullOrEmpty()) { startActivity(Intent(this, ActivationActivity::class.java)); finish(); return }
         val creds = LoginCredentials(host, user, pass)
         val b = ActivityHomeBinding.inflate(layoutInflater); setContentView(b.root)
-        tv = b.tvExpiry; b.tvExpiry.text = savedLabel(this)
+        tv = b.tvExpiry; b.tvExpiry.text = subLabel(this)
         setupHomeButtons(this, b.buttonsContainer, creds)
         setupHomeRows(this, b, creds)
+        refreshSub(creds) { tv?.text = subLabel(this).ifEmpty { savedLabel(this) } }
     }
-    override fun onResume() { super.onResume(); resyncDevice { tv?.text = it } }
+    override fun onResume() { super.onResume(); resyncDevice { } }
 }
