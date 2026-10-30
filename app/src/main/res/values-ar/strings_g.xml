@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nav_history">السجل</string>
+    <string name="cont_watching">متابعة المشاهدة</string>
+    <string name="hist_hint">اضغط مطولًا على العنصر لإزالته</string>
+    <string name="hist_empty">لم تشاهد شيئًا بعد</string>
+    <string name="fav_empty2">لا توجد مفضلة بعد</string>
+    <string name="fav_add">أضف إلى المفضلة</string>
+    <string name="fav_in">في المفضلة</string>
+    <string name="md_resume">متابعة %s</string>
+    <string name="cont_series">متابعة: %s</string>
+    <string name="ep_label">الموسم %1$s · الحلقة %2$d</string>
+</resources>
