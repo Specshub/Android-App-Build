@@ -1,12 +1,13 @@
 package com.iptv.player
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.iptv.player.data.api.XtreamUrlBuilder
 import com.iptv.player.data.model.LoginCredentials
+import com.iptv.player.data.model.VodStream
 import com.iptv.player.databinding.ActivityMovieDetailBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,7 +30,14 @@ class MovieDetailActivity : AppCompatActivity() {
         b.tvTitle.text = title; b.tvPlot.text = ""; b.tvMeta.visibility = View.GONE; b.tvCredits.visibility = View.GONE
         Glide.with(this).load(thumb(img)).centerCrop().into(b.ivPoster); Glide.with(this).load(thumb(img)).centerCrop().into(b.ivBack)
         b.btnBack.setOnClickListener { finish() }
-        b.btnPlay.setOnClickListener { startActivity(Intent(this, PlayerActivity::class.java).putExtra(PlayerActivity.EXTRA_STREAM_TITLE, title).putExtra(PlayerActivity.EXTRA_STREAM_URL, XtreamUrlBuilder.vodStreamUrl(c, id, ext))) }
+        val entry = WEntry("M$id", title, img, XtreamUrlBuilder.vodStreamUrl(c, id, ext), 0, 0, 0)
+        val h = wsAll(this).firstOrNull { it.k == entry.k }?.takeIf { !it.fin() && it.pos > 10_000 }
+        if (h != null) b.btnPlay.text = getString(R.string.md_resume, (h.pos / 1000).let { String.format(java.util.Locale.US, "%d:%02d", it / 60, it % 60) })
+        b.btnPlay.setOnClickListener { startActivity(watchIntent(this, entry, h?.pos ?: 0L)) }
+        val vs = VodStream(name = title, streamId = id, streamIcon = img, containerExtension = ext)
+        fun favOn() = FavoritesManager.getVodFavorites(this).any { it.streamId == id }
+        fun favUpd() { b.btnFav.text = getString(if (favOn()) R.string.fav_in else R.string.fav_add) }
+        favUpd(); b.btnFav.setOnClickListener { if (favOn()) { FavoritesManager.removeVodFavorite(this, vs); Toast.makeText(this, getString(R.string.fav_removed), Toast.LENGTH_SHORT).show() } else { FavoritesManager.addVodFavorite(this, vs); Toast.makeText(this, getString(R.string.fav_added), Toast.LENGTH_SHORT).show() }; favUpd() }
         b.btnPlay.requestFocus()
         lifecycleScope.launch {
             val i = withContext(Dispatchers.IO) { runCatching {
