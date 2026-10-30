@@ -17,6 +17,7 @@
 <activity android:name=".HomeActivity" android:exported="false" android:screenOrientation="sensorLandscape" android:configChanges="orientation|screenSize|keyboardHidden|screenLayout|smallestScreenSize" />
 <activity android:name=".LiveActivity" android:exported="false" android:screenOrientation="sensorLandscape" android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout" />
 <activity android:name=".BrowseActivity" android:exported="false" android:screenOrientation="sensorLandscape" android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout" />
+<activity android:name=".MovieDetailActivity" android:exported="false" android:screenOrientation="sensorLandscape" android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout" />
 <activity android:name=".SeriesActivity" android:exported="false" android:screenOrientation="sensorLandscape" android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout" />
 <activity android:name=".SettingsActivity" android:exported="false" android:screenOrientation="sensorLandscape" android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout" />
 <activity android:name=".SearchActivity" android:exported="false" android:screenOrientation="sensorLandscape" android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout" />
