@@ -2,7 +2,7 @@
 <resources>
     <string name="status_connect_fail">Could not reach the server</string>
     <string name="status_waiting">Waiting for activation...</string>
-    <string name="status_expired">Subscription expired. Renew it on the website</string>
+    <string name="status_expired">Activation has ended. Visit tajplayer.com to manage your device</string>
     <string name="status_banned">This device is suspended</string>
     <string name="status_pending">Add your playlist on the website to start</string>
     <string name="sec_series">Series</string>
