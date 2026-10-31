@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="sub_add">إضافة اشتراك</string>
-    <string name="sub_title">أضف اشتراكك</string>
+    <string name="sub_add">إضافة قائمة</string>
+    <string name="sub_title">أضف قائمتك</string>
     <string name="sub_sub">أدخل البيانات التي زوّدك بها مزوّد الخدمة</string>
     <string name="sub_hint_url">رابط السيرفر (http://...)</string>
     <string name="sub_hint_user">اسم المستخدم</string>
