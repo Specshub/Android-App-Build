@@ -21,7 +21,7 @@ fun initializePlayer(a: PlayerActivity) {
         override fun onPlayerError(error: PlaybackException) { showError(a, a.getString(R.string.video_fail, error.errorCodeName)) }
         override fun onPlaybackStateChanged(s: Int) {
             when (s) { Player.STATE_BUFFERING -> a.binding.progressBar.visibility = View.VISIBLE; Player.STATE_READY -> a.binding.progressBar.visibility = View.GONE
-                Player.STATE_ENDED -> { val d = exo.duration; a.watch?.let { if (d > 0) wsSave(a, it.copy(pos = d, dur = d, ts = System.currentTimeMillis())) }; a.prefs.edit().remove(posKey(a)).apply(); a.finish() } else -> {} }
+                Player.STATE_ENDED -> { val d = exo.duration; a.watch?.let { if (d > 0) wsSave(a, it.copy(pos = d, dur = d, ts = System.currentTimeMillis())) }; a.prefs.edit().remove(posKey(a)).apply(); if (!playNextEpisode(a)) a.finish() } else -> {} }
         }
     })
 }
