@@ -18,5 +18,6 @@ fun setupSettings(a: SettingsActivity) {
     a.b.swAuto.isChecked = p.getBoolean("AUTO_PLAY", true); a.b.swAuto.setOnCheckedChangeListener { _, on -> p.edit().putBoolean("AUTO_PLAY", on).apply() }
     a.b.vDevice.text = android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL
     a.b.swFill.isChecked = p.getBoolean("FILL_SCREEN", true); a.b.swFill.setOnCheckedChangeListener { _, on -> p.edit().putBoolean("FILL_SCREEN", on).remove("VIDEO_MODE").apply() }
+    a.b.swNext.isChecked = p.getBoolean("AUTO_NEXT", true); a.b.swNext.setOnCheckedChangeListener { _, on -> p.edit().putBoolean("AUTO_NEXT", on).apply() }
     showPane(a, 0)
 }
