@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="sub_add">Add subscription</string>
-    <string name="sub_title">Add your subscription</string>
+    <string name="sub_add">Add playlist</string>
+    <string name="sub_title">Add your playlist</string>
     <string name="sub_sub">Enter the details your provider gave you</string>
     <string name="sub_hint_url">Server URL (http://...)</string>
     <string name="sub_hint_user">Username</string>
