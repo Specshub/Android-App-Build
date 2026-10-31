@@ -26,7 +26,8 @@ private val subHttp = OkHttpClient.Builder().connectTimeout(12, TimeUnit.SECONDS
 private fun normHost(s: String): String { val t = s.trim(); val x = if (t.contains("://")) t else "http://$t"; return Regex("^(https?://[^/\\s]+)").find(x)?.groupValues?.get(1) ?: "" }
 private fun subCheck(h: String, u: String, p: String): Boolean {
     val url = h + "/player_api.php?username=" + URLEncoder.encode(u, "UTF-8") + "&password=" + URLEncoder.encode(p, "UTF-8")
-    subHttp.newCall(Request.Builder().url(url).header("User-Agent", "Mozilla/5.0").build()).execute().use { r -> return JSONObject(r.body?.string() ?: "{}").optJSONObject("user_info")?.optString("auth") == "1" }
+    val body = subHttp.newCall(Request.Builder().url(url).header("User-Agent", "Mozilla/5.0").build()).execute().use { it.body?.string() } ?: return false
+    return JSONObject(body).optJSONObject("user_info")?.optString("auth") == "1"
 }
 fun showAddSubDialog(a: AppCompatActivity) {
     val d = Dialog(a); d.requestWindowFeature(Window.FEATURE_NO_TITLE); d.setContentView(R.layout.dialog_addsub)
