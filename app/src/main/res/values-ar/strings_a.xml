@@ -2,7 +2,7 @@
 <resources>
     <string name="status_connect_fail">تعذر الاتصال بالسيرفر</string>
     <string name="status_waiting">في انتظار التفعيل...</string>
-    <string name="status_expired">انتهى الاشتراك. فعّله من الموقع</string>
+    <string name="status_expired">انتهى التفعيل. زر tajplayer.com لإدارة جهازك</string>
     <string name="status_banned">هذا الجهاز موقوف</string>
     <string name="status_pending">أضف قائمتك من الموقع للبدء</string>
     <string name="sec_series">المسلسلات</string>
