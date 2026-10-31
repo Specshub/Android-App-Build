@@ -70,7 +70,7 @@ class ContentAdapter(
                 is ContentItem.Category -> {
                     tvTitle.text = item.name
                     tvMeta.text = "FOLDER"
-                    loadThumbnail(getSmartCategoryIcon(item.name), isCategory = true)
+                    loadThumbnail(null, isCategory = true)
                 }
                 is ContentItem.Live -> {
                     tvTitle.text = item.stream.name
@@ -99,18 +99,6 @@ class ContentAdapter(
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .centerCrop()
                 .into(ivThumbnail)
-        }
-
-        private fun getSmartCategoryIcon(name: String): String {
-            val n = name.lowercase()
-            return when {
-                n.contains("bein") -> "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/BeIN_Sports_logo.svg/512px-BeIN_Sports_logo.svg.png"
-                n.contains("osn") -> "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/OSN_logo.svg/512px-OSN_logo.svg.png"
-                n.contains("netflix") -> "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg"
-                n.contains("shahid") -> "https://upload.wikimedia.org/wikipedia/ar/0/0e/Shahid_Logo.png"
-                n.contains("kids") || n.contains("اطفال") -> "https://cdn-icons-png.flaticon.com/512/3050/3050031.png"
-                else -> ""
-            }
         }
     }
 
