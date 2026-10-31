@@ -23,6 +23,7 @@
 <LinearLayout android:id="@+id/panePlayer" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:visibility="gone">
 <androidx.appcompat.widget.SwitchCompat android:id="@+id/swAuto" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_row" android:focusable="true" android:padding="16dp" android:text="@string/set_auto" android:textColor="#FFFFFF" android:textSize="16sp" />
 <androidx.appcompat.widget.SwitchCompat android:id="@+id/swFill" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:background="@drawable/bg_row" android:focusable="true" android:padding="16dp" android:text="@string/set_fill" android:textColor="#FFFFFF" android:textSize="16sp" />
+<androidx.appcompat.widget.SwitchCompat android:id="@+id/swNext" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:background="@drawable/bg_row" android:focusable="true" android:padding="16dp" android:text="@string/set_next" android:textColor="#FFFFFF" android:textSize="16sp" />
 </LinearLayout>
 </FrameLayout>
 </LinearLayout>
