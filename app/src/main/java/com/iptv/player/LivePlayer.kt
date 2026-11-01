@@ -24,11 +24,11 @@ fun releasePlayer(a: LiveActivity) { a.b.playerView.player = null; a.player?.rel
 fun startUrl(a: LiveActivity, u: String) { a.url = u; a.b.progress.visibility = View.VISIBLE; a.player?.let { it.setMediaItem(MediaItem.fromUri(u)); it.prepare(); it.playWhenReady = true } }
 fun playStream(a: LiveActivity, s: LiveStream) {
     a.current = s; a.altTried = false; a.retries = 0; a.prefs.edit().putInt("LAST_LIVE_ID", s.streamId).apply(); a.chAdapter.select(s.streamId.toString()); loadEpg(a, s)
-    startUrl(a, a.vm.buildStreamUrl(s.streamId, "ts"))
+    startUrl(a, a.vm.buildStreamUrl(s.streamId, liveExt(a.vm.getCredentials()?.host ?: "")))
 }
 fun onPlayError(a: LiveActivity) {
     val s = a.current ?: return; val c = a.vm.getCredentials() ?: return
-    if (!a.altTried) { a.altTried = true; startUrl(a, "${c.host.trimEnd('/')}/${c.username}/${c.password}/${s.streamId}.ts"); return }
-    if (a.retries < 3) { a.retries++; a.handler.postDelayed({ if (a.current?.streamId == s.streamId) startUrl(a, a.vm.buildStreamUrl(s.streamId, "ts")) }, 2000L * a.retries); return }
+    if (!a.altTried) { a.altTried = true; startUrl(a, "${c.host.trimEnd('/')}/${c.username}/${c.password}/${s.streamId}.${liveExt(c.host)}"); return }
+    if (a.retries < 3) { a.retries++; a.handler.postDelayed({ if (a.current?.streamId == s.streamId) startUrl(a, a.vm.buildStreamUrl(s.streamId, liveExt(a.vm.getCredentials()?.host ?: ""))) }, 2000L * a.retries); return }
     a.b.progress.visibility = View.GONE; Toast.makeText(a, a.getString(R.string.play_channel_fail), Toast.LENGTH_SHORT).show()
 }
