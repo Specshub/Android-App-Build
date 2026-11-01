@@ -15,7 +15,7 @@ fun playFav(a: FavoritesActivity, id: String) {
     val n = id.drop(1).toIntOrNull() ?: return
     when (id[0]) {
         'L' -> { val s = FavoritesManager.getFavorites(a).firstOrNull { it.streamId == n } ?: return
-            a.startActivity(Intent(a, PlayerActivity::class.java).putExtra(PlayerActivity.EXTRA_STREAM_TITLE, nm(s.name)).putExtra(PlayerActivity.EXTRA_STREAM_URL, "${c.host.trimEnd('/')}/live/${c.username}/${c.password}/${s.streamId}.ts")) }
+            a.startActivity(Intent(a, PlayerActivity::class.java).putExtra(PlayerActivity.EXTRA_STREAM_TITLE, nm(s.name)).putExtra(PlayerActivity.EXTRA_STREAM_URL, "${c.host.trimEnd('/')}/live/${c.username}/${c.password}/${s.streamId}.${liveExt(c.host)}")) }
         'M' -> { val v = FavoritesManager.getVodFavorites(a).firstOrNull { it.streamId == n } ?: return; openMovie(a, c, n, nm(v.name), v.streamIcon, v.containerExtension) }
         else -> { val s = FavoritesManager.getSeriesFavorites(a).firstOrNull { it.seriesId == n } ?: return; openSeries(a, c, n, nm(s.name), s.cover) }
     }
