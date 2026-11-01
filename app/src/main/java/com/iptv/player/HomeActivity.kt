@@ -8,12 +8,13 @@ import com.iptv.player.data.model.LoginCredentials
 import com.iptv.player.databinding.ActivityHomeBinding
 
 class HomeActivity : AppCompatActivity() {
-    private var tv: TextView? = null; private var refreshCont: (() -> Unit)? = null
+    private var tv: TextView? = null; private var refreshCont: (() -> Unit)? = null; private var empty = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (intent.getBooleanExtra("EXTRA_EMPTY", false)) {
+            empty = true
             val e = ActivityHomeBinding.inflate(layoutInflater); setContentView(e.root)
-            e.tvExpiry.text = getString(R.string.empty_banner); setupHomeButtons(this, e.buttonsContainer, LoginCredentials("", "", "")); return
+            e.tvExpiry.text = getString(R.string.empty_banner); val dc = demoCreds(); setupHomeButtons(this, e.buttonsContainer, dc, demo = true); setupHomeRows(this, e, dc); return
         }
         val p = getSharedPreferences("IPTV_PREFS", Context.MODE_PRIVATE)
         val host = intent.getStringExtra(EXTRA_HOST) ?: p.getString("HOST", null)
@@ -27,5 +28,5 @@ class HomeActivity : AppCompatActivity() {
         setupHomeRows(this, b, creds); refreshCont = setupContinue(this, b)
         refreshSub(creds) { tv?.text = subLabel(this).ifEmpty { savedLabel(this) } }
     }
-    override fun onResume() { super.onResume(); refreshCont?.invoke(); resyncDevice { } }
+    override fun onResume() { super.onResume(); refreshCont?.invoke(); if (!empty) resyncDevice { } }
 }
