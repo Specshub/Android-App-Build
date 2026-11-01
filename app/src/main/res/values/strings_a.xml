@@ -2,7 +2,7 @@
 <resources>
     <string name="status_connect_fail">Could not reach the server</string>
     <string name="status_waiting">Waiting for activation...</string>
-    <string name="status_expired">Activation has ended. Visit tajplayer.com to manage your device</string>
+    <string name="status_expired">Activation has ended. Please contact support</string>
     <string name="status_banned">This device is suspended</string>
     <string name="status_pending">Add your playlist on the website to start</string>
     <string name="sec_series">Series</string>
@@ -12,10 +12,10 @@
     <string name="episode_n">Episode %1$d: %2$s</string>
     <string name="cancel">Cancel</string>
     <string name="list_load_fail">Could not load the list</string>
-    <string name="exp_until">Subscription ends: %s</string>
+    <string name="exp_until">Activation ends: %s</string>
     <string name="exp_trial">Free trial ends: %s</string>
-    <string name="exp_lifetime">Lifetime subscription</string>
-    <string name="exp_ends">Subscription ends: %s</string>
+    <string name="exp_lifetime">Lifetime activation</string>
+    <string name="exp_ends">Activation ends: %s</string>
     <string name="nav_live">Channels</string>
     <string name="nav_movies">Movies</string>
     <string name="nav_series">Series</string>
