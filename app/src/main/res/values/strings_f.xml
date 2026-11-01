@@ -2,7 +2,7 @@
 <resources>
     <string name="lists_sub">Choose the list you want to use</string>
     <string name="act_ok">OK</string>
-    <string name="empty_banner">No content yet. Activate your device on the website</string>
+    <string name="empty_banner">No subscription yet. This is a demo, add your playlist on the website to see your own content</string>
     <string name="no_content">Add a playlist from the website to see content</string>
     <string name="md_play">Play</string>
     <string name="md_back">Back</string>
