@@ -2,7 +2,7 @@
 <resources>
     <string name="lists_sub">اختر القائمة التي تريد استخدامها</string>
     <string name="act_ok">موافق</string>
-    <string name="empty_banner">لا يوجد محتوى بعد. فعّل جهازك من الموقع</string>
+    <string name="empty_banner">لا يوجد اشتراك بعد. هذه نسخة تجريبية، أضف قائمتك من الموقع لعرض محتواك</string>
     <string name="no_content">أضف قائمة من الموقع لعرض المحتوى</string>
     <string name="md_play">تشغيل</string>
     <string name="md_back">رجوع</string>
