@@ -14,7 +14,8 @@ class ActivationActivity : AppCompatActivity() {
     private lateinit var b: ActivityActivationBinding; private lateinit var mac: String; private lateinit var key: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val sp = ipPrefs(this); if (sp.getBoolean("MANUAL", false) && !sp.getString("HOST", null).isNullOrEmpty()) { startActivity(Intent(this, HomeActivity::class.java)); finish(); return }
+        // activation is mandatory: clear any list that was added manually by an older version
+        val sp = ipPrefs(this); if (sp.getBoolean("MANUAL", false)) sp.edit().remove("MANUAL").remove("HOST").remove("USER").remove("PASS").remove("PLS").remove("SELK").apply()
         b = ActivityActivationBinding.inflate(layoutInflater); setContentView(b.root)
         mac = DeviceManager.getMac(this); key = DeviceManager.getKey(this)
         b.tvAppName.text = Constants.APP_NAME.uppercase(); b.tvSite.text = Constants.ACTIVATION_PAGE
