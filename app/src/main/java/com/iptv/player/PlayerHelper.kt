@@ -3,6 +3,7 @@ import android.view.View
 import androidx.media3.common.*
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
+import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 
@@ -12,7 +13,8 @@ fun initializePlayer(a: PlayerActivity) {
     if (a.streamUrl.isEmpty()) { showError(a, a.getString(R.string.link_missing)); return }
     val ds = DefaultHttpDataSource.Factory().setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36").setAllowCrossProtocolRedirects(true).setConnectTimeoutMs(15000).setReadTimeoutMs(20000)
     val lc = DefaultLoadControl.Builder().setBufferDurationsMs(30000, 120000, 1500, 3000).build()
-    val exo = ExoPlayer.Builder(a).setLoadControl(lc).setMediaSourceFactory(DefaultMediaSourceFactory(ds)).build()
+    val rf = DefaultRenderersFactory(a).setEnableDecoderFallback(true)
+    val exo = ExoPlayer.Builder(a, rf).setLoadControl(lc).setMediaSourceFactory(DefaultMediaSourceFactory(ds)).build()
     a.player = exo; a.binding.playerView.player = exo
     exo.setMediaItem(MediaItem.fromUri(a.streamUrl))
     val pos = a.intent.getLongExtra("START_POS", 0L).takeIf { it > 0 } ?: a.prefs.getLong(posKey(a), 0L); if (pos > 0) exo.seekTo(pos)
