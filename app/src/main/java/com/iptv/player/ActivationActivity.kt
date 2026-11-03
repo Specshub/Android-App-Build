@@ -17,7 +17,7 @@ class ActivationActivity : AppCompatActivity() {
         val sp = ipPrefs(this); if (sp.getBoolean("MANUAL", false) && !sp.getString("HOST", null).isNullOrEmpty()) { startActivity(Intent(this, HomeActivity::class.java)); finish(); return }
         b = ActivityActivationBinding.inflate(layoutInflater); setContentView(b.root)
         mac = DeviceManager.getMac(this); key = DeviceManager.getKey(this)
-        b.tvAppName.text = Constants.APP_NAME.uppercase(); b.tvSite.text = Constants.ACTIVATION_SITE
+        b.tvAppName.text = Constants.APP_NAME.uppercase(); b.tvSite.text = Constants.ACTIVATION_PAGE
         b.tvMac.text = mac; b.tvKey.text = key
         showQr(Constants.ACTIVATION_SITE + "/login.php?mac=" + mac + "#k=" + key)
         findViewById<LinearLayout>(R.id.demoHolder)?.let { h -> h.removeAllViews(); val ok = layoutInflater.inflate(R.layout.item_ok_btn, h, false); ok.setOnClickListener { startActivity(Intent(this, HomeActivity::class.java).putExtra("EXTRA_EMPTY", true)) }; h.addView(ok); h.addView(privacyLinkView(this)) }
